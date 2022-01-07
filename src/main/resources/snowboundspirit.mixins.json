@@ -1,0 +1,16 @@
+
+{
+  "minVersion": "0.8",
+  "required": true,
+  "compatibilityLevel": "JAVA_16",
+  "refmap": "selene.refmap.json",
+  "package": "net.mehvahdjukaar.snowboundspirit.mixins",
+  "mixins": [
+    "PowderSnowMixin"
+  ],
+  "client": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
