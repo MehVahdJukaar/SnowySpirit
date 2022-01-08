@@ -1,12 +1,24 @@
-package net.mehvahdjukaar.snowyspirit.events;
+package net.mehvahdjukaar.snowyspirit.common.events;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.mehvahdjukaar.snowyspirit.Christmas;
+import net.mehvahdjukaar.snowyspirit.common.capabilities.CapabilityHandler;
+import net.mehvahdjukaar.snowyspirit.common.capabilities.wreath_cap.IWreathProvider;
 import net.mehvahdjukaar.snowyspirit.common.IInputListener;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.Input;
+import net.minecraft.client.renderer.LevelRenderer;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.MovementInputUpdateEvent;
+import net.minecraftforge.client.event.RenderLevelLastEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -14,10 +26,10 @@ import net.minecraftforge.fml.common.Mod;
 @Mod.EventBusSubscriber(modid = Christmas.MOD_ID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class ClientEvents {
 
-    /*
+
     @SuppressWarnings("ConstantConditions")
     @SubscribeEvent
-    public static void renderEngravedBlocksOverlay(RenderLevelLastEvent event) {
+    public static void renderWreaths(RenderLevelLastEvent event) {
         Minecraft mc = Minecraft.getInstance();
         Level level = mc.player.level;
         PoseStack poseStack = event.getPoseStack();
@@ -36,6 +48,10 @@ public class ClientEvents {
                     RenderSystem.enableDepthTest();
                     poseStack.translate(-cameraPos.x(), -cameraPos.y(), -cameraPos.z());
                     poseStack.translate(pos.getX(), pos.getY(), pos.getZ());
+                    MultiBufferSource.BufferSource bufferSource = mc.renderBuffers().bufferSource();
+                    int pPackedLight = LevelRenderer.getLightColor(level, pos);
+                    mc.getBlockRenderer()
+                            .renderSingleBlock(Blocks.RED_CARPET.defaultBlockState(), poseStack, bufferSource, pPackedLight, OverlayTexture.NO_OVERLAY);
 
                     //render stuff
 
@@ -45,7 +61,7 @@ public class ClientEvents {
             }
         }
     }
-*/
+
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void onInputUpdate(MovementInputUpdateEvent event) {

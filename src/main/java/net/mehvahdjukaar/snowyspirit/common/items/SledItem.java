@@ -1,6 +1,6 @@
-package net.mehvahdjukaar.snowyspirit.items;
+package net.mehvahdjukaar.snowyspirit.common.items;
 
-import net.mehvahdjukaar.snowyspirit.entity.SledEntity;
+import net.mehvahdjukaar.snowyspirit.common.entity.SledEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;

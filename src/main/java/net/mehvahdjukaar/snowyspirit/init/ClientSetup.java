@@ -41,6 +41,7 @@ public class ClientSetup {
     @SubscribeEvent
     public static void init(final FMLClientSetupEvent event) {
         ItemBlockRenderTypes.setRenderLayer(ModRegistry.GINGER_CROP.get(), RenderType.cutout());
+        ItemBlockRenderTypes.setRenderLayer(ModRegistry.WREATH.get(), RenderType.cutout());
         for(var v : ModRegistry.GUMDROPS_BUTTON.values()){
             ItemBlockRenderTypes.setRenderLayer(v.get(), RenderType.translucent());
         }

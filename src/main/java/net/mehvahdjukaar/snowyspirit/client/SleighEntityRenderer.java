@@ -5,10 +5,9 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Matrix3f;
 import com.mojang.math.Matrix4f;
-import com.mojang.math.Quaternion;
 import com.mojang.math.Vector3f;
 import net.mehvahdjukaar.snowyspirit.Christmas;
-import net.mehvahdjukaar.snowyspirit.entity.SledEntity;
+import net.mehvahdjukaar.snowyspirit.common.entity.SledEntity;
 import net.mehvahdjukaar.snowyspirit.init.ClientSetup;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.Model;
@@ -128,7 +127,7 @@ public class SleighEntityRenderer extends EntityRenderer<SledEntity> {
         pBuffer.vertex(matrix4f, 0.0F, eye + 0.25f, 0.0F)
                 .color(255, 0, 255, 255)
                 .normal(matrix3f, (float) 0, (float) 1, (float) 0).endVertex();
-        pBuffer.vertex(matrix4f, (float) 0, (float) ((double) eye + 0.25f + pEntity.maxUpStep), (float) 0)
+        pBuffer.vertex(matrix4f, (float) 0, (float) ((double) eye + 0.25f + pEntity.misalignedFriction), (float) 0)
                 .color(255, 0, 255, 255)
                 .normal(matrix3f, (float) 0, (float) 1, (float) 0).endVertex();
 

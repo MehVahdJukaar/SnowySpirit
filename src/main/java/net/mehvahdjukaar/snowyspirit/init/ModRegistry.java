@@ -4,10 +4,12 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableMap;
 import net.mehvahdjukaar.snowyspirit.Christmas;
-import net.mehvahdjukaar.snowyspirit.block.GingerBlock;
-import net.mehvahdjukaar.snowyspirit.block.GumdropButton;
-import net.mehvahdjukaar.snowyspirit.entity.SledEntity;
-import net.mehvahdjukaar.snowyspirit.items.SledItem;
+import net.mehvahdjukaar.snowyspirit.common.block.GingerBlock;
+import net.mehvahdjukaar.snowyspirit.common.block.GumdropButton;
+import net.mehvahdjukaar.snowyspirit.common.block.WreathBlock;
+import net.mehvahdjukaar.snowyspirit.common.entity.SledEntity;
+import net.mehvahdjukaar.snowyspirit.common.items.SledItem;
+import net.mehvahdjukaar.snowyspirit.common.items.WreathItem;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
@@ -17,10 +19,7 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.CarrotBlock;
-import net.minecraft.world.level.block.RotatedPillarBlock;
-import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.Material;
@@ -92,6 +91,15 @@ public class ModRegistry {
             new Block(BlockBehaviour.Properties.copy(GINGERBREAD_BLOCK.get())));
     public static final RegistryObject<Item> GINGERBREAD_FROSTED_BLOCK_ITEM = regBlockItem(GINGERBREAD_FROSTED_BLOCK, CreativeModeTab.TAB_BUILDING_BLOCKS);
 
+    public static final RegistryObject<Block> GINGERBREAD_DOOR = BLOCKS.register("gingerbread_door", ()->
+            new DoorBlock(BlockBehaviour.Properties.copy(GINGERBREAD_BLOCK.get())));
+    public static final RegistryObject<Item> GINGERBREAD_DOOR_ITEM = regBlockItem(GINGERBREAD_DOOR, CreativeModeTab.TAB_REDSTONE);
+
+    public static final RegistryObject<Block> GINGERBREAD_TRAPDOOR = BLOCKS.register("gingerbread_trapdoor", ()->
+            new TrapDoorBlock(BlockBehaviour.Properties.copy(GINGERBREAD_BLOCK.get())));
+    public static final RegistryObject<Item> GINGERBREAD_TRAPDOOR_ITEM = regBlockItem(GINGERBREAD_TRAPDOOR, CreativeModeTab.TAB_REDSTONE);
+
+
     public static final RegistryObject<Block> GINGER_CROP = BLOCKS.register("ginger", ()->
             new GingerBlock(BlockBehaviour.Properties.of(Material.PLANT).noCollission().randomTicks().instabreak().sound(SoundType.CROP)));
     public static final RegistryObject<Item> GINGER_FLOWER = regItem("ginger_flower",
@@ -104,5 +112,12 @@ public class ModRegistry {
 
     public static final Map<DyeColor, RegistryObject<Item>> GUMDROPS_BUTTON_ITEMS = Stream.of(DyeColor.values()).collect(ImmutableMap.toImmutableMap((e) -> e,
             (t) -> regBlockItem(GUMDROPS_BUTTON.get(t),CreativeModeTab.TAB_DECORATIONS)));
+
+
+    public static final RegistryObject<Block> WREATH = BLOCKS.register("wreath", ()->
+            new WreathBlock(BlockBehaviour.Properties.of(Material.PLANT, MaterialColor.COLOR_GREEN)
+                    .sound(SoundType.VINE).strength(0.25f).noCollission().noCollission()));
+    public static final RegistryObject<Item> WREATH_ITEM = regItem("wreath",
+            ()-> new WreathItem(WREATH.get(),new Item.Properties().tab(CreativeModeTab.TAB_FOOD)));
 
 }

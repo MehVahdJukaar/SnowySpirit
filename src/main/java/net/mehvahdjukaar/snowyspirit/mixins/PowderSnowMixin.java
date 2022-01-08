@@ -1,6 +1,6 @@
 package net.mehvahdjukaar.snowyspirit.mixins;
 
-import net.mehvahdjukaar.snowyspirit.entity.SledEntity;
+import net.mehvahdjukaar.snowyspirit.common.entity.SledEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.PowderSnowBlock;

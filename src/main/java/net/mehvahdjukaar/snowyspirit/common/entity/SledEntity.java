@@ -1,4 +1,4 @@
-package net.mehvahdjukaar.snowyspirit.entity;
+package net.mehvahdjukaar.snowyspirit.common.entity;
 
 import com.google.common.collect.Lists;
 import net.mehvahdjukaar.snowyspirit.common.IInputListener;
@@ -23,14 +23,12 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.animal.WaterAnimal;
-import net.minecraft.world.entity.animal.horse.Llama;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.vehicle.Boat;
 import net.minecraft.world.entity.vehicle.DismountHelper;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.SnowLayerBlock;
@@ -236,6 +234,7 @@ public class SledEntity extends Entity implements IInputListener {
     public Vec3 prevProjectedPos = Vec3.ZERO;
     public Vec3 prevDeltaMovement = Vec3.ZERO;
     public boolean boost = false;
+    public double misalignedFriction = 1;
 
     @Override
     public void move(MoverType pType, Vec3 pPos) {
@@ -480,11 +479,11 @@ public class SledEntity extends Entity implements IInputListener {
                                 BlockState blockstate = this.level.getBlockState(mutable);
                                 if (blockstate.is(BlockTags.SNOW)) {
                                     onSnow = true;
-                                    f += 0.975F;
+                                    f += 0.985F;
                                     ++k1;
                                 } else if (this.level.getBlockState(mutable.above()).getBlock() instanceof SnowLayerBlock) {
                                     onSnowLayer = true;
-                                    f += 0.975F;
+                                    f += 0.985F;
                                     ++k1;
                                 } else if (!(blockstate.getBlock() instanceof WaterlilyBlock) && Shapes.joinIsNotEmpty(blockstate.getCollisionShape(this.level, mutable).move(l1, k2, i2), voxelshape, BooleanOp.AND)) {
                                     //decreases friction for blocks and ice in particular
@@ -509,7 +508,7 @@ public class SledEntity extends Entity implements IInputListener {
                 friction += 0.06 * slopeFriction;
             }
 
-            this.landFriction = Math.min(0.999f, friction);
+            this.landFriction = Math.min(0.9995f, friction);
             if (onSnowLayer) return Status.ON_SNOW_LAYER;
             if (onSnow) return Status.ON_SNOW;
             return Status.ON_LAND;
@@ -534,8 +533,24 @@ public class SledEntity extends Entity implements IInputListener {
         }
 
 
-        Vec3 vec3 = this.getDeltaMovement();
-        this.setDeltaMovement(vec3.x * (double) invFriction, vec3.y + gravity, vec3.z * (double) invFriction);
+        Vec3 movement = this.getDeltaMovement();
+
+        //alters friction when not facing the right way. allows braking
+        if(this.status.touchingGround()) {
+            //max friction decrement cause by misaligned speed vector
+            double inc = 0.825;
+            if(this.inputUp || this.inputDown || movement.lengthSqr()>0.001) {
+                Vec3 v = new Vec3(0, 0, 1);
+                v = v.yRot((float) ((-this.getYRot()) / 180 * Math.PI));
+
+                double dot = v.dot(new Vec3(movement.x, 0, movement.z).normalize());
+                inc = Mth.clamp(((dot+3)/4f)+0.005, inc, 1);
+            }
+            this.misalignedFriction =  (inc*4 -3);
+            invFriction *= inc;
+        }
+
+        this.setDeltaMovement(movement.x * (double) invFriction, movement.y + gravity, movement.z * (double) invFriction);
         //rotation friction
         //increase friction when steering
         this.deltaRotation *= Math.min(invFriction, (this.inputUp ? 0.7 : 0.9));
@@ -557,7 +572,7 @@ public class SledEntity extends Entity implements IInputListener {
 
                     double dot = v.dot(movement.normalize());
                     if (dot > 0) {
-                        this.setDeltaMovement(movement.yRot((float) (dot * 0.04)));
+                        this.setDeltaMovement(movement.yRot((float) (dot * 0.041)));
                     }
                 }
             }
@@ -571,7 +586,7 @@ public class SledEntity extends Entity implements IInputListener {
 
                     double dot = v.dot(movement.normalize());
                     if (dot > 0.8) {
-                        this.setDeltaMovement(movement.yRot((float) (-dot * 0.04)));
+                        this.setDeltaMovement(movement.yRot((float) (-dot * 0.041)));
                     }
                 }
             }
@@ -582,7 +597,7 @@ public class SledEntity extends Entity implements IInputListener {
 
             this.setYRot(this.getYRot() + this.deltaRotation);
             if (this.inputUp) {
-                if(this.status.onSnow()) powah += 0.015f;//0.04F;
+                if(this.status.onSnow()) powah += 0.017f;//0.04F;
                 else powah += 0.04F;
             }
 
@@ -639,12 +654,12 @@ public class SledEntity extends Entity implements IInputListener {
                         return;
                     }
 
-                    this.causeFallDamage(this.fallDistance, 1.0F, DamageSource.FALL);
+                    //this.causeFallDamage(this.fallDistance, 1.0F, DamageSource.FALL);
                 }
 
                 this.resetFallDistance();
             } else if (!this.level.getFluidState(this.blockPosition().below()).is(FluidTags.WATER) && p_38307_ < 0.0D) {
-                this.fallDistance = (float) ((double) this.fallDistance - p_38307_);
+                //this.fallDistance = (float) ((double) this.fallDistance - p_38307_);
             }
 
         }
@@ -791,6 +806,7 @@ public class SledEntity extends Entity implements IInputListener {
     @Override
     public void dismountTo(double pX, double pY, double pZ) {
         this.additionalY = 0;
+        this.projectedPos = Vec3.ZERO;
         super.dismountTo(pX, pY, pZ);
     }
 

@@ -2,6 +2,7 @@ package net.mehvahdjukaar.snowyspirit;
 
 
 import net.mehvahdjukaar.snowyspirit.init.ModRegistry;
+import net.mehvahdjukaar.snowyspirit.init.ModSetup;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
@@ -28,10 +29,10 @@ public class Christmas {
     private static final Logger LOGGER = LogManager.getLogger();
 
     public Christmas() {
-        int a = 6;
-        int b = 6;
+
         IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
         ModRegistry.init(bus);
+        bus.addListener(ModSetup::init);
         MinecraftForge.EVENT_BUS.register(this);
     }
 

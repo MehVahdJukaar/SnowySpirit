@@ -1,4 +1,4 @@
-package net.mehvahdjukaar.snowyspirit.block;
+package net.mehvahdjukaar.snowyspirit.common.block;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -9,6 +9,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.item.DyeColor;
@@ -17,7 +18,10 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
-import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.DirectionalBlock;
+import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -32,6 +36,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 public class GumdropButton extends DirectionalBlock {
 
@@ -42,7 +47,7 @@ public class GumdropButton extends DirectionalBlock {
     protected static final VoxelShape NORTH_AABB = Block.box(5.0D, 5.0D, 12.0D, 11.0D, 11.0D, 16.0D);
     protected static final VoxelShape SOUTH_AABB = Block.box(5.0D, 5.0D, 0.0D, 11.0D, 11.0D, 4.0D);
     protected static final VoxelShape WEST_AABB = Block.box(12.0D, 5.0D, 5.0D, 16.0D, 11.0D, 11.0D);
-    protected static final VoxelShape EAST_AABB = Block.box(0.0D, 5.0D, 5.0D, 2.0D, 11.0D, 11.0D);
+    protected static final VoxelShape EAST_AABB = Block.box(0.0D, 5.0D, 5.0D, 4.0D, 11.0D, 11.0D);
 
     protected static final VoxelShape PRESSED_DOWN_AABB = Block.box(5.0D, 14.0D, 5.0D, 11.0D, 16.0D, 11.0D);
     protected static final VoxelShape PRESSED_UP_AABB = Block.box(5.0D, 0.0D, 5.0D, 11.0D, 2.0D, 11.0D);
@@ -63,7 +68,11 @@ public class GumdropButton extends DirectionalBlock {
 
     @Override
     public boolean canSurvive(BlockState pState, LevelReader pLevel, BlockPos pPos) {
-        return ButtonBlock.canAttach(pLevel, pPos, pState.getValue(FACING).getOpposite());
+        Direction dir = pState.getValue(FACING).getOpposite();
+        BlockPos blockpos = pPos.relative(dir);
+        return canSupportCenter(pLevel, blockpos, dir);
+
+        //return ButtonBlock.canAttach(pLevel, pPos,);
     }
 
     @Nullable
@@ -166,7 +175,9 @@ public class GumdropButton extends DirectionalBlock {
     }
 
     private void checkPressed(BlockState pState, Level pLevel, BlockPos pPos) {
-        List<? extends Entity> list = pLevel.getEntitiesOfClass(AbstractArrow.class, pState.getShape(pLevel, pPos).bounds().move(pPos));
+        List<? extends Entity> list = pLevel.getEntitiesOfClass(Entity.class, pState.getShape(pLevel, pPos).bounds().move(pPos))
+                .stream().filter(e -> (e instanceof AbstractArrow || e instanceof LivingEntity)).collect(Collectors.toList());
+
         boolean flag = !list.isEmpty();
         boolean flag1 = pState.getValue(POWERED);
         if (flag != flag1) {
@@ -190,4 +201,27 @@ public class GumdropButton extends DirectionalBlock {
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> pBuilder) {
         pBuilder.add(FACING, POWERED);
     }
+
+/*
+    public void updateEntityAfterFallOn(BlockGetter pLevel, Entity pEntity) {
+        if (!pEntity.isSuppressingBounce()) {
+            BlockState state = pLevel.getBlockState(pEntity.blockPosition());
+            if (state.is(this) && !state.getValue(POWERED)) {
+                this.bounceUp(pEntity);
+                return;
+            }
+        }
+        super.updateEntityAfterFallOn(pLevel, pEntity);
+    }
+
+    private void bounceUp(Entity pEntity) {
+        Vec3 vec3 = pEntity.getDeltaMovement();
+        if (vec3.y < 0.0D) {
+            double d0 = pEntity instanceof LivingEntity ? 1.0D : 0.8D;
+            pEntity.setDeltaMovement(vec3.x, -vec3.y * (double) 0.5F * d0, vec3.z);
+        }
+
+    }
+    */
+
 }

@@ -1,4 +1,4 @@
-package net.mehvahdjukaar.snowyspirit.block;
+package net.mehvahdjukaar.snowyspirit.common.block;
 
 import net.mehvahdjukaar.snowyspirit.init.ModRegistry;
 import net.minecraft.core.BlockPos;
