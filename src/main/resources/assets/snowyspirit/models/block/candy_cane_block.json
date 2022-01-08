@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "particle": "snowyspirit:blocks/candy_cane_side",
+    "north": "snowyspirit:blocks/candy_cane_side",
+    "south": "snowyspirit:blocks/candy_cane_side",
+    "east": "snowyspirit:blocks/candy_cane_side",
+    "west": "snowyspirit:blocks/candy_cane_side",
+    "up": "snowyspirit:blocks/candy_cane_top",
+    "down": "snowyspirit:blocks/candy_cane_top"
+  }
+}
