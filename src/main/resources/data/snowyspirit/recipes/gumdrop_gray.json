@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {"item": "minecraft:sugar"},
+    {"tag": "forge:dyes/gray"}
+  ],
+  "result": {
+    "item": "snowyspirit:gumdrop_gray"
+  }
+}

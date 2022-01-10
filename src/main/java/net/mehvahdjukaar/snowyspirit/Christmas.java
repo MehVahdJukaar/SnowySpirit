@@ -29,7 +29,9 @@ public class Christmas {
     private static final Logger LOGGER = LogManager.getLogger();
 
     public Christmas() {
-
+        int b=2;
+        int a = 44;
+        int d = 5;
         IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
         ModRegistry.init(bus);
         bus.addListener(ModSetup::init);

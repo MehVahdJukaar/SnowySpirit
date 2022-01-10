@@ -28,7 +28,7 @@ mixin {
 }
 
 
-version = '1.18-1.0.0'
+version = '1.18-0.0.1'
 group = 'net.mehvahdjukaar.snowyspirit' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'snowyspirit'
 
@@ -109,7 +109,7 @@ dependencies {
     // that the dep is a ForgeGradle 'patcher' dependency. And it's patches will be applied.
     // The userdev artifact is a special name and will get all sorts of transformations applied to it.
 
-    minecraft 'net.minecraftforge:forge:1.18-38.0.15'
+    minecraft 'net.minecraftforge:forge:1.18.1-39.0.14'
     //minecraft 'net.minecraftforge:forge:1.16.5-36.1.0'
 
     // You may put jars on which you depend on in ./libs or you may define them like so..

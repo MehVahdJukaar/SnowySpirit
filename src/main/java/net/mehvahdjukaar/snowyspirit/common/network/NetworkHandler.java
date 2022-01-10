@@ -3,11 +3,13 @@ package net.mehvahdjukaar.snowyspirit.common.network;
 import net.mehvahdjukaar.snowyspirit.Christmas;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.Connection;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.players.PlayerList;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.network.NetworkDirection;
@@ -35,7 +37,8 @@ public class NetworkHandler {
                 PROTOCOL_VERSION::equals, PROTOCOL_VERSION::equals);
         register(ClientBoundSyncWreath.class, ClientBoundSyncWreath::buffer,
                 ClientBoundSyncWreath::new, ClientBoundSyncWreath::handler);
-
+        register(ClientBoundSyncAllWreaths.class, ClientBoundSyncAllWreaths::buffer,
+                ClientBoundSyncAllWreaths::new, ClientBoundSyncAllWreaths::handler);
 
     }
 
@@ -59,6 +62,7 @@ public class NetworkHandler {
         Minecraft.getInstance().getConnection().send(
                 INSTANCE.toVanillaPacket(message, NetworkDirection.PLAY_TO_SERVER));
     }
+
 
     public interface Message {
 

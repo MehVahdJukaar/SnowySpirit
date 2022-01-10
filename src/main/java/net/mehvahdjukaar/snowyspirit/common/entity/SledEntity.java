@@ -23,6 +23,7 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.animal.WaterAnimal;
+import net.minecraft.world.entity.animal.Wolf;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.vehicle.Boat;
 import net.minecraft.world.entity.vehicle.DismountHelper;
@@ -40,11 +41,14 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.BooleanOp;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraftforge.entity.PartEntity;
 import net.minecraftforge.network.NetworkHooks;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 
 public class SledEntity extends Entity implements IInputListener {
     private static final EntityDataAccessor<Integer> DATA_ID_HURT = SynchedEntityData.defineId(SledEntity.class, EntityDataSerializers.INT);
@@ -68,10 +72,16 @@ public class SledEntity extends Entity implements IInputListener {
     private Status status;
     private Status oldStatus;
 
+
+    private final SledTowingEntity[] subEntities;
+    private final SledTowingEntity headTow;
+
     public SledEntity(EntityType<? extends SledEntity> p_38290_, Level p_38291_) {
         super(p_38290_, p_38291_);
         this.blocksBuilding = true;
         this.maxUpStep = 1;
+        this.headTow = new SledTowingEntity(this);
+        this.subEntities = new SledTowingEntity[]{this.headTow};
     }
 
     public SledEntity(Level level, double x, double y, double z) {
@@ -95,7 +105,7 @@ public class SledEntity extends Entity implements IInputListener {
     @Override
     protected void addAdditionalSaveData(CompoundTag tag) {
         tag.putString("Type", this.getWoodType().getName());
-        if(this.getSeatType() != null) {
+        if (this.getSeatType() != null) {
             tag.putInt("Seat", this.getSeatType().getId());
         }
     }
@@ -161,8 +171,8 @@ public class SledEntity extends Entity implements IInputListener {
                 if (!isCreative && this.level.getGameRules().getBoolean(GameRules.RULE_DOENTITYDROPS)) {
                     this.spawnAtLocation(this.getDropItem());
                     DyeColor seat = this.getSeatType();
-                    if(seat != null){
-                       this.spawnAtLocation(ModRegistry.CARPETS.get(seat));
+                    if (seat != null) {
+                        this.spawnAtLocation(ModRegistry.CARPETS.get(seat));
                     }
                 }
                 this.discard();
@@ -234,18 +244,47 @@ public class SledEntity extends Entity implements IInputListener {
     public Vec3 prevProjectedPos = Vec3.ZERO;
     public Vec3 prevDeltaMovement = Vec3.ZERO;
     public boolean boost = false;
-    public double misalignedFriction = 1;
+    //how much movement direction is misaligned from sled direction. determines actual fcition
+    public double misalignedFrictionFactor = 1;
 
+    public Vec3 pullerPos = Vec3.ZERO;
+    public Vec3 prevPullerPos = Vec3.ZERO;
+    public AABB pullerAABB = new AABB(0.0D, 0.0D, 0.0D, 0.0D, 0.0D, 0.0D);
+    private EntityDimensions pullerDimensions = new EntityDimensions(1, 2.1f, false);
+
+    //test
+
+    private AABB resetPullerAABB() {
+        return this.pullerDimensions.makeBoundingBox(this.position());
+    }
+
+    //end test
     @Override
-    public void move(MoverType pType, Vec3 pPos) {
-        super.move(pType, pPos);
+    public void move(MoverType pType, Vec3 wantedPosIncrement) {
+
+        //this is a mess. hacks everywhere
+        this.prevPullerPos = this.pullerPos;
+
+        this.maxUpStep = 2;
+        this.pullerAABB = this.pullerDimensions.makeBoundingBox(this.position().add(0, 0, 0));
+
+        this.pullerPos = this.calculateSlopePosition(wantedPosIncrement.add(this.getLookAngle().scale(2)), this.pullerAABB,
+                this::resetPullerAABB, -2);
+        this.maxUpStep = 1;
+
+        this.pullerPos = this.pullerPos.add(0, 0, 0);
+
+        super.move(pType, wantedPosIncrement);
+
+        this.pullerAABB = this.pullerDimensions.makeBoundingBox(this.position().add(this.pullerPos));
+
         this.prevProjectedPos = this.projectedPos;
         this.projectedPos = Vec3.ZERO;
 
         //considered on ground even when in air but with block below
         if (!this.onGround) {
             float belowCheck = -1.25f;
-            Vec3 blockBelow = this.findNextPos(new Vec3(0, belowCheck, 0));
+            Vec3 blockBelow = this.calculateSlopePosition(new Vec3(0, belowCheck, 0), this.getBoundingBox(), this::makeBoundingBox, -1);
             if (blockBelow.y > belowCheck + 0.01) {
                 this.onGround = true;
             }
@@ -253,8 +292,8 @@ public class SledEntity extends Entity implements IInputListener {
 
         if (this.onGround) {
 
-            //this.projectedPos = this.findNextPos(this.getLookAngle().scale(this.getDeltaMovement().length()).scale(6));
-            this.projectedPos = this.findNextPos(this.getDeltaMovement().scale(6));
+            //this.projectedPos = this.calculateSlopePosition(this.getLookAngle().scale(this.getDeltaMovement().length()).scale(6));
+            this.projectedPos = this.calculateSlopePosition(this.getDeltaMovement().scale(6), this.getBoundingBox(), this::makeBoundingBox, -1);
             double y = Mth.clamp(this.projectedPos.y, -1, 1);
             if (y == 0) {
                 //reset
@@ -285,8 +324,17 @@ public class SledEntity extends Entity implements IInputListener {
         }
     }
 
+    //modified collide method to take into account puller AABB
+
+
     @Override
     public void tick() {
+
+
+        this.getPassengers().forEach(e -> e.setInvulnerable(true));
+        //headTow.setOldPosAndRot();
+        //headTow.setPos(this.getX(), this.getY(), this.getZ()+1);
+
         this.oldStatus = this.status;
         this.status = this.getStatusAndUpdateFriction();
 
@@ -345,7 +393,7 @@ public class SledEntity extends Entity implements IInputListener {
             double k = Mth.clamp(this.projectedPos.y, -1, 1);
             if (k > 0) {
                 //decelerate uphill
-                this.setDeltaMovement(movement.scale(1 + -0.05 * k));
+                //this.setDeltaMovement(movement.scale(1 + -0.05 * k));
             } else {
                 //boost downhill
                 this.boost = true;
@@ -368,8 +416,14 @@ public class SledEntity extends Entity implements IInputListener {
         }
 
         this.checkInsideBlocks();
+        this.headTow.specialTick();
+        var l = this.getPassengers();
 
-        List<Entity> list = this.level.getEntities(this, this.getBoundingBox().inflate(0.2F, (double) -0.01F, (double) 0.2F), EntitySelector.pushableBy(this));
+
+        List<Entity> list = this.level.getEntities(this, this.getBoundingBox().inflate(0.2F, 0.01F, 0.2F), EntitySelector.pushableBy(this));
+        //List<Entity> list = this.level.getEntities(this, this.getBoundingBox().inflate(1F, 0F, 0F),
+        //        e->true);
+
         if (!list.isEmpty()) {
             boolean notLocalPlayerControlled = !this.level.isClientSide && !(this.getControllingPassenger() instanceof Player);
 
@@ -377,12 +431,21 @@ public class SledEntity extends Entity implements IInputListener {
                 if (!entity.hasPassenger(this)) {
                     if (notLocalPlayerControlled && this.getPassengers().size() < 2 && !entity.isPassenger() && entity.getBbWidth() < this.getBbWidth() && entity instanceof LivingEntity && !(entity instanceof WaterAnimal) && !(entity instanceof Player)) {
                         entity.startRiding(this);
+                        //TODO: remove
+
                     } else {
                         this.push(entity);
                     }
                 }
             }
         }
+
+
+    }
+
+    @Override
+    public boolean canSpawnSprintParticle() {
+        return !this.status.onSnow() && super.canSpawnSprintParticle();
     }
 
     @Override
@@ -393,12 +456,42 @@ public class SledEntity extends Entity implements IInputListener {
         return super.makeBoundingBox();
     }
 
+    @Override
+    public Vec3 collide(Vec3 pVec) {
+        AABB aabb = this.getBoundingBox();
+        List<VoxelShape> list = new ArrayList<>(this.level.getEntityCollisions(this, aabb.expandTowards(pVec)));
+
+        list.add(Shapes.create(this.pullerAABB));
+
+        Vec3 vec3 = pVec.lengthSqr() == 0.0D ? pVec : collideBoundingBox(this, pVec, aabb, this.level, list);
+        boolean flag = pVec.x != vec3.x;
+        boolean flag1 = pVec.y != vec3.y;
+        boolean flag2 = pVec.z != vec3.z;
+        boolean flag3 = this.onGround || flag1 && pVec.y < 0.0D;
+        if (this.maxUpStep > 0.0F && flag3 && (flag || flag2)) {
+            Vec3 vec31 = collideBoundingBox(this, new Vec3(pVec.x, (double) this.maxUpStep, pVec.z), aabb, this.level, list);
+            Vec3 vec32 = collideBoundingBox(this, new Vec3(0.0D, (double) this.maxUpStep, 0.0D), aabb.expandTowards(pVec.x, 0.0D, pVec.z), this.level, list);
+            if (vec32.y < (double) this.maxUpStep) {
+                Vec3 vec33 = collideBoundingBox(this, new Vec3(pVec.x, 0.0D, pVec.z), aabb.move(vec32), this.level, list).add(vec32);
+                if (vec33.horizontalDistanceSqr() > vec31.horizontalDistanceSqr()) {
+                    vec31 = vec33;
+                }
+            }
+
+            if (vec31.horizontalDistanceSqr() > vec3.horizontalDistanceSqr()) {
+                return vec31.add(collideBoundingBox(this, new Vec3(0.0D, -vec31.y + pVec.y, 0.0D), aabb.move(vec31), this.level, list));
+            }
+        }
+
+        return vec3;
+    }
+
     /**
      * Given a motion vector, return an updated vector that takes into account restrictions such as collisions (from all
      * directions) and step-up from stepHeight
      */
-    private Vec3 findNextPos(Vec3 pVec) {
-        AABB aabb = this.getBoundingBox();
+    private Vec3 calculateSlopePosition(Vec3 pVec, AABB aabb, Supplier<AABB> aabbResetter, float maxDownStep) {
+
         List<VoxelShape> list = this.level.getEntityCollisions(this, aabb.expandTowards(pVec));
         Vec3 vec3 = pVec.lengthSqr() == 0.0D ? pVec : collideBoundingBox(this, pVec, aabb, this.level, list);
         boolean changedX = pVec.x != vec3.x;
@@ -421,8 +514,11 @@ public class SledEntity extends Entity implements IInputListener {
         }
         //hack to get down pos
         Vec3 cached = this.position();
-        this.setPos(cached.add(vec3));
-        Vec3 down = collideBoundingBox(this, new Vec3(0, -1, 0), this.getBoundingBox(), this.level, list);
+        Vec3 newPos = cached.add(vec3);
+        this.setPosRaw(newPos.x, newPos.y, newPos.z);
+        AABB aa = aabbResetter.get();
+        this.setBoundingBox(aa);
+        Vec3 down = collideBoundingBox(this, new Vec3(0, maxDownStep, 0), aa, this.level, list); //getAABB
         this.setPos(cached);
         return vec3.add(down);
     }
@@ -488,7 +584,7 @@ public class SledEntity extends Entity implements IInputListener {
                                 } else if (!(blockstate.getBlock() instanceof WaterlilyBlock) && Shapes.joinIsNotEmpty(blockstate.getCollisionShape(this.level, mutable).move(l1, k2, i2), voxelshape, BooleanOp.AND)) {
                                     //decreases friction for blocks and ice in particular
                                     float fr = blockstate.getFriction(this.level, mutable, this);
-                                    if(fr>0.9)fr*=0.97;
+                                    if (fr > 0.9) fr *= 0.97;
                                     f += fr;
                                     ++k1;
                                 }
@@ -536,17 +632,17 @@ public class SledEntity extends Entity implements IInputListener {
         Vec3 movement = this.getDeltaMovement();
 
         //alters friction when not facing the right way. allows braking
-        if(this.status.touchingGround()) {
+        if (this.status.touchingGround()) {
             //max friction decrement cause by misaligned speed vector
             double inc = 0.825;
-            if(this.inputUp || this.inputDown || movement.lengthSqr()>0.001) {
+            if (this.inputUp || this.inputDown || movement.lengthSqr() > 0.001) {
                 Vec3 v = new Vec3(0, 0, 1);
                 v = v.yRot((float) ((-this.getYRot()) / 180 * Math.PI));
 
                 double dot = v.dot(new Vec3(movement.x, 0, movement.z).normalize());
-                inc = Mth.clamp(((dot+3)/4f)+0.005, inc, 1);
+                inc = Mth.clamp(((dot + 3) / 4f) + 0.005, inc, 1);
             }
-            this.misalignedFriction =  (inc*4 -3);
+            this.misalignedFrictionFactor = (inc * 4 - 3);
             invFriction *= inc;
         }
 
@@ -566,7 +662,7 @@ public class SledEntity extends Entity implements IInputListener {
             if (this.inputLeft) {
                 --this.deltaRotation;
                 //crappy steering
-                if(this.status.touchingGround() && canSteer) {
+                if (this.status.touchingGround() && canSteer) {
                     Vec3 v = new Vec3(0, 0, 1);
                     v = v.yRot((float) ((-this.getYRot()) / 180 * Math.PI));
 
@@ -580,7 +676,7 @@ public class SledEntity extends Entity implements IInputListener {
             if (this.inputRight) {
                 ++this.deltaRotation;
                 //steering
-                if(this.status.touchingGround() && canSteer) {
+                if (this.status.touchingGround() && canSteer) {
                     Vec3 v = new Vec3(0, 0, 1);
                     v = v.yRot((float) ((-this.getYRot()) / 180 * Math.PI));
 
@@ -597,7 +693,7 @@ public class SledEntity extends Entity implements IInputListener {
 
             this.setYRot(this.getYRot() + this.deltaRotation);
             if (this.inputUp) {
-                if(this.status.onSnow()) powah += 0.017f;//0.04F;
+                if (this.status.onSnow()) powah += 0.017f;//0.04F;
                 else powah += 0.04F;
             }
 
@@ -607,9 +703,9 @@ public class SledEntity extends Entity implements IInputListener {
 
 
             this.setDeltaMovement(this.getDeltaMovement().add(
-                        Mth.sin(-this.getYRot() * ((float) Math.PI / 180F)) * powah,
-                        0.0D,
-                        Mth.cos(this.getYRot() * ((float) Math.PI / 180F)) * powah));
+                    Mth.sin(-this.getYRot() * ((float) Math.PI / 180F)) * powah,
+                    0.0D,
+                    Mth.cos(this.getYRot() * ((float) Math.PI / 180F)) * powah));
 
         }
     }
@@ -624,14 +720,14 @@ public class SledEntity extends Entity implements IInputListener {
     }
 
     @Override
-    protected void checkFallDamage(double p_38307_, boolean pOnGround, BlockState p_38309_, BlockPos p_38310_) {
+    protected void checkFallDamage(double pY, boolean pOnGround, BlockState pState, BlockPos pPos) {
 
-        if (this.level.isClientSide && fallDistance > 0.7 && this.onGround) {
+        if (this.level.isClientSide && this.fallDistance > 0.5 && this.onGround) {
             if (this.status.onSnow()) {
-                float p = Mth.clamp(fallDistance * 4f, 5, 20);
+                float p = Mth.clamp(this.fallDistance * 4f, 5, 20);
                 Vec3 front = this.position().add(this.getLookAngle().scale(0.8f));
                 Vec3 mov = this.getDeltaMovement().scale(1.1);
-                float ySpeed = (float) (mov.lengthSqr() * 0.15 + fallDistance * 0.005f);
+                float ySpeed = (float) (mov.lengthSqr() * 0.06 + this.fallDistance * 0.005f);
                 for (int i = 0; i < p; i++) {
 
                     level.addParticle(ParticleTypes.SNOWFLAKE,
@@ -644,25 +740,7 @@ public class SledEntity extends Entity implements IInputListener {
                 }
             }
         }
-
-
-        if (!this.isPassenger()) {
-            if (pOnGround) {
-                if (this.fallDistance > 3.0F) {
-                    if (!this.status.touchingGround()) {
-                        this.resetFallDistance();
-                        return;
-                    }
-
-                    //this.causeFallDamage(this.fallDistance, 1.0F, DamageSource.FALL);
-                }
-
-                this.resetFallDistance();
-            } else if (!this.level.getFluidState(this.blockPosition().below()).is(FluidTags.WATER) && p_38307_ < 0.0D) {
-                //this.fallDistance = (float) ((double) this.fallDistance - p_38307_);
-            }
-
-        }
+        super.checkFallDamage(pY, pOnGround, pState, pPos);
     }
 
     public void setDamage(float p_38312_) {
@@ -720,7 +798,7 @@ public class SledEntity extends Entity implements IInputListener {
     public InteractionResult interact(Player player, InteractionHand pHand) {
         if (!player.isSecondaryUseActive()) {
             ItemStack stack = player.getItemInHand(pHand);
-            if(stack.is(ItemTags.CARPETS) && this.getSeatType() == null){
+            if (stack.is(ItemTags.CARPETS) && this.getSeatType() == null) {
                 this.playSound(SoundEvents.ARMOR_EQUIP_LEATHER, 0.5F, 1.0F);
 
                 //will crash with modded carpets. save actial item isntead. depends on implementation if we render carper or not
@@ -783,11 +861,20 @@ public class SledEntity extends Entity implements IInputListener {
                 yPos -= cos * zPos;
 
             }
-            if(entity instanceof Animal){
+
+            if (entity instanceof Animal) {
                 if (this.getPassengers().size() > 1) {
-                    zPos +=  0.2D;
+                    zPos += 0.2D;
                 }
                 yPos += 0.125;
+            }
+
+            //powder snow check here
+            if (this.getPassengers().indexOf(entity) == 1 && entity instanceof Wolf wolf) {
+                Vec3 vv = new Vec3(this.pullerPos.x, 0, this.pullerPos.z);
+                zPos = (float) vv.length();
+                yPos = (float) this.pullerPos.y;
+                if(this.wolf == null) this.wolf = wolf;
             }
 
             Vec3 vec3 = (new Vec3(zPos, 0.0D, 0.0D)).yRot(-this.getYRot() * ((float) Math.PI / 180F) - ((float) Math.PI / 2F));
@@ -797,8 +884,19 @@ public class SledEntity extends Entity implements IInputListener {
             this.clampRotation(entity);
             if (entity instanceof Animal animal && this.getPassengers().size() > 1) {
                 int yRot = entity.getId() % 2 == 0 ? 90 : 270;
-                entity.setYBodyRot(animal.yBodyRot + (float) yRot);
-                entity.setYHeadRot(entity.getYHeadRot() + (float) yRot);
+                //entity.setYBodyRot(animal.yBodyRot + (float) yRot);
+                //entity.setYHeadRot(entity.getYHeadRot() + (float) yRot);
+
+                entity.setYBodyRot(animal.yBodyRot + (float) this.deltaRotation * 10);
+                entity.setYHeadRot(animal.yBodyRot);
+            }
+
+            if (entity instanceof Wolf wolf) {
+                wolf.animationSpeed = 0;
+                wolf.animationPosition = 0;
+                wolf.animationSpeedOld = 0;
+                this.calculateEntityAnimation(wolf);
+                wolf.setInSittingPose(this.getDeltaMovement().length() < 0.001);
             }
         }
     }
@@ -842,6 +940,18 @@ public class SledEntity extends Entity implements IInputListener {
     }
 
     @Override
+    public void ejectPassengers() {
+        if(this.wolf != null)this.removeWolf();
+        super.ejectPassengers();
+    }
+
+    @Override
+    protected void removePassenger(Entity pPassenger) {
+        if(this.wolf == pPassenger) this.removeWolf();
+        super.removePassenger(pPassenger);
+    }
+
+    @Override
     public void onPassengerTurned(Entity entity) {
         this.clampRotation(entity);
     }
@@ -862,6 +972,11 @@ public class SledEntity extends Entity implements IInputListener {
         return ModRegistry.SLED_ITEMS.get(this.getWoodType()).get();
     }
 
+    //if it can prevent freezing
+    public boolean isComfy() {
+        return true;
+    }
+
     public enum Status {
         ON_SNOW,
         ON_SNOW_LAYER,
@@ -876,6 +991,55 @@ public class SledEntity extends Entity implements IInputListener {
         public boolean onSnow() {
             return this == ON_SNOW || this == ON_SNOW_LAYER;
         }
+    }
+
+    //wolf towing (god help me)
+
+    public boolean isTowingEntity(LivingEntity entity) {
+        return entity == this.wolf;
+    }
+
+    private float wolfAnimationSpeed = 0;
+    private float wolfAnimationPosition = 0;
+    @Nullable
+    private TamableAnimal wolf = null;
+
+    public void addWolf(TamableAnimal wolf){
+        this.wolf = wolf;
+    }
+
+    public boolean hasWolf(){
+        return this.wolf != null;
+    }
+
+    public void removeWolf(){
+        if(this.wolf != null){
+            this.wolf.setInSittingPose(false);
+            this.wolf.setInvulnerable(false);
+        }
+        this.wolf = null;
+    }
+
+    @Nullable
+    public Entity getWolf() {
+        return wolf;
+    }
+
+    public void calculateEntityAnimation(LivingEntity entity) {
+        entity.animationSpeedOld = wolfAnimationSpeed;
+        double d0 = entity.getX() - entity.xo;
+        double d1 = 0.0D;
+        double d2 = entity.getZ() - entity.zo;
+        float f = (float) Math.sqrt(d0 * d0 + d1 * d1 + d2 * d2) * 4.0F;
+        if (f > 1.0F) {
+            f = 1.0F;
+        }
+
+        wolfAnimationSpeed += (f - wolfAnimationSpeed) * 0.4F;
+        wolfAnimationPosition += wolfAnimationSpeed;
+
+        entity.animationSpeed = wolfAnimationSpeed;
+        entity.animationPosition = wolfAnimationPosition;
     }
 
 

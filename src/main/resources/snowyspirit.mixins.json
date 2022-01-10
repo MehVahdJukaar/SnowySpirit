@@ -6,9 +6,11 @@
   "refmap": "snowyspirit.refmap.json",
   "package": "net.mehvahdjukaar.snowyspirit.mixins",
   "mixins": [
+    "EntityMixin",
     "PowderSnowMixin"
   ],
   "client": [
+    "LivingEntityRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1
