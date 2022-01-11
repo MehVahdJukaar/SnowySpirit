@@ -27,11 +27,13 @@ import net.minecraft.world.entity.animal.Wolf;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.vehicle.Boat;
 import net.minecraft.world.entity.vehicle.DismountHelper;
+import net.minecraft.world.entity.vehicle.MinecartChest;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.ChestBlock;
 import net.minecraft.world.level.block.SnowLayerBlock;
 import net.minecraft.world.level.block.WaterlilyBlock;
 import net.minecraft.world.level.block.state.BlockState;
@@ -41,7 +43,6 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.BooleanOp;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraftforge.entity.PartEntity;
 import net.minecraftforge.network.NetworkHooks;
 import org.jetbrains.annotations.NotNull;
 
@@ -70,18 +71,11 @@ public class SledEntity extends Entity implements IInputListener {
     private boolean inputDown;
     private float landFriction;
     private Status status;
-    private Status oldStatus;
-
-
-    private final SledTowingEntity[] subEntities;
-    private final SledTowingEntity headTow;
 
     public SledEntity(EntityType<? extends SledEntity> p_38290_, Level p_38291_) {
         super(p_38290_, p_38291_);
         this.blocksBuilding = true;
         this.maxUpStep = 1;
-        this.headTow = new SledTowingEntity(this);
-        this.subEntities = new SledTowingEntity[]{this.headTow};
     }
 
     public SledEntity(Level level, double x, double y, double z) {
@@ -188,7 +182,6 @@ public class SledEntity extends Entity implements IInputListener {
         this.setDamage(this.getDamage() * 11.0F);
     }
 
-
     /**
      * Applies a velocity to the entities, to push them away from eachother.
      */
@@ -202,7 +195,6 @@ public class SledEntity extends Entity implements IInputListener {
             super.push(pEntity);
         }
     }
-
 
     /**
      * Sets a target for the client to interpolate towards over the next few ticks
@@ -236,8 +228,9 @@ public class SledEntity extends Entity implements IInputListener {
         return this.getDirection().getClockWise();
     }
 
+    //magic slope detection code
 
-    //relative
+    //all values are relative
     public double additionalY = 0;
     public double prevAdditionalY = 0;
     public Vec3 projectedPos = Vec3.ZERO;
@@ -250,15 +243,13 @@ public class SledEntity extends Entity implements IInputListener {
     public Vec3 pullerPos = Vec3.ZERO;
     public Vec3 prevPullerPos = Vec3.ZERO;
     public AABB pullerAABB = new AABB(0.0D, 0.0D, 0.0D, 0.0D, 0.0D, 0.0D);
-    private EntityDimensions pullerDimensions = new EntityDimensions(1, 2.1f, false);
+    private final EntityDimensions pullerDimensions = new EntityDimensions(0.8f, 2.1f, false);
 
-    //test
 
     private AABB resetPullerAABB() {
         return this.pullerDimensions.makeBoundingBox(this.position());
     }
 
-    //end test
     @Override
     public void move(MoverType pType, Vec3 wantedPosIncrement) {
 
@@ -269,14 +260,16 @@ public class SledEntity extends Entity implements IInputListener {
         this.pullerAABB = this.pullerDimensions.makeBoundingBox(this.position().add(0, 0, 0));
 
         this.pullerPos = this.calculateSlopePosition(wantedPosIncrement.add(this.getLookAngle().scale(2)), this.pullerAABB,
-                this::resetPullerAABB, -2);
+                this::resetPullerAABB, -1);
         this.maxUpStep = 1;
 
         this.pullerPos = this.pullerPos.add(0, 0, 0);
 
+        this.pullerAABB = this.pullerDimensions.makeBoundingBox(this.position().add(this.pullerPos));
+
         super.move(pType, wantedPosIncrement);
 
-        this.pullerAABB = this.pullerDimensions.makeBoundingBox(this.position().add(this.pullerPos));
+
 
         this.prevProjectedPos = this.projectedPos;
         this.projectedPos = Vec3.ZERO;
@@ -293,17 +286,18 @@ public class SledEntity extends Entity implements IInputListener {
         if (this.onGround) {
 
             //this.projectedPos = this.calculateSlopePosition(this.getLookAngle().scale(this.getDeltaMovement().length()).scale(6));
-            this.projectedPos = this.calculateSlopePosition(this.getDeltaMovement().scale(6), this.getBoundingBox(), this::makeBoundingBox, -1);
+            this.projectedPos = this.calculateSlopePosition(this.getDeltaMovement().scale(6),
+                    this.getBoundingBox(), this::makeBoundingBox, -1);
             double y = Mth.clamp(this.projectedPos.y, -1, 1);
             if (y == 0) {
                 //reset
                 this.setXRot(this.getXRot() + -this.getXRot() * 0.3f);
             } else if (y > 0) {
                 //up
-                this.setXRot((float) Math.max(this.getXRot() - 6f, -40 * y));
+                this.setXRot((float) Math.max(this.getXRot() - 6f, -30 * y));
             } else {
                 //down
-                this.setXRot((float) Math.min(this.getXRot() + 3f, -40 * y));
+                this.setXRot((float) Math.min(this.getXRot() + 3f, -30 * y));
             }
         }
 
@@ -330,14 +324,9 @@ public class SledEntity extends Entity implements IInputListener {
     @Override
     public void tick() {
 
+        if(this.wolf != null)this.wolf.setInvulnerable(true);
 
-        this.getPassengers().forEach(e -> e.setInvulnerable(true));
-        //headTow.setOldPosAndRot();
-        //headTow.setPos(this.getX(), this.getY(), this.getZ()+1);
-
-        this.oldStatus = this.status;
         this.status = this.getStatusAndUpdateFriction();
-
 
         if (this.getHurtTime() > 0) {
             this.setHurtTime(this.getHurtTime() - 1);
@@ -356,9 +345,9 @@ public class SledEntity extends Entity implements IInputListener {
         double speed = movement.lengthSqr();
 
         if (this.level.isClientSide && this.status.onSnow()) {
-            float horSpeed = (float) (speed - (movement.y * movement.y));
-            if (this.random.nextFloat() * 0.16f < horSpeed) {
-                float up = (float) Math.min(horSpeed * 0.6, 0.3);
+            float horizontalSpeed = (float) (speed - (movement.y * movement.y));
+            if (this.random.nextFloat() * 0.16f < horizontalSpeed) {
+                float up = (float) Math.min(horizontalSpeed * 0.6, 0.3);
 
                 float xRot = this.getXRot();
                 float yRot = this.getYRot();
@@ -416,7 +405,7 @@ public class SledEntity extends Entity implements IInputListener {
         }
 
         this.checkInsideBlocks();
-        this.headTow.specialTick();
+
         var l = this.getPassengers();
 
 
@@ -572,16 +561,19 @@ public class SledEntity extends Entity implements IInputListener {
                         for (int k2 = k; k2 < l; ++k2) {
                             if (j2 <= 0 || k2 != k && k2 != l - 1) {
                                 mutable.set(l1, k2, i2);
+                                final float snowFriction = 0.985f;
+                                if (this.level.getBlockState(mutable.above()).getBlock() instanceof SnowLayerBlock) {
+                                    onSnowLayer = true;
+                                    f += snowFriction;
+                                    ++k1;
+                                    continue;
+                                }
                                 BlockState blockstate = this.level.getBlockState(mutable);
                                 if (blockstate.is(BlockTags.SNOW)) {
                                     onSnow = true;
-                                    f += 0.985F;
+                                    f += snowFriction;
                                     ++k1;
-                                } else if (this.level.getBlockState(mutable.above()).getBlock() instanceof SnowLayerBlock) {
-                                    onSnowLayer = true;
-                                    f += 0.985F;
-                                    ++k1;
-                                } else if (!(blockstate.getBlock() instanceof WaterlilyBlock) && Shapes.joinIsNotEmpty(blockstate.getCollisionShape(this.level, mutable).move(l1, k2, i2), voxelshape, BooleanOp.AND)) {
+                                } else if (Shapes.joinIsNotEmpty(blockstate.getCollisionShape(this.level, mutable).move(l1, k2, i2), voxelshape, BooleanOp.AND)) {
                                     //decreases friction for blocks and ice in particular
                                     float fr = blockstate.getFriction(this.level, mutable, this);
                                     if (fr > 0.9) fr *= 0.97;
@@ -848,55 +840,52 @@ public class SledEntity extends Entity implements IInputListener {
     @Override
     public void positionRider(Entity entity) {
         if (this.hasPassenger(entity)) {
-            float zPos = 0.0F;
-            float yPos = (float) ((this.isRemoved() ? 0.01 : this.getPassengersRidingOffset()) + entity.getMyRidingOffset());
-            if (this.getPassengers().size() > 1) {
-                int i = this.getPassengers().indexOf(entity);
-                float cos = Mth.sin((float) (this.getXRot() * Math.PI / 180f));
-                if (i == 0) {
-                    zPos = 0.1F;
-                } else {
-                    zPos = -0.8F;
-                }
-                yPos -= cos * zPos;
 
-            }
+            if(entity instanceof Wolf w && this.wolf == null)  this.wolf = w;
 
-            if (entity instanceof Animal) {
-                if (this.getPassengers().size() > 1) {
-                    zPos += 0.2D;
-                }
-                yPos += 0.125;
-            }
-
-            //powder snow check here
-            if (this.getPassengers().indexOf(entity) == 1 && entity instanceof Wolf wolf) {
-                Vec3 vv = new Vec3(this.pullerPos.x, 0, this.pullerPos.z);
-                zPos = (float) vv.length();
-                yPos = (float) this.pullerPos.y;
-                if(this.wolf == null) this.wolf = wolf;
-            }
-
-            Vec3 vec3 = (new Vec3(zPos, 0.0D, 0.0D)).yRot(-this.getYRot() * ((float) Math.PI / 180F) - ((float) Math.PI / 2F));
-            entity.setPos(this.getX() + vec3.x, this.getY() + (double) yPos, this.getZ() + vec3.z);
-            entity.setYRot(entity.getYRot() + this.deltaRotation);
-            entity.setYHeadRot(entity.getYHeadRot() + this.deltaRotation);
-            this.clampRotation(entity);
-            if (entity instanceof Animal animal && this.getPassengers().size() > 1) {
-                int yRot = entity.getId() % 2 == 0 ? 90 : 270;
-                //entity.setYBodyRot(animal.yBodyRot + (float) yRot);
-                //entity.setYHeadRot(entity.getYHeadRot() + (float) yRot);
-
-                entity.setYBodyRot(animal.yBodyRot + (float) this.deltaRotation * 10);
+            if(this.isWolfEntity(entity)){
+                Animal animal = (Animal)entity;
+                entity.setYRot(entity.getYRot() + this.deltaRotation);
+                this.clampRotation(entity);
+                entity.setYBodyRot(animal.yBodyRot + this.deltaRotation * 10);
                 entity.setYHeadRot(animal.yBodyRot);
-            }
+                //powder snow check here
+                entity.setPos(this.getX() + pullerPos.x,this.getY() + pullerPos.y,this.getZ() + pullerPos.z);
 
-            if (entity instanceof Wolf wolf) {
-                wolf.animationSpeed = 0;
-                wolf.animationPosition = 0;
-                wolf.animationSpeedOld = 0;
-                this.calculateEntityAnimation(wolf);
-                wolf.setInSittingPose(this.getDeltaMovement().length() < 0.001);
+                this.updateWolfAnimations();
+            }
+            else {
+                float zPos = 0.0F;
+                float yPos = (float) ((this.isRemoved() ? 0.01 : this.getPassengersRidingOffset()) + entity.getMyRidingOffset());
+                if (this.getPassengers().size() > 1) {
+                    int i = this.getPassengers().indexOf(entity);
+                    float cos = Mth.sin((float) (this.getXRot() * Math.PI / 180f));
+                    if (i == 0) {
+                        zPos = 0.1F;
+                    } else {
+                        zPos = -0.8F;
+                    }
+                    yPos -= cos * zPos;
+                }
+
+                if (entity instanceof Animal) {
+                    if (this.getPassengers().size() > 1) {
+                        zPos += 0.2D;
+                    }
+                    yPos += 0.125;
+                }
+
+                Vec3 vec3 = (new Vec3(zPos, 0.0D, 0.0D)).yRot(-this.getYRot() * ((float) Math.PI / 180F) - ((float) Math.PI / 2F));
+                entity.setPos(this.getX() + vec3.x, this.getY() + (double) yPos, this.getZ() + vec3.z);
+
+                entity.setYRot(entity.getYRot() + this.deltaRotation);
+                entity.setYHeadRot(entity.getYHeadRot() + this.deltaRotation);
+                this.clampRotation(entity);
+                if (entity instanceof Animal animal && this.getPassengers().size() > 1) {
+                    int yRot = entity.getId() % 2 == 0 ? 90 : 270;
+                    entity.setYBodyRot(animal.yBodyRot + (float) yRot);
+                    entity.setYHeadRot(entity.getYHeadRot() + (float) yRot);
+                }
             }
         }
     }
@@ -995,7 +984,7 @@ public class SledEntity extends Entity implements IInputListener {
 
     //wolf towing (god help me)
 
-    public boolean isTowingEntity(LivingEntity entity) {
+    public boolean isWolfEntity(Entity entity) {
         return entity == this.wolf;
     }
 
@@ -1025,22 +1014,29 @@ public class SledEntity extends Entity implements IInputListener {
         return wolf;
     }
 
-    public void calculateEntityAnimation(LivingEntity entity) {
-        entity.animationSpeedOld = wolfAnimationSpeed;
-        double d0 = entity.getX() - entity.xo;
-        double d1 = 0.0D;
-        double d2 = entity.getZ() - entity.zo;
-        float f = (float) Math.sqrt(d0 * d0 + d1 * d1 + d2 * d2) * 4.0F;
-        if (f > 1.0F) {
-            f = 1.0F;
+    public void updateWolfAnimations() {
+        if(this.wolf != null) {
+            this.wolf.animationSpeedOld =  this.wolfAnimationSpeed;
+            double d0 = wolf.getX() - wolf.xo;
+            double d1 = 0.0D;
+            double d2 = wolf.getZ() - wolf.zo;
+            float f = (float) Math.sqrt(d0 * d0 + d1 * d1 + d2 * d2) * 4.0F;
+            if (f > 1.0F) {
+                f = 1.0F;
+            }
+
+            this.wolfAnimationSpeed += (f -  this.wolfAnimationSpeed) * 0.4F;
+            this.wolfAnimationPosition +=  this.wolfAnimationSpeed;
+
+            this.wolf.animationSpeed = this.wolfAnimationSpeed;
+            this.wolf.animationPosition =  this.wolfAnimationPosition;
+            this.wolf.setInSittingPose(this.getDeltaMovement().length() < 0.001);
         }
-
-        wolfAnimationSpeed += (f - wolfAnimationSpeed) * 0.4F;
-        wolfAnimationPosition += wolfAnimationSpeed;
-
-        entity.animationSpeed = wolfAnimationSpeed;
-        entity.animationPosition = wolfAnimationPosition;
     }
+
+
+    //chest madness
+
 
 
 }
