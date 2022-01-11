@@ -7,19 +7,25 @@ import net.mehvahdjukaar.snowyspirit.Christmas;
 import net.mehvahdjukaar.snowyspirit.common.block.GingerBlock;
 import net.mehvahdjukaar.snowyspirit.common.block.GumdropButton;
 import net.mehvahdjukaar.snowyspirit.common.block.WreathBlock;
+import net.mehvahdjukaar.snowyspirit.common.entity.ContainerHolderEntity;
 import net.mehvahdjukaar.snowyspirit.common.entity.SledEntity;
 import net.mehvahdjukaar.snowyspirit.common.items.SledItem;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.EntityTypeTags;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.vehicle.Boat;
+import net.minecraft.world.entity.vehicle.MinecartChest;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.material.MaterialColor;
+import net.minecraftforge.common.Tags;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -38,6 +44,10 @@ public class ModRegistry {
             CARPETS.put(c, ForgeRegistries.ITEMS.getValue(new ResourceLocation(c.getName() + "_carpet")));
         }
     }
+
+    public static final Tags.IOptionalNamedTag<Item> VALID_CONTAINERS = ItemTags.createOptional(Christmas.res("sled_container"));
+    public static final Tags.IOptionalNamedTag<EntityType<?>> WOLVES = EntityTypeTags.createOptional(Christmas.res("sled_pullers"));
+
 
     public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, Christmas.MOD_ID);
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, Christmas.MOD_ID);
@@ -67,6 +77,13 @@ public class ModRegistry {
                     .sized(1.375F, 0.5625F)
                     .clientTrackingRange(10)
                     .build("sled"));
+
+    public static final RegistryObject<EntityType<ContainerHolderEntity>> CONTAINER_ENTITY = ENTITIES.register("container_entity",
+            () ->  EntityType.Builder.of(ContainerHolderEntity::new, MobCategory.MISC)
+                    .sized(0.75f, 0.75f)
+                    .clientTrackingRange(8)
+                    .build("container_entity"));
+
 
     public static final Map<Boat.Type, RegistryObject<Item>> SLED_ITEMS = Stream.of(Boat.Type.values()).collect(ImmutableMap.toImmutableMap((e) -> e,
             (t) -> regItem("sled_" + t.getName(), () -> new SledItem(t))));

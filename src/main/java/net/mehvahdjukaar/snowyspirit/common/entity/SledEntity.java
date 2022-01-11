@@ -23,19 +23,15 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.animal.WaterAnimal;
-import net.minecraft.world.entity.animal.Wolf;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.vehicle.Boat;
 import net.minecraft.world.entity.vehicle.DismountHelper;
-import net.minecraft.world.entity.vehicle.MinecartChest;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.ChestBlock;
 import net.minecraft.world.level.block.SnowLayerBlock;
-import net.minecraft.world.level.block.WaterlilyBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.AABB;
@@ -140,6 +136,7 @@ public class SledEntity extends Entity implements IInputListener {
         return true;
     }
 
+    @Override
     public boolean canCollideWith(Entity entity) {
         return Boat.canVehicleCollide(this, entity);
     }
@@ -256,26 +253,31 @@ public class SledEntity extends Entity implements IInputListener {
         //this is a mess. hacks everywhere
         this.prevPullerPos = this.pullerPos;
 
-        this.maxUpStep = 2;
-        this.pullerAABB = this.pullerDimensions.makeBoundingBox(this.position().add(0, 0, 0));
+        boolean isMoving = wantedPosIncrement != Vec3.ZERO;
 
-        this.pullerPos = this.calculateSlopePosition(wantedPosIncrement.add(this.getLookAngle().scale(2)), this.pullerAABB,
-                this::resetPullerAABB, -1);
-        this.maxUpStep = 1;
+        //so wolf can climb up
+        if (isMoving) this.maxUpStep = 2;
 
-        this.pullerPos = this.pullerPos.add(0, 0, 0);
+        if(this.hasWolf()) {
+            this.pullerAABB = this.pullerDimensions.makeBoundingBox(this.position().add(0, 0, 0));
 
-        this.pullerAABB = this.pullerDimensions.makeBoundingBox(this.position().add(this.pullerPos));
+            this.pullerPos = this.calculateSlopePosition(wantedPosIncrement.add(this.getLookAngle().scale(2)), this.pullerAABB,
+                    this::resetPullerAABB, -1);
+            this.maxUpStep = 1;
+
+            this.pullerPos = this.pullerPos.add(0, 0, 0);
+
+            this.pullerAABB = this.pullerDimensions.makeBoundingBox(this.position().add(this.pullerPos));
+        }
 
         super.move(pType, wantedPosIncrement);
-
 
 
         this.prevProjectedPos = this.projectedPos;
         this.projectedPos = Vec3.ZERO;
 
         //considered on ground even when in air but with block below
-        if (!this.onGround) {
+        if (!this.onGround && isMoving) {
             float belowCheck = -1.25f;
             Vec3 blockBelow = this.calculateSlopePosition(new Vec3(0, belowCheck, 0), this.getBoundingBox(), this::makeBoundingBox, -1);
             if (blockBelow.y > belowCheck + 0.01) {
@@ -286,8 +288,10 @@ public class SledEntity extends Entity implements IInputListener {
         if (this.onGround) {
 
             //this.projectedPos = this.calculateSlopePosition(this.getLookAngle().scale(this.getDeltaMovement().length()).scale(6));
-            this.projectedPos = this.calculateSlopePosition(this.getDeltaMovement().scale(6),
-                    this.getBoundingBox(), this::makeBoundingBox, -1);
+
+            this.projectedPos = !isMoving ? Vec3.ZERO :
+                    this.calculateSlopePosition(this.getDeltaMovement().scale(6).add(1,0,0),
+                            this.getBoundingBox(), this::makeBoundingBox, -1);
             double y = Mth.clamp(this.projectedPos.y, -1, 1);
             if (y == 0) {
                 //reset
@@ -324,7 +328,7 @@ public class SledEntity extends Entity implements IInputListener {
     @Override
     public void tick() {
 
-        if(this.wolf != null)this.wolf.setInvulnerable(true);
+        if (this.wolf != null) this.wolf.setInvulnerable(true);
 
         this.status = this.getStatusAndUpdateFriction();
 
@@ -399,19 +403,18 @@ public class SledEntity extends Entity implements IInputListener {
                 this.controlSled();
             }
 
-            this.move(MoverType.SELF, this.getDeltaMovement());
         } else {
             this.setDeltaMovement(Vec3.ZERO);
         }
+        //always move
+        this.move(MoverType.SELF, this.getDeltaMovement());
 
         this.checkInsideBlocks();
 
         var l = this.getPassengers();
 
 
-        List<Entity> list = this.level.getEntities(this, this.getBoundingBox().inflate(0.2F, 0.01F, 0.2F), EntitySelector.pushableBy(this));
-        //List<Entity> list = this.level.getEntities(this, this.getBoundingBox().inflate(1F, 0F, 0F),
-        //        e->true);
+        List<Entity> list = this.level.getEntities(this, this.getBoundingBox().inflate(0.1F, 0.01F, 0.1F), EntitySelector.pushableBy(this));
 
         if (!list.isEmpty()) {
             boolean notLocalPlayerControlled = !this.level.isClientSide && !(this.getControllingPassenger() instanceof Player);
@@ -450,7 +453,7 @@ public class SledEntity extends Entity implements IInputListener {
         AABB aabb = this.getBoundingBox();
         List<VoxelShape> list = new ArrayList<>(this.level.getEntityCollisions(this, aabb.expandTowards(pVec)));
 
-        list.add(Shapes.create(this.pullerAABB));
+        if(this.hasWolf()) list.add(Shapes.create(this.pullerAABB));
 
         Vec3 vec3 = pVec.lengthSqr() == 0.0D ? pVec : collideBoundingBox(this, pVec, aabb, this.level, list);
         boolean flag = pVec.x != vec3.x;
@@ -797,6 +800,10 @@ public class SledEntity extends Entity implements IInputListener {
                 this.setSeatType(ModRegistry.CARPETS.inverse().get(stack.getItem()));
                 stack.shrink(1);
                 return InteractionResult.sidedSuccess(player.level.isClientSide);
+            } else if (stack.is(ModRegistry.VALID_CONTAINERS) && this.canAddChest()) {
+                Entity container = new ContainerHolderEntity(level, this, stack.split(1));
+                level.addFreshEntity(container);
+                return InteractionResult.sidedSuccess(player.level.isClientSide);
             }
 
             if (!this.level.isClientSide) {
@@ -809,8 +816,15 @@ public class SledEntity extends Entity implements IInputListener {
     }
 
     @Override
-    protected boolean canAddPassenger(Entity p_38390_) {
-        return this.getPassengers().size() < 2 && !this.isEyeInFluid(FluidTags.WATER);
+    protected boolean canAddPassenger(Entity entity) {
+        if (this.isEyeInFluid(FluidTags.WATER)) return false;
+
+        int maxAllowed = this.getMaxPassengersSize();
+
+        if (this.getPassengers().size() >= maxAllowed) return false;
+        //has space
+        if (hasChest() && entity instanceof ContainerHolderEntity) return false;
+        return true;
     }
 
     @Nullable
@@ -837,50 +851,79 @@ public class SledEntity extends Entity implements IInputListener {
         }
     }
 
+
     @Override
     public void positionRider(Entity entity) {
         if (this.hasPassenger(entity)) {
 
-            if(entity instanceof Wolf w && this.wolf == null)  this.wolf = w;
+            if (this.wolf == null && isValidWolf(entity)) this.wolf = (TamableAnimal) entity;
+            else if (this.chest == null && entity instanceof ContainerHolderEntity chest){
+                this.chest = chest;
+                this.chest.setYRot(this.getYRot());
+            }
 
-            if(this.isWolfEntity(entity)){
-                Animal animal = (Animal)entity;
+            if (this.isWolfEntity(entity)) {
+                Animal animal = (Animal) entity;
                 entity.setYRot(entity.getYRot() + this.deltaRotation);
                 this.clampRotation(entity);
                 entity.setYBodyRot(animal.yBodyRot + this.deltaRotation * 10);
                 entity.setYHeadRot(animal.yBodyRot);
                 //powder snow check here
-                entity.setPos(this.getX() + pullerPos.x,this.getY() + pullerPos.y,this.getZ() + pullerPos.z);
+                entity.setPos(this.getX() + pullerPos.x, this.getY() + pullerPos.y, this.getZ() + pullerPos.z);
 
                 this.updateWolfAnimations();
-            }
-            else {
+            } else {
                 float zPos = 0.0F;
                 float yPos = (float) ((this.isRemoved() ? 0.01 : this.getPassengersRidingOffset()) + entity.getMyRidingOffset());
-                if (this.getPassengers().size() > 1) {
-                    int i = this.getPassengers().indexOf(entity);
-                    float cos = Mth.sin((float) (this.getXRot() * Math.PI / 180f));
-                    if (i == 0) {
-                        zPos = 0.1F;
-                    } else {
-                        zPos = -0.8F;
-                    }
-                    yPos -= cos * zPos;
-                }
 
-                if (entity instanceof Animal) {
+                if (this.isChestEntity(entity)) {
+
+                    entity.xRotO = this.xRotO;
+                    entity.setXRot(this.getXRot());
+                    entity.yRotO = this.yRotO;
+                    entity.setYRot(this.getYRot());
+
+                    //entity.yRotO = this.yRotO;
+                    zPos = -0.4f;
+                    yPos += 0.3125;
+                    float cos = Mth.sin((float) (this.getXRot() * Math.PI / 180f));
+                    yPos -= cos * zPos;
+                } else {
+
                     if (this.getPassengers().size() > 1) {
-                        zPos += 0.2D;
+                        int i = 0;
+                        for (Entity p : this.getPassengers()) {
+                            if (p == entity) break;
+                            if (!(isWolfEntity(p) || isChestEntity(p))) i++;
+                        }
+
+                        float cos = Mth.sin((float) (this.getXRot() * Math.PI / 180f));
+                        if (i == 0) {
+                            zPos = 0.1F;
+                        } else {
+                            zPos = -0.8F;
+                        }
+                        yPos -= cos * zPos;
                     }
-                    yPos += 0.125;
+
+                    if (entity instanceof Animal) {
+                        if (this.getPassengers().size() > 1) {
+                            zPos += 0.2D;
+                        }
+                        yPos += 0.125;
+                    }
+                    entity.setYRot(entity.getYRot() + this.deltaRotation);
+                    entity.setYHeadRot(entity.getYHeadRot() + this.deltaRotation);
+                    this.clampRotation(entity);
+
                 }
 
                 Vec3 vec3 = (new Vec3(zPos, 0.0D, 0.0D)).yRot(-this.getYRot() * ((float) Math.PI / 180F) - ((float) Math.PI / 2F));
                 entity.setPos(this.getX() + vec3.x, this.getY() + (double) yPos, this.getZ() + vec3.z);
 
-                entity.setYRot(entity.getYRot() + this.deltaRotation);
-                entity.setYHeadRot(entity.getYHeadRot() + this.deltaRotation);
-                this.clampRotation(entity);
+
+
+
                 if (entity instanceof Animal animal && this.getPassengers().size() > 1) {
                     int yRot = entity.getId() % 2 == 0 ? 90 : 270;
                     entity.setYBodyRot(animal.yBodyRot + (float) yRot);
@@ -930,13 +973,15 @@ public class SledEntity extends Entity implements IInputListener {
 
     @Override
     public void ejectPassengers() {
-        if(this.wolf != null)this.removeWolf();
+        if (this.wolf != null) this.removeWolf();
+        if (this.chest != null) this.removeChest();
         super.ejectPassengers();
     }
 
     @Override
     protected void removePassenger(Entity pPassenger) {
-        if(this.wolf == pPassenger) this.removeWolf();
+        if (this.wolf == pPassenger) this.removeWolf();
+        if (this.chest == pPassenger) this.removeChest();
         super.removePassenger(pPassenger);
     }
 
@@ -988,21 +1033,36 @@ public class SledEntity extends Entity implements IInputListener {
         return entity == this.wolf;
     }
 
+    public boolean isChestEntity(Entity entity) {
+        return entity == this.chest;
+    }
+
+    public boolean isValidWolf(Entity entity) {
+        return entity.getType().is(ModRegistry.WOLVES) && entity instanceof Animal;
+    }
+
     private float wolfAnimationSpeed = 0;
     private float wolfAnimationPosition = 0;
     @Nullable
     private TamableAnimal wolf = null;
+    @Nullable
+    private ContainerHolderEntity chest = null;
 
-    public void addWolf(TamableAnimal wolf){
-        this.wolf = wolf;
-    }
-
-    public boolean hasWolf(){
+    public boolean hasWolf() {
         return this.wolf != null;
     }
 
-    public void removeWolf(){
-        if(this.wolf != null){
+    public boolean hasChest() {
+        return this.chest != null;
+    }
+
+    public void removeChest() {
+        //only reset here cause it is called on client only side sometimes
+        this.chest = null;
+    }
+
+    public void removeWolf() {
+        if (this.wolf != null) {
             this.wolf.setInSittingPose(false);
             this.wolf.setInvulnerable(false);
         }
@@ -1015,8 +1075,8 @@ public class SledEntity extends Entity implements IInputListener {
     }
 
     public void updateWolfAnimations() {
-        if(this.wolf != null) {
-            this.wolf.animationSpeedOld =  this.wolfAnimationSpeed;
+        if (this.wolf != null) {
+            this.wolf.animationSpeedOld = this.wolfAnimationSpeed;
             double d0 = wolf.getX() - wolf.xo;
             double d1 = 0.0D;
             double d2 = wolf.getZ() - wolf.zo;
@@ -1025,17 +1085,25 @@ public class SledEntity extends Entity implements IInputListener {
                 f = 1.0F;
             }
 
-            this.wolfAnimationSpeed += (f -  this.wolfAnimationSpeed) * 0.4F;
-            this.wolfAnimationPosition +=  this.wolfAnimationSpeed;
+            this.wolfAnimationSpeed += (f - this.wolfAnimationSpeed) * 0.4F;
+            this.wolfAnimationPosition += this.wolfAnimationSpeed;
 
             this.wolf.animationSpeed = this.wolfAnimationSpeed;
-            this.wolf.animationPosition =  this.wolfAnimationPosition;
+            this.wolf.animationPosition = this.wolfAnimationPosition;
             this.wolf.setInSittingPose(this.getDeltaMovement().length() < 0.001);
         }
     }
 
 
     //chest madness
+
+    private boolean canAddChest() {
+        return this.getPassengers().size() < this.getMaxPassengersSize() && !this.hasChest();
+    }
+
+    private int getMaxPassengersSize() {
+        return this.hasWolf() ? 3 : 2;
+    }
 
 
 

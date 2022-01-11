@@ -1,10 +1,8 @@
 package net.mehvahdjukaar.snowyspirit.init;
 
 import net.mehvahdjukaar.snowyspirit.Christmas;
-import net.mehvahdjukaar.snowyspirit.client.SledModel;
-import net.mehvahdjukaar.snowyspirit.client.SledModel2;
-import net.mehvahdjukaar.snowyspirit.client.SledModel3;
-import net.mehvahdjukaar.snowyspirit.client.SleighEntityRenderer;
+import net.mehvahdjukaar.snowyspirit.client.*;
+import net.mehvahdjukaar.snowyspirit.common.entity.ContainerHolderEntity;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
@@ -36,6 +34,7 @@ public class ClientSetup {
     @SubscribeEvent
     public static void entityRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerEntityRenderer(ModRegistry.SLED.get(), SleighEntityRenderer::new);
+        event.registerEntityRenderer(ModRegistry.CONTAINER_ENTITY.get(), ContainerHolderEntityRenderer::new);
     }
 
     @SubscribeEvent

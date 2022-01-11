@@ -1,9 +1,12 @@
 package net.mehvahdjukaar.snowyspirit.common.entity;
 
+import net.mehvahdjukaar.snowyspirit.init.ModRegistry;
 import net.minecraft.advancements.CriteriaTriggers;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -11,15 +14,17 @@ import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Mth;
 import net.minecraft.world.*;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.SlotAccess;
+import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.item.FallingBlockEntity;
 import net.minecraft.world.entity.monster.piglin.PiglinAi;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ChestMenu;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.GameRules;
@@ -33,28 +38,39 @@ import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.entity.IEntityAdditionalSpawnData;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.wrapper.InvWrapper;
 import net.minecraftforge.network.NetworkHooks;
 
 import javax.annotation.Nullable;
 
-public abstract class ContainerHolderEntity extends Entity implements Container, MenuProvider {
+public class ContainerHolderEntity extends Entity implements Container, MenuProvider, IEntityAdditionalSpawnData {
     private static final EntityDataAccessor<Integer> DATA_ID_HURT = SynchedEntityData.defineId(ContainerHolderEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Float> DATA_ID_DAMAGE = SynchedEntityData.defineId(ContainerHolderEntity.class, EntityDataSerializers.FLOAT);
-    private static final EntityDataAccessor<Integer> DATA_ID_BLOCK = SynchedEntityData.defineId(ContainerHolderEntity.class, EntityDataSerializers.INT);
 
-    protected ContainerHolderEntity(EntityType<?> type, Level level) {
+    private ItemStack containerStack = ItemStack.EMPTY;
+
+    //for client
+    public BlockState displayState = Blocks.AIR.defaultBlockState();
+
+    public ContainerHolderEntity(EntityType<?> type, Level level) {
         super(type, level);
         this.blocksBuilding = true;
     }
 
-    protected ContainerHolderEntity(EntityType<?> p_38090_, Level p_38091_, double p_38092_, double p_38093_, double p_38094_) {
-        this(p_38090_, p_38091_);
-        this.setPos(p_38092_, p_38093_, p_38094_);
-        this.xo = p_38092_;
-        this.yo = p_38093_;
-        this.zo = p_38094_;
+    protected ContainerHolderEntity(Level level, Entity sled, ItemStack containerStack) {
+        this(ModRegistry.CONTAINER_ENTITY.get(), level);
+        this.setContainerItem(containerStack);
+        this.startRiding(sled);
+        this.setPos(sled.position());
+    }
+
+    public void setContainerItem(ItemStack stack){
+        this.containerStack = stack;
+        if(this.containerStack.getItem() instanceof BlockItem blockItem){
+            this.displayState = blockItem.getBlock().defaultBlockState();
+        }
     }
 
     @Override
@@ -63,8 +79,21 @@ public abstract class ContainerHolderEntity extends Entity implements Container,
     }
 
     @Override
+    public void writeSpawnData(FriendlyByteBuf buffer) {
+        buffer.writeItem(this.containerStack);
+    }
+
+    @Override
+    public void readSpawnData(FriendlyByteBuf additionalData) {
+        this.setContainerItem(additionalData.readItem());
+    }
+
+    @Override
     protected void readAdditionalSaveData(CompoundTag pCompound) {
-        this.setDisplayBlockState(NbtUtils.readBlockState(pCompound.getCompound("DisplayState")));
+        this.containerStack = ItemStack.of(pCompound.getCompound("ContainerItem"));
+        if(this.containerStack.getItem() instanceof BlockItem blockItem){
+            this.displayState = blockItem.getBlock().defaultBlockState();
+        }
 
         if (this.lootTable != null) {
             pCompound.putString("LootTable", this.lootTable.toString());
@@ -78,8 +107,8 @@ public abstract class ContainerHolderEntity extends Entity implements Container,
 
     @Override
     protected void addAdditionalSaveData(CompoundTag pCompound) {
-        pCompound.putBoolean("CustomDisplayTile", true);
-        pCompound.put("DisplayState", NbtUtils.writeBlockState(this.getDisplayBlockState()));
+
+        pCompound.put("ContainerItem", this.containerStack.save(new CompoundTag()));
 
         this.itemStacks = NonNullList.withSize(this.getContainerSize(), ItemStack.EMPTY);
         if (pCompound.contains("LootTable", 8)) {
@@ -94,7 +123,21 @@ public abstract class ContainerHolderEntity extends Entity implements Container,
     protected void defineSynchedData() {
         this.entityData.define(DATA_ID_HURT, 0);
         this.entityData.define(DATA_ID_DAMAGE, 0.0F);
-        this.entityData.define(DATA_ID_BLOCK, Block.getId(Blocks.AIR.defaultBlockState()));
+    }
+
+    @Override
+    public double getMyRidingOffset() {
+        return 0;
+    }
+
+    @Override
+    protected float getEyeHeight(Pose pPose, EntityDimensions pSize) {
+        return pSize.height * 0.5F;
+    }
+
+    @Override
+    public boolean canBeCollidedWith() {
+        return true;
     }
 
     @Override
@@ -120,8 +163,8 @@ public abstract class ContainerHolderEntity extends Entity implements Container,
                 this.markHurt();
                 this.setDamage(this.getDamage() + pAmount * 10.0F);
                 this.gameEvent(GameEvent.ENTITY_DAMAGED, pSource.getEntity());
-                boolean flag = pSource.getEntity() instanceof Player && ((Player) pSource.getEntity()).getAbilities().instabuild;
-                if (flag || this.getDamage() > 40.0F) {
+                boolean flag = pSource.getEntity() instanceof Player player && player.getAbilities().instabuild;
+                if (flag || this.getDamage() > 15.0F) {
                     this.ejectPassengers();
                     if (flag && !this.hasCustomName()) {
                         this.discard();
@@ -129,12 +172,9 @@ public abstract class ContainerHolderEntity extends Entity implements Container,
                         this.destroy(pSource);
                     }
                 }
-
-                return true;
             }
-        } else {
-            return true;
         }
+        return true;
     }
 
     public void destroy(DamageSource pSource) {
@@ -149,11 +189,10 @@ public abstract class ContainerHolderEntity extends Entity implements Container,
         }
         this.remove(Entity.RemovalReason.KILLED);
         if (this.level.getGameRules().getBoolean(GameRules.RULE_DOENTITYDROPS)) {
-            ItemStack itemstack = new ItemStack(Items.MINECART);
+            ItemStack itemstack = this.containerStack.copy();
             if (this.hasCustomName()) {
                 itemstack.setHoverName(this.getCustomName());
             }
-
             this.spawnAtLocation(itemstack);
         }
     }
@@ -175,24 +214,44 @@ public abstract class ContainerHolderEntity extends Entity implements Container,
         return !this.isRemoved();
     }
 
+    @Override
+    public void setYRot(float pYRot) {
+        if(yRotO<0){
+            int a =1;
+        }
+        super.setYRot(pYRot);
+    }
+
     /**
      * Called to update the entity's position/logic.
      */
     @Override
     public void tick() {
+        Entity v = this.getVehicle();
+        if(v != null) {
 
-        if (this.getHurtTime() > 0) {
-            this.setHurtTime(this.getHurtTime() - 1);
+            if (this.getHurtTime() > 0) {
+                this.setHurtTime(this.getHurtTime() - 1);
+            }
+
+            if (this.getDamage() > 0.0F) {
+                this.setDamage(this.getDamage() - 1.0F);
+            }
+
+            this.checkOutOfWorld();
+            this.handleNetherPortal();
+
+
+            // this.xRotO = v.xRotO;
+           // this.yRotO = v.yRotO;
+            //this.setYRot(v.getYRot());
+            super.tick();
+            // this.xRotO = this.getXRot();
+            //this.yRotO = this.getYRot();
+        }else{
+            this.destroy(DamageSource.GENERIC);
         }
-
-        if (this.getDamage() > 0.0F) {
-            this.setDamage(this.getDamage() - 1.0F);
-        }
-
-        this.checkOutOfWorld();
-        this.handleNetherPortal();
     }
-
 
     /**
      * Sets the current amount of damage the minecart has taken. Decreases over time. The cart breaks when this is over
@@ -223,15 +282,6 @@ public abstract class ContainerHolderEntity extends Entity implements Container,
     public int getHurtTime() {
         return this.entityData.get(DATA_ID_HURT);
     }
-
-    public BlockState getDisplayBlockState() {
-        return Block.stateById(this.getEntityData().get(DATA_ID_BLOCK));
-    }
-
-    public void setDisplayBlockState(BlockState pDisplayTile) {
-        this.getEntityData().set(DATA_ID_BLOCK, Block.getId(pDisplayTile));
-    }
-
 
     //container
 
@@ -408,7 +458,14 @@ public abstract class ContainerHolderEntity extends Entity implements Container,
         }
     }
 
-    protected abstract AbstractContainerMenu createMenu(int pId, Inventory pPlayerInventory);
+    @Override
+    public int getContainerSize() {
+        return 27;
+    }
+
+    public AbstractContainerMenu createMenu(int pId, Inventory pPlayerInventory) {
+        return ChestMenu.threeRows(pId, pPlayerInventory, this);
+    }
 
     // Forge Start
     private LazyOptional<?> itemHandler = LazyOptional.of(() -> new InvWrapper(this));
@@ -431,5 +488,6 @@ public abstract class ContainerHolderEntity extends Entity implements Container,
         super.reviveCaps();
         this.itemHandler = LazyOptional.of(() -> new InvWrapper(this));
     }
+
 
 }

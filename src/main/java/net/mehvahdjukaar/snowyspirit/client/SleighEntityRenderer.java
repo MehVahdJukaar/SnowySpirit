@@ -15,6 +15,7 @@ import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.blockentity.SignRenderer;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MinecartRenderer;
@@ -74,8 +75,6 @@ public class SleighEntityRenderer extends EntityRenderer<SledEntity> {
         poseStack.translate(-0.5, 0, -0.5);
 
 
-        Minecraft.getInstance().getBlockRenderer()
-                .renderSingleBlock(Blocks.CHEST.defaultBlockState(), poseStack, bufferSource, light, OverlayTexture.NO_OVERLAY);
         poseStack.popPose();
 
         ResourceLocation resourcelocation = this.getTextureLocation(sled);
@@ -110,9 +109,10 @@ public class SleighEntityRenderer extends EntityRenderer<SledEntity> {
                 .move(-pEntity.getX(), -pEntity.getY(), -pEntity.getZ());
         LevelRenderer.renderLineBox(pMatrixStack, pBuffer, aabb, 1.0F, 0, 0, 1.0F);
 
-        aabb = pEntity.pullerAABB.move(-pEntity.getX(), -pEntity.getY(), -pEntity.getZ());
-
-        LevelRenderer.renderLineBox(pMatrixStack, pBuffer, aabb, 0, 1, 0, 1.0F);
+        if(pEntity.hasWolf()) {
+            aabb = pEntity.pullerAABB.move(-pEntity.getX(), -pEntity.getY(), -pEntity.getZ());
+            LevelRenderer.renderLineBox(pMatrixStack, pBuffer, aabb, 0, 1, 0, 1.0F);
+        }
 
         Vec3 movement = lerpV(pPartialTicks, pEntity.prevDeltaMovement, pEntity.getDeltaMovement());
 
@@ -135,13 +135,6 @@ public class SleighEntityRenderer extends EntityRenderer<SledEntity> {
                 .color(255, 0, 255, 255)
                 .normal(matrix3f, 0, 1, 0).endVertex();
 
-
-        pBuffer.vertex(matrix4f, (float) pEntity.pullerPos.x, (float) pEntity.pullerPos.y, (float) pEntity.pullerPos.z)
-                .color(255, 0, 255, 255)
-                .normal(matrix3f, 0, 1, 0).endVertex();
-        pBuffer.vertex(matrix4f, (float) pEntity.pullerPos.x, (float) pEntity.pullerPos.y + 1, (float) pEntity.pullerPos.z)
-                .color(111, 255, 111, 255)
-                .normal(matrix3f, 0, 1, 0).endVertex();
 
         if (pEntity.boost) {
             movement = movement.normalize().scale(-1);
