@@ -37,7 +37,9 @@ public class ContainerHolderEntityRenderer<T extends ContainerHolderEntity> exte
 
         poseStack.pushPose();
 
-        float xRot = entity.getViewXRot(partialTicks);
+        //hack cause I can't get the rotation to align. god darn. I spent so much time trying to get it to work so this wil have to do
+        float xRot = vehicle.getViewXRot(partialTicks);
+        yRot = vehicle.getViewYRot(partialTicks);
 
        poseStack.mulPose(Vector3f.YP.rotationDegrees(180.0F - yRot));
        poseStack.mulPose(Vector3f.XN.rotationDegrees(xRot));

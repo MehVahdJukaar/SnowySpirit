@@ -9,16 +9,12 @@ import com.mojang.math.Vector3f;
 import net.mehvahdjukaar.snowyspirit.Christmas;
 import net.mehvahdjukaar.snowyspirit.common.entity.SledEntity;
 import net.mehvahdjukaar.snowyspirit.init.ClientSetup;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.model.Model;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.blockentity.SignRenderer;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.client.renderer.entity.MinecartRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
@@ -26,26 +22,21 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.vehicle.Boat;
 import net.minecraft.world.level.LightLayer;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.Map;
 import java.util.stream.Stream;
 
-public class SleighEntityRenderer extends EntityRenderer<SledEntity> {
+public class SledEntityRenderer extends EntityRenderer<SledEntity> {
 
     private final Map<Boat.Type, ResourceLocation> textures;
     private final SledModel<SledEntity> model;
-    private final SledModel2<SledEntity> model2;
-    private final SledModel3<SledEntity> model3;
 
-    public SleighEntityRenderer(EntityRendererProvider.Context context) {
+    public SledEntityRenderer(EntityRendererProvider.Context context) {
         super(context);
         this.shadowRadius = 0.8F;
         this.model = new SledModel<>(context.bakeLayer(ClientSetup.SLED_MODEL));
-        this.model2 = new SledModel2<>(context.bakeLayer(ClientSetup.SLED_MODEL2));
-        this.model3 = new SledModel3<>(context.bakeLayer(ClientSetup.SLED_MODEL3));
         this.textures = Stream.of(Boat.Type.values()).collect(ImmutableMap.toImmutableMap((e) -> e,
                 (t) -> new ResourceLocation(Christmas.MOD_ID + ":textures/entity/sled/" + t.getName() + ".png")));
     }
@@ -53,7 +44,7 @@ public class SleighEntityRenderer extends EntityRenderer<SledEntity> {
     @Override
     public void render(SledEntity sled, float yRot, float partialTicks, PoseStack poseStack, MultiBufferSource bufferSource, int light) {
         poseStack.pushPose();
-        poseStack.translate(0.0D, 0.375D + Mth.lerp(partialTicks, sled.prevAdditionalY, sled.additionalY), 0.0D);
+        poseStack.translate(0.0D, 0.375D + Mth.lerp(partialTicks, sled.prevAdditionalY, sled.cachedAdditionalY), 0.0D);
         //same stuff that happens to yRot when its created
         float xRot = sled.getViewXRot(partialTicks);
 
@@ -81,9 +72,7 @@ public class SleighEntityRenderer extends EntityRenderer<SledEntity> {
 
         poseStack.scale(-1.0F, -1.0F, 1.0F);
 
-
         //boatmodel.setupAnim(sled, partialTicks, 0.0F, -0.1F, 0.0F, 0.0F);
-        Model model = this.model3;
 
         VertexConsumer vertexconsumer = bufferSource.getBuffer(model.renderType(resourcelocation));
         model.renderToBuffer(poseStack, vertexconsumer, light, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
@@ -96,7 +85,7 @@ public class SleighEntityRenderer extends EntityRenderer<SledEntity> {
             this.renderDebugHitbox(poseStack, bufferSource.getBuffer(RenderType.lines()), sled, partialTicks);
         }
 
-        this.renderLeash(sled, partialTicks, poseStack, bufferSource, (float)((90+yRot)* Math.PI / 180),(float)( xRot* Math.PI / 180));
+        this.renderLeash(sled, partialTicks, poseStack, bufferSource, (float) ((90 + yRot) * Math.PI / 180), (float) (xRot * Math.PI / 180));
     }
 
     @Override
@@ -109,7 +98,7 @@ public class SleighEntityRenderer extends EntityRenderer<SledEntity> {
                 .move(-pEntity.getX(), -pEntity.getY(), -pEntity.getZ());
         LevelRenderer.renderLineBox(pMatrixStack, pBuffer, aabb, 1.0F, 0, 0, 1.0F);
 
-        if(pEntity.hasWolf()) {
+        if (pEntity.hasWolf()) {
             aabb = pEntity.pullerAABB.move(-pEntity.getX(), -pEntity.getY(), -pEntity.getZ());
             LevelRenderer.renderLineBox(pMatrixStack, pBuffer, aabb, 0, 1, 0, 1.0F);
         }
@@ -119,7 +108,7 @@ public class SleighEntityRenderer extends EntityRenderer<SledEntity> {
         Matrix4f matrix4f = pMatrixStack.last().pose();
         Matrix3f matrix3f = pMatrixStack.last().normal();
         float mult = 6;
-        float eye = (float) (pEntity.getEyeHeight() + 1 + pEntity.additionalY);
+        float eye = (float) (pEntity.getEyeHeight() + 1 + pEntity.cachedAdditionalY);
         pBuffer.vertex(matrix4f, 0.0F, eye, 0.0F)
                 .color(0, 255, 0, 255)
                 .normal(matrix3f, (float) movement.x, (float) movement.y, (float) movement.z).endVertex();
@@ -187,11 +176,11 @@ public class SleighEntityRenderer extends EntityRenderer<SledEntity> {
                 double wolfOffsetZ = sin * ropeOffset.z - cos * ropeOffset.x * rope;
                 double offsetX = (cos * sledOffset.z + sin * sledOffset.x * rope) * pCos;
                 double offsetZ = (sin * sledOffset.z - cos * sledOffset.x * rope) * pCos;
-                double offsetY = -pSin * sledOffset.length() + sled.additionalY + 0.25;
+                double offsetY = -pSin * sledOffset.length() + sled.cachedAdditionalY + 0.25;
                 double pX = sledX + offsetX;
                 double pY = sledY + offsetY;
                 double pZ = sledZ + offsetZ;
-                poseStack.translate(offsetX,offsetY , offsetZ);
+                poseStack.translate(offsetX, offsetY, offsetZ);
 
                 float deltaX = (float) (wolfPos.x + wolfOffsetX - pX);
                 float deltaY = (float) (wolfPos.y - pY);

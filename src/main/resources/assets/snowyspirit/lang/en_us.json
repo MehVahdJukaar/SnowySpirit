@@ -30,5 +30,6 @@
   "block.snowyspirit.gumdrop_light_gray": "Light Gray Gumdrop",
   "block.snowyspirit.gumdrop_gray": "Gray Gumdrop",
   "block.snowyspirit.gumdrop_black": "Black Gumdrop",
-  "block.snowyspirit.gumdrop_brown": "Brown Gumdrop"
+  "block.snowyspirit.gumdrop_brown": "Brown Gumdrop",
+  "entity.snowyspirit.container_entity": "Sled Chest"
 }
