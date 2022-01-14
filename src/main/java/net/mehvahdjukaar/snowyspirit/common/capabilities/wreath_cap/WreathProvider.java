@@ -3,16 +3,16 @@
 //import net.mehvahdjukaar.snowyspirit.common.capabilities.CapabilityHandler;
 //import net.mehvahdjukaar.snowyspirit.init.ModRegistry;
 //import net.minecraft.client.multiplayer.ClientLevel;
-//import net.minecraft.client.renderer.LevelRenderer;
 //import net.minecraft.core.BlockPos;
 //import net.minecraft.core.Direction;
 //import net.minecraft.nbt.CompoundTag;
 //import net.minecraft.nbt.NbtUtils;
 //import net.minecraft.server.level.ServerLevel;
-//import net.minecraft.sounds.SoundSource;
 //import net.minecraft.world.entity.item.ItemEntity;
 //import net.minecraft.world.level.Level;
-//import net.minecraft.world.level.block.*;
+//import net.minecraft.world.level.block.Block;
+//import net.minecraft.world.level.block.DoorBlock;
+//import net.minecraft.world.level.block.LevelEvent;
 //import net.minecraft.world.level.block.state.BlockState;
 //import net.minecraft.world.level.block.state.properties.DoorHingeSide;
 //import net.minecraftforge.common.capabilities.Capability;
@@ -101,7 +101,7 @@
 //    }
 //
 //    @Override
-//    public void updateAllBlocksClient(ClientLevel level) {
+//    public void updateAllBlocksClient(Level level) {
 //        Set<BlockPos> positions = new HashSet<>(this.wreathBlocks.keySet());
 //        positions.forEach(p -> updateWeathBlock(p, level));
 //    }
@@ -122,7 +122,6 @@
 //            }
 //        });
 //    }
-//
 //
 //
 //    ;

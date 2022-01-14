@@ -1,0 +1,23 @@
+{
+  "replace": false,
+  "values": [
+    "snowyspirit:glow_lights_white",
+    "snowyspirit:glow_lights_orange",
+    "snowyspirit:glow_lights_magenta",
+    "snowyspirit:glow_lights_light_blue",
+    "snowyspirit:glow_lights_yellow",
+    "snowyspirit:glow_lights_lime",
+    "snowyspirit:glow_lights_light_blue",
+    "snowyspirit:glow_lights_pink",
+    "snowyspirit:glow_lights_gray",
+    "snowyspirit:glow_lights_light_gray",
+    "snowyspirit:glow_lights_cyan",
+    "snowyspirit:glow_lights_purple",
+    "snowyspirit:glow_lights_blue",
+    "snowyspirit:glow_lights_brown",
+    "snowyspirit:glow_lights_green",
+    "snowyspirit:glow_lights_red",
+    "snowyspirit:glow_lights_black",
+    "snowyspirit:glow_lights_prismatic"
+  ]
+}

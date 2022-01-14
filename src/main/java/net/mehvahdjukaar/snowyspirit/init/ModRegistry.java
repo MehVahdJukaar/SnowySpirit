@@ -3,22 +3,28 @@ package net.mehvahdjukaar.snowyspirit.init;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableMap;
+import com.mojang.serialization.Codec;
 import net.mehvahdjukaar.snowyspirit.Christmas;
-import net.mehvahdjukaar.snowyspirit.common.block.GingerBlock;
-import net.mehvahdjukaar.snowyspirit.common.block.GumdropButton;
-import net.mehvahdjukaar.snowyspirit.common.block.WreathBlock;
+import net.mehvahdjukaar.snowyspirit.common.block.*;
 import net.mehvahdjukaar.snowyspirit.common.entity.ContainerHolderEntity;
 import net.mehvahdjukaar.snowyspirit.common.entity.SledEntity;
+import net.mehvahdjukaar.snowyspirit.common.items.EggnogItem;
+import net.mehvahdjukaar.snowyspirit.common.items.GlowLightsItem;
 import net.mehvahdjukaar.snowyspirit.common.items.SledItem;
+import net.minecraft.core.GlobalPos;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.BlockTags;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.tags.EntityTypeTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
+import net.minecraft.world.entity.ai.memory.MemoryModuleType;
+import net.minecraft.world.entity.ai.sensing.SensorType;
+import net.minecraft.world.entity.schedule.Activity;
+import net.minecraft.world.entity.schedule.Schedule;
 import net.minecraft.world.entity.vehicle.Boat;
-import net.minecraft.world.entity.vehicle.MinecartChest;
+import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -31,7 +37,9 @@ import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
@@ -50,17 +58,27 @@ public class ModRegistry {
 
 
     public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, Christmas.MOD_ID);
+    public static final DeferredRegister<SoundEvent> SOUNDS = DeferredRegister.create(ForgeRegistries.SOUND_EVENTS, Christmas.MOD_ID);
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, Christmas.MOD_ID);
     public static final DeferredRegister<BlockEntityType<?>> TILES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITIES, Christmas.MOD_ID);
     public static final DeferredRegister<EntityType<?>> ENTITIES = DeferredRegister.create(ForgeRegistries.ENTITIES, Christmas.MOD_ID);
     public static final DeferredRegister<ParticleType<?>> PARTICLES = DeferredRegister.create(ForgeRegistries.PARTICLE_TYPES, Christmas.MOD_ID);
+    public static final DeferredRegister<Activity> ACTIVITIES = DeferredRegister.create(ForgeRegistries.ACTIVITIES, Christmas.MOD_ID);
+    public static final DeferredRegister<Schedule> SCHEDULES = DeferredRegister.create(ForgeRegistries.SCHEDULES, Christmas.MOD_ID);
+    public static final DeferredRegister<MemoryModuleType<?>> MEMORY_MODULE_TYPES = DeferredRegister.create(ForgeRegistries.MEMORY_MODULE_TYPES, Christmas.MOD_ID);
+    public static final DeferredRegister<SensorType<?>> POI_SENSORS = DeferredRegister.create(ForgeRegistries.SENSOR_TYPES, Christmas.MOD_ID);
 
     public static void init(IEventBus bus) {
+        SOUNDS.register(bus);
         BLOCKS.register(bus);
         ITEMS.register(bus);
         TILES.register(bus);
         ENTITIES.register(bus);
         PARTICLES.register(bus);
+        ACTIVITIES.register(bus);
+        SCHEDULES.register(bus);
+        MEMORY_MODULE_TYPES.register(bus);
+        POI_SENSORS.register(bus);
     }
 
     private static RegistryObject<Item> regItem(String name, Supplier<? extends Item> sup) {
@@ -71,6 +89,11 @@ public class ModRegistry {
         return regItem(blockSup.getId().getPath(), () -> new BlockItem(blockSup.get(), (new Item.Properties()).tab(group)));
     }
 
+    public static RegistryObject<SoundEvent> makeSoundEvent(String name) {
+        return SOUNDS.register(name, () -> new SoundEvent(Christmas.res(name)));
+    }
+
+    public static final RegistryObject<SoundEvent> WINTER_MUSIC = makeSoundEvent("music.winter");
 
     public static final RegistryObject<EntityType<SledEntity>> SLED = ENTITIES.register("sled",
             () -> EntityType.Builder.<SledEntity>of(SledEntity::new, MobCategory.MISC)
@@ -79,7 +102,7 @@ public class ModRegistry {
                     .build("sled"));
 
     public static final RegistryObject<EntityType<ContainerHolderEntity>> CONTAINER_ENTITY = ENTITIES.register("container_entity",
-            () ->  EntityType.Builder.of(ContainerHolderEntity::new, MobCategory.MISC)
+            () -> EntityType.Builder.of(ContainerHolderEntity::new, MobCategory.MISC)
                     .sized(0.75f, 0.75f)
                     .clientTrackingRange(8)
                     .build("container_entity"));
@@ -93,7 +116,14 @@ public class ModRegistry {
                     .requiresCorrectToolForDrops().strength(1.5F).sound(SoundType.CALCITE)));
     public static final RegistryObject<Item> CANDY_CANE_BLOCK_ITEM = regBlockItem(CANDY_CANE_BLOCK, CreativeModeTab.TAB_BUILDING_BLOCKS);
     public static final RegistryObject<Item> CANDY_CANE = regItem("candy_cane",
-            () -> new Item(new Item.Properties().tab(CreativeModeTab.TAB_FOOD)));
+            () -> new Item(new Item.Properties().tab(CreativeModeTab.TAB_FOOD).food(new FoodProperties
+                    .Builder().nutrition(2).saturationMod(0.4f).build())));
+
+    public static final RegistryObject<Item> EGGNOG = regItem("eggnog", EggnogItem::new);
+
+    public static final RegistryObject<Item> WINTER_DISC = ITEMS.register("winter_disc",
+            () -> new RecordItem(14, WINTER_MUSIC, new Item.Properties()
+                    .tab(CreativeModeTab.TAB_MISC).rarity(Rarity.RARE).stacksTo(1)));
 
     public static final RegistryObject<Block> GINGERBREAD_BLOCK = BLOCKS.register("gingerbread", () ->
             new Block(BlockBehaviour.Properties.of(Material.STONE, MaterialColor.TERRACOTTA_ORANGE)
@@ -113,6 +143,11 @@ public class ModRegistry {
     public static final RegistryObject<Item> GINGERBREAD_TRAPDOOR_ITEM = regBlockItem(GINGERBREAD_TRAPDOOR, CreativeModeTab.TAB_REDSTONE);
 
 
+    public static final RegistryObject<Block> GINGER_WILD = BLOCKS.register("wild_ginger", () -> new WildGingerBlock(
+            BlockBehaviour.Properties.copy(Blocks.TALL_GRASS)));
+    public static final RegistryObject<Item> GINGER_WILD_ITEM = regBlockItem(GINGER_WILD, CreativeModeTab.TAB_DECORATIONS);
+
+
     public static final RegistryObject<Block> GINGER_CROP = BLOCKS.register("ginger", () ->
             new GingerBlock(BlockBehaviour.Properties.of(Material.PLANT).noCollission().randomTicks().instabreak().sound(SoundType.CROP)));
     public static final RegistryObject<Item> GINGER_FLOWER = regItem("ginger_flower",
@@ -120,16 +155,45 @@ public class ModRegistry {
     public static final RegistryObject<Item> GINGER = regItem("ginger",
             () -> new Item(new Item.Properties().tab(CreativeModeTab.TAB_FOOD)));
 
-    public static final Map<DyeColor, RegistryObject<Block>> GUMDROPS_BUTTON = Stream.of(DyeColor.values()).collect(ImmutableMap.toImmutableMap((e) -> e,
+    public static final Map<DyeColor, RegistryObject<Block>> GUMDROPS_BUTTONS = Stream.of(DyeColor.values()).collect(ImmutableMap.toImmutableMap((e) -> e,
             (t) -> BLOCKS.register("gumdrop_" + t.getName(), () -> new GumdropButton(t))));
 
     public static final Map<DyeColor, RegistryObject<Item>> GUMDROPS_BUTTON_ITEMS = Stream.of(DyeColor.values()).collect(ImmutableMap.toImmutableMap((e) -> e,
-            (t) -> regBlockItem(GUMDROPS_BUTTON.get(t), CreativeModeTab.TAB_DECORATIONS)));
+            (t) -> regBlockItem(GUMDROPS_BUTTONS.get(t), CreativeModeTab.TAB_DECORATIONS)));
+
+    public static final Map<DyeColor, RegistryObject<Block>> GLOW_LIGHTS_BLOCKS = new HashMap<>();
+    public static final Map<DyeColor, RegistryObject<Item>> GLOW_LIGHTS_ITEMS = new HashMap<>();
+
+    static {
+        for (DyeColor c : DyeColor.values()) {
+            GLOW_LIGHTS_BLOCKS.put(c, BLOCKS.register("glow_lights_" + c.getName(), () -> new GlowLightsBlock(c)));
+            GLOW_LIGHTS_ITEMS.put(c, regItem("glow_lights_" + c.getName(), () -> new GlowLightsItem(GLOW_LIGHTS_BLOCKS.get(c).get())));
+        }
+        GLOW_LIGHTS_BLOCKS.put(null, BLOCKS.register("glow_lights_prismatic", () -> new GlowLightsBlock(null)));
+        GLOW_LIGHTS_ITEMS.put(null, regItem("glow_lights_prismatic", () -> new GlowLightsItem(GLOW_LIGHTS_BLOCKS.get(null).get())));
+    }
+
+    public static final RegistryObject<BlockEntityType<GlowLightsBlockTile>> GLOW_LIGHTS_BLOCK_TILE = TILES
+            .register("glow_lights", () -> BlockEntityType.Builder.of(GlowLightsBlockTile::new,
+                    ModRegistry.GLOW_LIGHTS_BLOCKS.values().stream().map(RegistryObject::get).toArray(Block[]::new)).build(null));
 
 
     public static final RegistryObject<Block> WREATH = BLOCKS.register("wreath", () ->
             new WreathBlock(BlockBehaviour.Properties.of(Material.PLANT, MaterialColor.COLOR_GREEN)
-                    .sound(SoundType.VINE).strength(0.1f).noCollission().noCollission()));
+                    .sound(SoundType.VINE).strength(0.1f).noCollission()));
     public static final RegistryObject<Item> WREATH_ITEM = regBlockItem(WREATH, CreativeModeTab.TAB_DECORATIONS);
+
+
+    //AI stuff
+
+    public static final RegistryObject<MemoryModuleType<Boolean>> PLACED_PRESENT =
+            MEMORY_MODULE_TYPES.register("placed_present", () -> new MemoryModuleType<>(Optional.of(Codec.BOOL)));
+
+    public static final RegistryObject<MemoryModuleType<GlobalPos>> WREATH_POS =
+            MEMORY_MODULE_TYPES.register("wreath_pos", () -> new MemoryModuleType<>(Optional.of(GlobalPos.CODEC)));
+
+    public static final RegistryObject<Block> SNOW_GLOBE = BLOCKS.register("snow_globe", () ->
+            new SnowGlobeBlock(BlockBehaviour.Properties.of(Material.STONE).strength(0.5f)));
+    public static final RegistryObject<Item> SNOW_GLOBE_ITEM = regBlockItem(SNOW_GLOBE, CreativeModeTab.TAB_DECORATIONS);
 
 }

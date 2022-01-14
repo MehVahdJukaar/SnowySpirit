@@ -19,7 +19,7 @@ public interface IWreathProvider {
 
     void updateWeathBlock(BlockPos pos, Level level);
 
-    void updateAllBlocksClient(ClientLevel level);
+    void updateAllBlocksClient(Level level);
 
     void updateAllBlocks(ServerLevel level);
 

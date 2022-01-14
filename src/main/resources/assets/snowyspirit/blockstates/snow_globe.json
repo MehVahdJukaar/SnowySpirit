@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "snowy=true": {
+      "model": "snowyspirit:block/snow_globe_snowy"
+    },
+    "snowy=false": {
+      "model": "snowyspirit:block/snow_globe"
+    }
+  }
+}

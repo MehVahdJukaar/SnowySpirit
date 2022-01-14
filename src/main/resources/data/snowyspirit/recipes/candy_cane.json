@@ -1,16 +1,11 @@
 {
-  "type": "minecraft:crafting_shaped",
-  "group": "candy_cane",
-  "pattern": [
-    "##",
-    "##",
-    "##"
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {"item": "minecraft:sugar"},
+    {"item": "minecraft:honeycomb"}
   ],
-  "key": {
-    "#": {"item": "minecraft:sugar"}
-  },
   "result": {
     "item": "snowyspirit:candy_cane",
-    "count": 1
+    "count": 6
   }
 }

@@ -315,11 +315,14 @@ public class SledEntity extends Entity implements IInputListener, IEntityAdditio
             this.maxUpStep = 1;
 
             this.pullerPos = this.pullerPos.add(0, 0, 0);
-            this.pullerAABB = this.pullerDimensions.makeBoundingBox(this.position().add(this.pullerPos));
+            this.pullerAABB = this.pullerDimensions.makeBoundingBox(this.position()
+                    .add(this.pullerPos));
         }
 
         //end wolf stuff
 
+
+        //old move
 
 
 
@@ -334,6 +337,8 @@ public class SledEntity extends Entity implements IInputListener, IEntityAdditio
                 this.onGround = true;
             }
         }
+
+
 
         if (this.onGround) {
 
@@ -357,27 +362,45 @@ public class SledEntity extends Entity implements IInputListener, IEntityAdditio
 
         float localAdditionalY = this.getAdditionalY();
         this.prevAdditionalY = localAdditionalY;
+        //if wants to go up raises y
         if (this.projectedPos.y > 0) {
             double slopeIncrement = (projectedPos.y + 0.01) / 2.5d;
             localAdditionalY = (float) Math.min(projectedPos.y, localAdditionalY + slopeIncrement);
         } else {
             //adjust bounding box
-            if (localAdditionalY > 0) {
-                this.setBoundingBox(this.makeBoundingBox());
-            }
+            //if (localAdditionalY > 0) {
+            //bb set in move
+               // this.setBoundingBox(this.makeBoundingBox());
+            //}
             localAdditionalY = 0;
         }
+
+        final float snowLayerHeight = 0.0625f;
+
         //raise when on snow layer
         if (this.status == Status.ON_SNOW_LAYER && localAdditionalY < 0.0625) {
-            localAdditionalY += 0.0625;
+            localAdditionalY += snowLayerHeight;
         }
 
         this.setDataAdditionalY(localAdditionalY);
         this.cachedAdditionalY = localAdditionalY;
 
-        //TODO: maybe bring up where it was
+        double oldY = this.getY();
+
+        //bb is set here
         super.move(pType, wantedPosIncrement);
 
+
+        //reset additionalY when is stepping up
+
+        if(this.cachedAdditionalY >0 && oldY<this.getY()) {
+
+            float newHeight = this.status == Status.ON_SNOW_LAYER ? snowLayerHeight : 0;
+            //adjust bounding box
+            this.setDataAdditionalY(newHeight);
+            this.cachedAdditionalY = newHeight;
+            this.setBoundingBox(this.makeBoundingBox());
+        }
     }
 
     //modified collide method to take into account puller AABB
@@ -385,6 +408,9 @@ public class SledEntity extends Entity implements IInputListener, IEntityAdditio
 
     @Override
     public void tick() {
+
+        if(this.chest != null && chest.isRemoved())this.chest = null;
+        if(this.wolf != null && wolf.isRemoved())this.wolf = null;
 
         if(this.restoreWolfUUID != null){
             for(var p : this.getPassengers()){
@@ -523,9 +549,11 @@ public class SledEntity extends Entity implements IInputListener, IEntityAdditio
         AABB aabb = this.getBoundingBox();
         List<VoxelShape> list = new ArrayList<>(this.level.getEntityCollisions(this, aabb.expandTowards(pVec)));
 
-        if (this.hasWolf()) list.add(Shapes.create(this.pullerAABB));
+        double lengthSqr = pVec.lengthSqr();
 
-        Vec3 vec3 = pVec.lengthSqr() == 0.0D ? pVec : collideBoundingBox(this, pVec, aabb, this.level, list);
+        if (this.hasWolf() && lengthSqr <0.01) list.add(Shapes.create(this.pullerAABB));
+
+        Vec3 vec3 = lengthSqr == 0.0D ? pVec : collideBoundingBox(this, pVec, aabb, this.level, list);
         boolean flag = pVec.x != vec3.x;
         boolean flag1 = pVec.y != vec3.y;
         boolean flag2 = pVec.z != vec3.z;
@@ -714,7 +742,7 @@ public class SledEntity extends Entity implements IInputListener, IEntityAdditio
         this.setDeltaMovement(movement.x * (double) invFriction, movement.y + gravity, movement.z * (double) invFriction);
         //rotation friction
         //increase rotation friction when going forward. Turning is hard!
-        this.deltaRotation *= Math.min(invFriction, (this.inputUp ? 0.75 : 0.9));
+        this.deltaRotation *= Math.min(invFriction, (this.inputUp ? 0.75 : 0.92));
     }
 
     private void controlSled() {
@@ -810,7 +838,19 @@ public class SledEntity extends Entity implements IInputListener, IEntityAdditio
                 }
             }
         }
-        super.checkFallDamage(pY, pOnGround, pState, pPos);
+        //super code
+        if (pOnGround) {
+            if (this.fallDistance > 0.0F) {
+                //pState.getBlock().fallOn(this.level, pState, pPos, this, this.fallDistance);
+                //if (!pState.is(BlockTags.OCCLUDES_VIBRATION_SIGNALS)) {
+                //    this.gameEvent(GameEvent.HIT_GROUND);
+                //}
+            }
+
+            this.resetFallDistance();
+        } else if (pY < 0.0D) {
+            this.fallDistance = (float)((double)this.fallDistance - pY);
+        }
     }
 
     public void setDamage(float p_38312_) {
@@ -864,6 +904,16 @@ public class SledEntity extends Entity implements IInputListener, IEntityAdditio
         return 0.2D + this.getAdditionalY();
     }
 
+    @Nullable
+    public ContainerHolderEntity tryAddingChest(ItemStack stack){
+        if(stack.is(ModRegistry.VALID_CONTAINERS) && this.canAddChest()){
+            ContainerHolderEntity container = new ContainerHolderEntity(level, this, stack.split(1));
+            level.addFreshEntity(container);
+            return container;
+        }
+        return null;
+    }
+
     @Override
     public InteractionResult interact(Player player, InteractionHand pHand) {
         if (!player.isSecondaryUseActive()) {
@@ -877,9 +927,7 @@ public class SledEntity extends Entity implements IInputListener, IEntityAdditio
                 this.setSeatType(ModRegistry.CARPETS.inverse().get(stack.getItem()));
                 stack.shrink(1);
                 return InteractionResult.sidedSuccess(player.level.isClientSide);
-            } else if (stack.is(ModRegistry.VALID_CONTAINERS) && this.canAddChest()) {
-                ContainerHolderEntity container = new ContainerHolderEntity(level, this, stack.split(1));
-                level.addFreshEntity(container);
+            } else if (this.tryAddingChest(stack) != null){
                 return InteractionResult.sidedSuccess(player.level.isClientSide);
             }
             if(!this.hasWolf()){
@@ -968,7 +1016,9 @@ public class SledEntity extends Entity implements IInputListener, IEntityAdditio
         if (this.hasPassenger(entity)) {
 
             //can only have 1 chest so the rider that is chest is THE chest
-            if(this.chest == null && entity instanceof ContainerHolderEntity container)this.chest = container;
+            if(this.chest == null && entity instanceof ContainerHolderEntity container){
+                this.chest = container;
+            }
 
             if (this.isWolfEntity(entity)) {
                 Animal animal = (Animal) entity;

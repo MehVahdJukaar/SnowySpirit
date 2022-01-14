@@ -22,6 +22,7 @@ import net.minecraft.world.entity.item.FallingBlockEntity;
 import net.minecraft.world.entity.monster.piglin.PiglinAi;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.vehicle.MinecartChest;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ChestMenu;
 import net.minecraft.world.item.BlockItem;
@@ -64,8 +65,12 @@ public class ContainerHolderEntity extends Entity implements Container, MenuProv
     protected ContainerHolderEntity(Level level, Entity sled, ItemStack containerStack) {
         this(ModRegistry.CONTAINER_ENTITY.get(), level);
         this.setContainerItem(containerStack);
-        this.startRiding(sled);
         this.setPos(sled.position());
+        if(this.startRiding(sled)){
+            //this causes issues
+           // sled.positionRider(this);
+        }
+
     }
 
     public void setContainerItem(ItemStack stack){
@@ -97,6 +102,19 @@ public class ContainerHolderEntity extends Entity implements Container, MenuProv
             this.displayState = blockItem.getBlock().defaultBlockState();
         }
 
+        this.itemStacks = NonNullList.withSize(this.getContainerSize(), ItemStack.EMPTY);
+        if (pCompound.contains("LootTable", 8)) {
+            this.lootTable = new ResourceLocation(pCompound.getString("LootTable"));
+            this.lootTableSeed = pCompound.getLong("LootTableSeed");
+        } else {
+            ContainerHelper.loadAllItems(pCompound, this.itemStacks);
+        }
+    }
+
+    @Override
+    protected void addAdditionalSaveData(CompoundTag pCompound) {
+        pCompound.put("ContainerItem", this.containerStack.save(new CompoundTag()));
+
         if (this.lootTable != null) {
             pCompound.putString("LootTable", this.lootTable.toString());
             if (this.lootTableSeed != 0L) {
@@ -104,20 +122,6 @@ public class ContainerHolderEntity extends Entity implements Container, MenuProv
             }
         } else {
             ContainerHelper.saveAllItems(pCompound, this.itemStacks);
-        }
-    }
-
-    @Override
-    protected void addAdditionalSaveData(CompoundTag pCompound) {
-
-        pCompound.put("ContainerItem", this.containerStack.save(new CompoundTag()));
-
-        this.itemStacks = NonNullList.withSize(this.getContainerSize(), ItemStack.EMPTY);
-        if (pCompound.contains("LootTable", 8)) {
-            this.lootTable = new ResourceLocation(pCompound.getString("LootTable"));
-            this.lootTableSeed = pCompound.getLong("LootTableSeed");
-        } else {
-            ContainerHelper.loadAllItems(pCompound, this.itemStacks);
         }
     }
 

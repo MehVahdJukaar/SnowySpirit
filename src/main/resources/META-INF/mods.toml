@@ -29,13 +29,13 @@ displayName="Snowy Spirit" #mandatory
 # A file name (in the root of the mod JAR) containing a logo for display
 logoFile="icon.png" #optional
 # A text field displayed in the mod UI
-credits="MehVahdJukaar" #optional
+credits="MehVahdJukaar, PlantKillable, AlleCraft, Meman" #optional
 # A text field displayed in the mod UI
 authors="MehVahdJukaar" #optional
 # The description text for the mod (multi line!) (#mandatory)
-itemIcon="minecraft:snowball" #catalogue icon
+itemIcon="snowyspirit:wreath" #catalogue icon
 description='''
-Christmas themed mod
+Winter themed mod that adds working sleds and winter related items with related ai tweaks for villagers
 '''
 # A dependency - use the . to indicate dependency for a specific modid. Dependencies are optional.
 [[dependencies.snowyspirit]] #optional
@@ -55,5 +55,13 @@ Christmas themed mod
     mandatory=true
     # This version range declares a minimum of the current minecraft version up to but not including the next major version
     versionRange="[1.18,1.19)"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.snowyspirit]]
+
+    modId="selene"
+    mandatory=true
+    versionRange="[1.18-1.12,]"
     ordering="NONE"
     side="BOTH"

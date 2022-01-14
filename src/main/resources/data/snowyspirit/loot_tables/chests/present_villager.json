@@ -1,0 +1,203 @@
+{
+  "type": "minecraft:chest",
+  "pools": [
+    {
+      "rolls": 1.0,
+      "bonus_rolls": 0.0,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "weight": 20,
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "type": "minecraft:uniform",
+                "min": 8.0,
+                "max": 16.0
+              },
+              "add": false
+            }
+          ],
+          "name": "minecraft:emerald"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 8,
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "type": "minecraft:uniform",
+                "min": 4.0,
+                "max": 8.0
+              },
+              "add": false
+            }
+          ],
+          "name": "minecraft:charcoal"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 8,
+          "name": "supplementaries:speaker_block"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 3,
+          "name": "minecraft:totem_of_undying"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 8,
+          "name": "supplementaries:globe"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 8,
+          "name": "minecraft:spyglass"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 8,
+          "name": "snowyspirit:winter_disc"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 2,
+          "name": "snowyspirit:sled_oak"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 2,
+          "name": "snowyspirit:sled_dark_oak"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 2,
+          "name": "snowyspirit:sled_jungle"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 2,
+          "name": "snowyspirit:sled_acacia"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 2,
+          "name": "snowyspirit:sled_spruce"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 8,
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "type": "minecraft:uniform",
+                "min": 8.0,
+                "max": 16.0
+              },
+              "add": false
+            }
+          ],
+          "name": "snowyspirit:candy_cane"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 8,
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "type": "minecraft:uniform",
+                "min": 8.0,
+                "max": 16.0
+              },
+              "add": false
+            }
+          ],
+          "name": "supplementaries:candy"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 4,
+          "functions": [
+            {
+              "function": "minecraft:set_enchantments",
+              "tag": "{StoredEnchantments:[{lvl:1s,id:\"supplementaries:stasis\"}]}"
+            }
+          ],
+          "name": "supplementaries:bubble_blower"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 8,
+          "functions": [
+            {
+              "function": "minecraft:enchant_with_levels",
+              "levels": {
+                "type": "minecraft:uniform",
+                "min": 10.0,
+                "max": 30.0
+              },
+              "treasure": true
+            }
+          ],
+          "name": "supplementaries:slingshot"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 8,
+          "name": "supplementaries:wrench"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 3,
+          "functions": [
+            {
+              "function": "minecraft:set_enchantments",
+              "tag": "{StoredEnchantments:[{lvl:1s,id:\"minecraft:unbreaking\"}]}"
+            }
+          ],
+          "name": "supplementaries:flute"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 3,
+          "functions": [
+            {
+              "function": "minecraft:set_enchantments",
+              "tag": "{StoredEnchantments:[{lvl:2s,id:\"minecraft:unbreaking\"}]}"
+            }
+          ],
+          "name": "supplementaries:flute"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 2,
+          "functions": [
+            {
+              "function": "minecraft:set_enchantments",
+              "tag": "{StoredEnchantments:[{lvl:3s,id:\"minecraft:unbreaking\"}]}"
+            }
+          ],
+          "name": "supplementaries:flute"
+        },
+		        {
+          "type": "minecraft:item",
+          "weight": 6,
+          "functions": [
+            {
+              "function": "minecraft:set_name",
+				"name": {
+					"text": "mehvahdjukaar"
+				}
+            }
+          ],
+          "name": "supplementaries:statue"
+        }
+      ]
+    }
+  ]
+}

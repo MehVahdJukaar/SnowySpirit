@@ -11,6 +11,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 @Mixin(LivingEntityRenderer.class)
 public abstract class LivingEntityRendererMixin {
 
+    //animations for sled pullers
     @Redirect(method ="render(Lnet/minecraft/world/entity/LivingEntity;FFLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V",
             at = @At(value = "INVOKE",
                     target = "net/minecraft/world/entity/LivingEntity.getVehicle ()Lnet/minecraft/world/entity/Entity;",
@@ -22,4 +23,6 @@ public abstract class LivingEntityRendererMixin {
         }
         return vehicle;
     }
+
+
 }

@@ -7,6 +7,7 @@
   "package": "net.mehvahdjukaar.snowyspirit.mixins",
   "mixins": [
     "EntityMixin",
+    "IglooPiecesMixin",
     "PowderSnowMixin"
   ],
   "client": [
