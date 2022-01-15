@@ -1,7 +1,9 @@
 package net.mehvahdjukaar.snowyspirit.init;
 
 import net.mehvahdjukaar.snowyspirit.Christmas;
-import net.mehvahdjukaar.snowyspirit.client.*;
+import net.mehvahdjukaar.snowyspirit.client.ContainerHolderEntityRenderer;
+import net.mehvahdjukaar.snowyspirit.client.SledEntityRenderer;
+import net.mehvahdjukaar.snowyspirit.client.SledModel;
 import net.mehvahdjukaar.snowyspirit.client.block_model.GlowLightsModelLoader;
 import net.mehvahdjukaar.snowyspirit.common.block.GlowLightsBlockTile;
 import net.minecraft.client.Minecraft;
@@ -18,15 +20,12 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.ColorHandlerEvent;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
-import net.minecraftforge.client.model.ForgeModelBakery;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.registries.RegistryObject;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.stream.Collectors;
 
 @Mod.EventBusSubscriber(modid = Christmas.MOD_ID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class ClientSetup {

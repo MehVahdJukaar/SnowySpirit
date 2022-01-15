@@ -1,6 +1,5 @@
 package net.mehvahdjukaar.snowyspirit.common.capabilities.wreath_cap;
 
-import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;

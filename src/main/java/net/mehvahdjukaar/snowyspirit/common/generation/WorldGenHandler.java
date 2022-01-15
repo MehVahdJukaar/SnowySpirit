@@ -14,7 +14,8 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.Set;
 
-import static net.minecraftforge.common.BiomeDictionary.Type.*;
+import static net.minecraftforge.common.BiomeDictionary.Type.JUNGLE;
+import static net.minecraftforge.common.BiomeDictionary.Type.SPARSE;
 
 public class WorldGenHandler {
 

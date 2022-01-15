@@ -3,7 +3,7 @@ package net.mehvahdjukaar.snowyspirit.common.ai;
 
 import com.google.common.collect.ImmutableMap;
 import net.mehvahdjukaar.snowyspirit.common.block.WreathBlock;
-
+import net.mehvahdjukaar.snowyspirit.common.capabilities.CapabilityHandler;
 import net.mehvahdjukaar.snowyspirit.init.ModRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
@@ -29,7 +29,7 @@ public class PlaceWreathTask extends Behavior<Villager> {
     private final float speedModifier;
     private BlockPos targetPos;
     private int ticksSinceReached = 0;
-    private int cooldown = 20 * 30;
+    private int cooldown = 20 * 20;
 
     public PlaceWreathTask(float speed) {
         super(ImmutableMap.of(
@@ -91,10 +91,10 @@ public class PlaceWreathTask extends Behavior<Villager> {
                 this.ticksSinceReached++;
                 if (ticksSinceReached > 20) {
 
-                    //TODO: readd
-                    //if (WreathBlock.placeWreathOnDoor(targetPos, pLevel)) {
-                   //     pOwner.getBrain().setMemory(ModRegistry.WREATH_POS.get(), GlobalPos.of(pLevel.dimension(), targetPos));
-                    //}
+
+                    if (WreathBlock.placeWreathOnDoor(targetPos, pLevel)) {
+                        pOwner.getBrain().setMemory(ModRegistry.WREATH_POS.get(), GlobalPos.of(pLevel.dimension(), targetPos));
+                    }
                     //so taks ends
                     targetPos = null;
                 }
@@ -126,11 +126,11 @@ public class PlaceWreathTask extends Behavior<Villager> {
         BlockState state = serverLevel.getBlockState(pos);
         if (state.getBlock() instanceof DoorBlock) {
             boolean lower = state.getValue(DoorBlock.HALF) == DoubleBlockHalf.LOWER;
-            //TODO: readd
-            //var c = serverLevel.getCapability(CapabilityHandler.WREATH_CAPABILITY).orElse(null);
-            //return c != null && (lower ? !c.hasWreath(pos.above()) : !c.hasWreath(pos));
+
+            var c = serverLevel.getCapability(CapabilityHandler.WREATH_CAPABILITY).orElse(null);
+            return c != null && (lower ? !c.hasWreath(pos.above()) : !c.hasWreath(pos));
         }
-        ;
+
         return false;
     }
 

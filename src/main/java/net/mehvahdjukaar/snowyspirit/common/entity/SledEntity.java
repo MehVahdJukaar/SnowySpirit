@@ -3,6 +3,7 @@ package net.mehvahdjukaar.snowyspirit.common.entity;
 import com.google.common.collect.Lists;
 import net.mehvahdjukaar.snowyspirit.common.IInputListener;
 import net.mehvahdjukaar.snowyspirit.init.ModRegistry;
+import net.mehvahdjukaar.supplementaries.common.items.FluteItem;
 import net.minecraft.BlockUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -23,19 +24,21 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.animal.Animal;
-import net.minecraft.world.entity.animal.IronGolem;
 import net.minecraft.world.entity.animal.WaterAnimal;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.vehicle.Boat;
 import net.minecraft.world.entity.vehicle.DismountHelper;
-import net.minecraft.world.item.*;
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.SnowLayerBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
+import net.minecraft.world.level.storage.loot.functions.SetEnchantmentsFunction;
 import net.minecraft.world.phys.AABB;
-import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.BooleanOp;
 import net.minecraft.world.phys.shapes.Shapes;
@@ -126,9 +129,10 @@ public class SledEntity extends Entity implements IInputListener, IEntityAdditio
     }
     @Override
     public void writeSpawnData(FriendlyByteBuf buffer) {
-        buffer.writeBoolean(this.hasWolf());
-        if(this.wolf != null){
-            buffer.writeUUID(this.wolf.getUUID());
+        UUID id = this.hasWolf() ? this.wolf.getUUID() : this.restoreWolfUUID;
+        buffer.writeBoolean(id != null);
+        if(id != null){
+            buffer.writeUUID(id);
         }
     }
     //all of this to sync that damn wolf
@@ -412,6 +416,7 @@ public class SledEntity extends Entity implements IInputListener, IEntityAdditio
         if(this.chest != null && chest.isRemoved())this.chest = null;
         if(this.wolf != null && wolf.isRemoved())this.wolf = null;
 
+        //on first and second tick cause of passengers fuckery needing 2 ticks to get added
         if(this.restoreWolfUUID != null){
             for(var p : this.getPassengers()){
                 if(p.getUUID().equals(restoreWolfUUID) && p instanceof TamableAnimal animal){
@@ -419,7 +424,8 @@ public class SledEntity extends Entity implements IInputListener, IEntityAdditio
                     break;
                 }
             }
-            this.restoreWolfUUID = null;
+            //has 3 attempts to restore the worlf (omg)
+            if(this.tickCount>3) this.restoreWolfUUID = null;
         }
         if (this.wolf != null) this.wolf.setInvulnerable(true);
 
@@ -551,7 +557,8 @@ public class SledEntity extends Entity implements IInputListener, IEntityAdditio
 
         double lengthSqr = pVec.lengthSqr();
 
-        if (this.hasWolf() && lengthSqr <0.01) list.add(Shapes.create(this.pullerAABB));
+        //todo: maye re enable. this pretty much disable collisions with wolf at all times since it causes desync and glitchynes when going uphill
+        if (this.hasWolf() && lengthSqr <0.08) list.add(Shapes.create(this.pullerAABB));
 
         Vec3 vec3 = lengthSqr == 0.0D ? pVec : collideBoundingBox(this, pVec, aabb, this.level, list);
         boolean flag = pVec.x != vec3.x;
@@ -670,11 +677,17 @@ public class SledEntity extends Entity implements IInputListener, IEntityAdditio
                                     continue;
                                 }
                                 BlockState blockstate = this.level.getBlockState(mutable);
-                                if (blockstate.is(BlockTags.SNOW)) {
+                                if (blockstate.is(ModRegistry.SLED_SNOW)) {
                                     onSnow = true;
                                     f += snowFriction;
                                     ++k1;
-                                } else if (Shapes.joinIsNotEmpty(blockstate.getCollisionShape(this.level, mutable).move(l1, k2, i2), voxelshape, BooleanOp.AND)) {
+                                }
+                                else if(blockstate.is(ModRegistry.SLED_SAND)){
+                                    //sand friction
+                                    f += 0.83;
+                                    ++k1;
+                                }
+                                else if (Shapes.joinIsNotEmpty(blockstate.getCollisionShape(this.level, mutable).move(l1, k2, i2), voxelshape, BooleanOp.AND)) {
                                     //decreases friction for blocks and ice in particular
                                     float fr = blockstate.getFriction(this.level, mutable, this);
                                     if (fr > 0.9) fr *= 0.97;
@@ -792,7 +805,7 @@ public class SledEntity extends Entity implements IInputListener, IEntityAdditio
                     double acceleration = hasWolf ? 0.017f : 0.015;
                     powah += acceleration;//0.04F;
                 }
-                else powah += 0.04F;
+                else powah += 0.037F;
             }
 
             if (this.inputDown) {
@@ -1230,7 +1243,7 @@ public class SledEntity extends Entity implements IInputListener, IEntityAdditio
                 this.wolf.setInSittingPose(false);
                 this.wolf.setInvulnerable(false);
                 this.wolf = null;
-                this.spawnAtLocation(Items.LEAD);
+                //this.spawnAtLocation(Items.LEAD);
             }
         }
     }

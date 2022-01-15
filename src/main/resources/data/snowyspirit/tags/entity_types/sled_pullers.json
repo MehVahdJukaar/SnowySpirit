@@ -5,6 +5,10 @@
     {
       "id" :"quark:shiba",
       "required": false
+    },
+    {
+      "id" :"alexmobs:grizzly_bear",
+      "required": false
     }
   ]
 }

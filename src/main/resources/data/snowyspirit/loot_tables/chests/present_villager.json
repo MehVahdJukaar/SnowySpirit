@@ -29,8 +29,8 @@
               "function": "minecraft:set_count",
               "count": {
                 "type": "minecraft:uniform",
-                "min": 4.0,
-                "max": 8.0
+                "min": 6.0,
+                "max": 32.0
               },
               "add": false
             }
@@ -39,12 +39,12 @@
         },
         {
           "type": "minecraft:item",
-          "weight": 8,
+          "weight": 3,
           "name": "supplementaries:speaker_block"
         },
         {
           "type": "minecraft:item",
-          "weight": 3,
+          "weight": 2,
           "name": "minecraft:totem_of_undying"
         },
         {
@@ -59,7 +59,7 @@
         },
         {
           "type": "minecraft:item",
-          "weight": 8,
+          "weight": 25,
           "name": "snowyspirit:winter_disc"
         },
         {
@@ -89,7 +89,7 @@
         },
         {
           "type": "minecraft:item",
-          "weight": 8,
+          "weight": 12,
           "functions": [
             {
               "function": "minecraft:set_count",
@@ -121,13 +121,20 @@
         },
         {
           "type": "minecraft:item",
-          "weight": 4,
+          "weight": 5,
           "functions": [
             {
               "function": "minecraft:set_enchantments",
-              "tag": "{StoredEnchantments:[{lvl:1s,id:\"supplementaries:stasis\"}]}"
+              "enchantments": {
+                "supplementaries:stasis": 1
+              }
             }
           ],
+          "name": "supplementaries:bubble_blower"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 3,
           "name": "supplementaries:bubble_blower"
         },
         {
@@ -149,44 +156,26 @@
         {
           "type": "minecraft:item",
           "weight": 8,
-          "name": "supplementaries:wrench"
+          "name": "supplementaries:wrench",
+          "functions": [
+            {
+              "function": "minecraft:enchant_randomly"
+            }
+          ]
         },
         {
           "type": "minecraft:item",
           "weight": 3,
           "functions": [
             {
-              "function": "minecraft:set_enchantments",
-              "tag": "{StoredEnchantments:[{lvl:1s,id:\"minecraft:unbreaking\"}]}"
+              "function": "minecraft:enchant_randomly"
             }
           ],
           "name": "supplementaries:flute"
         },
-        {
-          "type": "minecraft:item",
-          "weight": 3,
-          "functions": [
-            {
-              "function": "minecraft:set_enchantments",
-              "tag": "{StoredEnchantments:[{lvl:2s,id:\"minecraft:unbreaking\"}]}"
-            }
-          ],
-          "name": "supplementaries:flute"
-        },
-        {
+		{
           "type": "minecraft:item",
           "weight": 2,
-          "functions": [
-            {
-              "function": "minecraft:set_enchantments",
-              "tag": "{StoredEnchantments:[{lvl:3s,id:\"minecraft:unbreaking\"}]}"
-            }
-          ],
-          "name": "supplementaries:flute"
-        },
-		        {
-          "type": "minecraft:item",
-          "weight": 6,
           "functions": [
             {
               "function": "minecraft:set_name",
@@ -196,6 +185,29 @@
             }
           ],
           "name": "supplementaries:statue"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 4,
+          "functions": [
+            {
+              "function": "minecraft:set_name",
+              "name": {
+                "text": "Flat"
+              }
+            }
+          ],
+          "name": "supplementaries:globe"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 4,
+          "name": "supplementaries:globe_sepia"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 7,
+          "name": "snowyspirit:snow_globe"
         }
       ]
     }

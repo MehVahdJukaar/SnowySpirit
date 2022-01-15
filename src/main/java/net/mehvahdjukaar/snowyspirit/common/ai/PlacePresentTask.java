@@ -8,9 +8,9 @@ import net.mehvahdjukaar.supplementaries.common.block.blocks.PresentBlock;
 import net.mehvahdjukaar.supplementaries.common.block.tiles.PresentBlockTile;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.GlobalPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.behavior.Behavior;
@@ -22,8 +22,7 @@ import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraftforge.event.ForgeEventFactory;
@@ -54,7 +53,7 @@ public class PlacePresentTask extends Behavior<Villager> {
         if (pOwner.isBaby()) return false;
         //doesnt always start and gets put on cooldown
         if (!ForgeEventFactory.getMobGriefingEvent(pLevel, pOwner) || pLevel.random.nextInt(5)!=0) {
-            cooldown = 20 * 60;
+            cooldown = 20 * 50;
             return false;
         }
         var meeting = pOwner.getBrain().getMemory(MemoryModuleType.MEETING_POINT);
@@ -142,12 +141,12 @@ public class PlacePresentTask extends Behavior<Villager> {
     }
 
     public static boolean isValidPlacementSpot(ServerLevel serverLevel, BlockPos pos) {
-        if (serverLevel.canSeeSky(pos) && (double) serverLevel.getHeightmapPos(Heightmap.Types.MOTION_BLOCKING, pos).getY() >= serverLevel.getSeaLevel()-1) {
+        if (serverLevel.canSeeSky(pos) && (double) serverLevel.getHeightmapPos(Heightmap.Types.MOTION_BLOCKING, pos).getY() >= serverLevel.getSeaLevel()-10) {
             BlockState state = serverLevel.getBlockState(pos);
             if (state.getMaterial().isReplaceable() && state.getFluidState().isEmpty()) {
 
                 BlockState below = serverLevel.getBlockState(pos.below());
-                return below.isFaceSturdy(serverLevel, pos, Direction.UP);
+                return below.isFaceSturdy(serverLevel, pos, Direction.UP) || below.is(BlockTags.DIRT);
             }
         }
         return false;

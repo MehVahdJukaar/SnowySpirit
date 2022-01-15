@@ -15,6 +15,7 @@ import net.minecraft.core.GlobalPos;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.EntityTypeTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.entity.EntityType;
@@ -55,6 +56,8 @@ public class ModRegistry {
 
     public static final Tags.IOptionalNamedTag<Item> VALID_CONTAINERS = ItemTags.createOptional(Christmas.res("sled_container"));
     public static final Tags.IOptionalNamedTag<EntityType<?>> WOLVES = EntityTypeTags.createOptional(Christmas.res("sled_pullers"));
+    public static final Tags.IOptionalNamedTag<Block> SLED_SNOW = BlockTags.createOptional(Christmas.res("sled_snow"));
+    public static final Tags.IOptionalNamedTag<Block> SLED_SAND = BlockTags.createOptional(Christmas.res("sled_sand"));
 
 
     public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, Christmas.MOD_ID);
@@ -155,16 +158,17 @@ public class ModRegistry {
     public static final RegistryObject<Item> GINGER = regItem("ginger",
             () -> new Item(new Item.Properties().tab(CreativeModeTab.TAB_FOOD)));
 
-    public static final Map<DyeColor, RegistryObject<Block>> GUMDROPS_BUTTONS = Stream.of(DyeColor.values()).collect(ImmutableMap.toImmutableMap((e) -> e,
-            (t) -> BLOCKS.register("gumdrop_" + t.getName(), () -> new GumdropButton(t))));
-
-    public static final Map<DyeColor, RegistryObject<Item>> GUMDROPS_BUTTON_ITEMS = Stream.of(DyeColor.values()).collect(ImmutableMap.toImmutableMap((e) -> e,
-            (t) -> regBlockItem(GUMDROPS_BUTTONS.get(t), CreativeModeTab.TAB_DECORATIONS)));
+    public static final Map<DyeColor, RegistryObject<Block>> GUMDROPS_BUTTONS = new HashMap<>();
+    public static final Map<DyeColor, RegistryObject<Item>> GUMDROPS_BUTTON_ITEMS = new HashMap<>();
 
     public static final Map<DyeColor, RegistryObject<Block>> GLOW_LIGHTS_BLOCKS = new HashMap<>();
     public static final Map<DyeColor, RegistryObject<Item>> GLOW_LIGHTS_ITEMS = new HashMap<>();
 
     static {
+        for (DyeColor c : DyeColor.values()) {
+            GUMDROPS_BUTTONS.put(c, BLOCKS.register("gumdrop_" + c.getName(), () -> new GumdropButton(c)));
+            GUMDROPS_BUTTON_ITEMS.put(c,regBlockItem(GUMDROPS_BUTTONS.get(c), CreativeModeTab.TAB_DECORATIONS));
+        }
         for (DyeColor c : DyeColor.values()) {
             GLOW_LIGHTS_BLOCKS.put(c, BLOCKS.register("glow_lights_" + c.getName(), () -> new GlowLightsBlock(c)));
             GLOW_LIGHTS_ITEMS.put(c, regItem("glow_lights_" + c.getName(), () -> new GlowLightsItem(GLOW_LIGHTS_BLOCKS.get(c).get())));
