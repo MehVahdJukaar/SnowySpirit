@@ -1,23 +1,15 @@
 package net.mehvahdjukaar.snowyspirit.common.ai;
 
-import com.google.common.collect.ImmutableList;
 import com.mojang.datafixers.util.Pair;
 import net.mehvahdjukaar.selene.villager_ai.VillagerAIManager;
 import net.mehvahdjukaar.selene.villager_ai.VillagerBrainEvent;
 import net.mehvahdjukaar.snowyspirit.Christmas;
 import net.mehvahdjukaar.snowyspirit.init.ModRegistry;
-import net.minecraft.client.renderer.entity.VillagerRenderer;
-import net.minecraft.world.entity.ai.behavior.Behavior;
-import net.minecraft.world.entity.ai.behavior.VillagerGoalPackages;
+import net.mehvahdjukaar.snowyspirit.suppcompat.PlacePresentTask;
 import net.minecraft.world.entity.npc.Villager;
-import net.minecraft.world.entity.npc.VillagerProfession;
 import net.minecraft.world.entity.npc.VillagerType;
 import net.minecraft.world.entity.schedule.Activity;
-import net.minecraft.world.level.Level;
 import net.minecraftforge.fml.ModList;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class WinterVillagerAI {
 

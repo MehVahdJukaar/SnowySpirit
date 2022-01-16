@@ -1,6 +1,8 @@
 package net.mehvahdjukaar.snowyspirit.common.entity;
 
+import net.mehvahdjukaar.snowyspirit.Christmas;
 import net.mehvahdjukaar.snowyspirit.init.ModRegistry;
+import net.mehvahdjukaar.snowyspirit.suppcompat.SackHelper;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
@@ -21,10 +23,12 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ChestMenu;
 import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.ShulkerBoxBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.storage.loot.LootContext;
@@ -45,6 +49,7 @@ public class ContainerHolderEntity extends Entity implements Container, MenuProv
     private static final EntityDataAccessor<Float> DATA_ID_DAMAGE = SynchedEntityData.defineId(ContainerHolderEntity.class, EntityDataSerializers.FLOAT);
 
     private ItemStack containerStack = ItemStack.EMPTY;
+    private final int containerSize = 27;
 
     //for client
     public BlockState displayState = Blocks.AIR.defaultBlockState();
@@ -58,16 +63,17 @@ public class ContainerHolderEntity extends Entity implements Container, MenuProv
         this(ModRegistry.CONTAINER_ENTITY.get(), level);
         this.setContainerItem(containerStack);
         this.setPos(sled.position());
-        if(this.startRiding(sled)){
+        if (this.startRiding(sled)) {
             //this causes issues
-           // sled.positionRider(this);
+            // sled.positionRider(this);
         }
 
     }
 
-    public void setContainerItem(ItemStack stack){
+
+    public void setContainerItem(ItemStack stack) {
         this.containerStack = stack;
-        if(this.containerStack.getItem() instanceof BlockItem blockItem){
+        if (this.containerStack.getItem() instanceof BlockItem blockItem) {
             this.displayState = blockItem.getBlock().defaultBlockState();
         }
     }
@@ -90,7 +96,7 @@ public class ContainerHolderEntity extends Entity implements Container, MenuProv
     @Override
     protected void readAdditionalSaveData(CompoundTag pCompound) {
         this.containerStack = ItemStack.of(pCompound.getCompound("ContainerItem"));
-        if(this.containerStack.getItem() instanceof BlockItem blockItem){
+        if (this.containerStack.getItem() instanceof BlockItem blockItem) {
             this.displayState = blockItem.getBlock().defaultBlockState();
         }
 
@@ -177,7 +183,6 @@ public class ContainerHolderEntity extends Entity implements Container, MenuProv
 
     public void destroy(DamageSource pSource) {
         if (this.level.getGameRules().getBoolean(GameRules.RULE_DOENTITYDROPS)) {
-            Containers.dropContents(this.level, this, this);
             if (!this.level.isClientSide) {
                 Entity entity = pSource.getDirectEntity();
                 if (entity != null && entity.getType() == EntityType.PLAYER) {
@@ -186,13 +191,21 @@ public class ContainerHolderEntity extends Entity implements Container, MenuProv
             }
         }
         this.remove(Entity.RemovalReason.KILLED);
-        if (this.level.getGameRules().getBoolean(GameRules.RULE_DOENTITYDROPS)) {
-            ItemStack itemstack = this.containerStack.copy();
-            if (this.hasCustomName()) {
-                itemstack.setHoverName(this.getCustomName());
-            }
-            this.spawnAtLocation(itemstack);
+    }
+
+    public void spawnDrops() {
+        ItemStack stack = this.containerStack.copy();
+        if (this.hasCustomName()) {
+            stack.setHoverName(this.getCustomName());
         }
+        if (!this.containerStack.is(ModRegistry.VALID_CONTAINERS)) {
+            CompoundTag tag = new CompoundTag();
+            ContainerHelper.saveAllItems(tag, this.itemStacks, false);
+            stack.addTagElement("BlockEntityTag", tag);
+        } else {
+            Containers.dropContents(this.level, this, this);
+        }
+        this.spawnAtLocation(stack);
     }
 
     /**
@@ -214,8 +227,8 @@ public class ContainerHolderEntity extends Entity implements Container, MenuProv
 
     @Override
     public void setYRot(float pYRot) {
-        if(yRotO<0){
-            int a =1;
+        if (yRotO < 0) {
+            int a = 1;
         }
         super.setYRot(pYRot);
     }
@@ -226,7 +239,7 @@ public class ContainerHolderEntity extends Entity implements Container, MenuProv
     @Override
     public void tick() {
         Entity v = this.getVehicle();
-        if(v != null) {
+        if (v != null) {
 
             if (this.getHurtTime() > 0) {
                 this.setHurtTime(this.getHurtTime() - 1);
@@ -241,12 +254,12 @@ public class ContainerHolderEntity extends Entity implements Container, MenuProv
 
 
             // this.xRotO = v.xRotO;
-           // this.yRotO = v.yRotO;
+            // this.yRotO = v.yRotO;
             //this.setYRot(v.getYRot());
             super.tick();
             // this.xRotO = this.getXRot();
             //this.yRotO = this.getYRot();
-        }else{
+        } else {
             this.destroy(DamageSource.GENERIC);
         }
     }
@@ -387,7 +400,9 @@ public class ContainerHolderEntity extends Entity implements Container, MenuProv
     @Override
     public void remove(Entity.RemovalReason pReason) {
         if (!this.level.isClientSide && pReason.shouldDestroy()) {
-            Containers.dropContents(this.level, this, this);
+            if (this.level.getGameRules().getBoolean(GameRules.RULE_DOENTITYDROPS)) {
+                this.spawnDrops();
+            }
         }
         super.remove(pReason);
     }
@@ -463,11 +478,14 @@ public class ContainerHolderEntity extends Entity implements Container, MenuProv
 
     @Override
     public int getContainerSize() {
-        return 27;
+        return containerSize;
     }
 
-    public AbstractContainerMenu createMenu(int pId, Inventory pPlayerInventory) {
-        return ChestMenu.threeRows(pId, pPlayerInventory, this);
+    public AbstractContainerMenu createMenu(int id, Inventory pPlayerInventory) {
+        if (Christmas.SUPP && SackHelper.isSack(containerStack.getItem())) {
+            return SackHelper.createMenu(id, pPlayerInventory, this);
+        }
+        return ChestMenu.threeRows(id, pPlayerInventory, this);
     }
 
     // Forge Start
@@ -492,5 +510,12 @@ public class ContainerHolderEntity extends Entity implements Container, MenuProv
         this.itemHandler = LazyOptional.of(() -> new InvWrapper(this));
     }
 
+
+    public static boolean isChestItem(ItemStack stack) {
+        Item i = stack.getItem();
+        if (Christmas.SUPP && SackHelper.isSack(i)) return true;
+        return ModRegistry.VALID_CONTAINERS.contains(i) ||
+                (i instanceof BlockItem bi && (bi.getBlock() instanceof ShulkerBoxBlock));
+    }
 
 }

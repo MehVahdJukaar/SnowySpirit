@@ -1,4 +1,4 @@
-package net.mehvahdjukaar.snowyspirit.common.ai;
+package net.mehvahdjukaar.snowyspirit.suppcompat;
 
 
 import com.google.common.collect.ImmutableMap;

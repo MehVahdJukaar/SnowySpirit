@@ -87,24 +87,27 @@ public class WreathBlock extends HorizontalDirectionalBlock {
         var c = level.getCapability(CapabilityHandler.WREATH_CAPABILITY).orElse(null);
         if (c != null) {
             BlockState door = level.getBlockState(pos);
-            boolean lower = door.getValue(DoorBlock.HALF) == DoubleBlockHalf.LOWER;
-            BlockPos p = lower ? pos.above() : pos;
-            if (door.getBlock() instanceof DoorBlock && !c.hasWreath(pos)) {
 
-                if(level instanceof ServerLevel serverLevel) {
-                    BlockState state = ModRegistry.WREATH.get().defaultBlockState();
+            if (door.getBlock() instanceof DoorBlock) {
+                boolean lower = door.getValue(DoorBlock.HALF) == DoubleBlockHalf.LOWER;
+                BlockPos p = lower ? pos.above() : pos;
+                if (!c.hasWreath(p)) {
 
-                    c.updateWeathBlock(p, level);
-                    //pLevel.setBlockAndUpdate(targetPos, state);
-                    SoundType soundtype = state.getSoundType(level, p, null);
-                    level.playSound(null, p, soundtype.getPlaceSound(), SoundSource.BLOCKS, (soundtype.getVolume() + 1.0F) / 2.0F, soundtype.getPitch() * 0.8F);
-                    //send packet to clients
-                    NetworkHandler.sendToAllInRangeClients(p, serverLevel, Integer.MAX_VALUE,
-                            new ClientBoundSyncWreath(p, true,
-                                    door.getValue(DoorBlock.FACING), door.getValue(DoorBlock.OPEN)));
+                    if (level instanceof ServerLevel serverLevel) {
+                        BlockState state = ModRegistry.WREATH.get().defaultBlockState();
 
+                        c.updateWeathBlock(p, level);
+                        //pLevel.setBlockAndUpdate(targetPos, state);
+                        SoundType soundtype = state.getSoundType(level, p, null);
+                        level.playSound(null, p, soundtype.getPlaceSound(), SoundSource.BLOCKS, (soundtype.getVolume() + 1.0F) / 2.0F, soundtype.getPitch() * 0.8F);
+                        //send packet to clients
+                        NetworkHandler.sendToAllInRangeClients(p, serverLevel, Integer.MAX_VALUE,
+                                new ClientBoundSyncWreath(p, true,
+                                        door.getValue(DoorBlock.FACING), door.getValue(DoorBlock.OPEN)));
+
+                    }
+                    return true;
                 }
-                return true;
             }
         }
         return false;

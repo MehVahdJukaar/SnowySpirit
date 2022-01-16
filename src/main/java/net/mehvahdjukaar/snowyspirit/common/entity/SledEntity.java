@@ -919,7 +919,7 @@ public class SledEntity extends Entity implements IInputListener, IEntityAdditio
 
     @Nullable
     public ContainerHolderEntity tryAddingChest(ItemStack stack){
-        if(stack.is(ModRegistry.VALID_CONTAINERS) && this.canAddChest()){
+        if(ContainerHolderEntity.isChestItem(stack) && this.canAddChest()){
             ContainerHolderEntity container = new ContainerHolderEntity(level, this, stack.split(1));
             level.addFreshEntity(container);
             return container;
