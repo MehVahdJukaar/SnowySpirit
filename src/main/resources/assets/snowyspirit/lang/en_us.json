@@ -33,6 +33,7 @@
   "block.snowyspirit.gumdrop_black": "Black Gumdrop",
   "block.snowyspirit.gumdrop_brown": "Brown Gumdrop",
   "entity.snowyspirit.container_entity": "Sled Chest",
+  "message.snowyspirit.container_entity_name": "Sled %s",
   "block.snowyspirit.glow_lights_red": "Red Glow Lights",
   "block.snowyspirit.glow_lights_orange": "Orange Glow Lights",
   "block.snowyspirit.glow_lights_yellow": "Yellow Glow Lights",

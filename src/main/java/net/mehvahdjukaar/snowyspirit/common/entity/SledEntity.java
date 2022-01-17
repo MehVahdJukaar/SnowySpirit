@@ -3,7 +3,6 @@ package net.mehvahdjukaar.snowyspirit.common.entity;
 import com.google.common.collect.Lists;
 import net.mehvahdjukaar.snowyspirit.common.IInputListener;
 import net.mehvahdjukaar.snowyspirit.init.ModRegistry;
-import net.mehvahdjukaar.supplementaries.common.items.FluteItem;
 import net.minecraft.BlockUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -15,7 +14,6 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.util.Mth;
@@ -24,6 +22,7 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.animal.Animal;
+import net.minecraft.world.entity.animal.Fox;
 import net.minecraft.world.entity.animal.WaterAnimal;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.vehicle.Boat;
@@ -37,7 +36,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.SnowLayerBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
-import net.minecraft.world.level.storage.loot.functions.SetEnchantmentsFunction;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.BooleanOp;
@@ -77,8 +75,8 @@ public class SledEntity extends Entity implements IInputListener, IEntityAdditio
     private float landFriction;
     private Status status;
 
-    public SledEntity(EntityType<? extends SledEntity> p_38290_, Level p_38291_) {
-        super(p_38290_, p_38291_);
+    public SledEntity(EntityType<? extends SledEntity> entityType, Level level) {
+        super(entityType, level);
         this.blocksBuilding = true;
         this.maxUpStep = 1;
     }
@@ -89,6 +87,7 @@ public class SledEntity extends Entity implements IInputListener, IEntityAdditio
         this.xo = x;
         this.yo = y;
         this.zo = z;
+
     }
 
     @Override
@@ -107,7 +106,7 @@ public class SledEntity extends Entity implements IInputListener, IEntityAdditio
         if (this.getSeatType() != null) {
             tag.putInt("Seat", this.getSeatType().getId());
         }
-        if(this.wolf != null){
+        if (this.wolf != null) {
             tag.putUUID("Wolf", this.wolf.getUUID());
         }
     }
@@ -120,25 +119,27 @@ public class SledEntity extends Entity implements IInputListener, IEntityAdditio
         if (tag.contains("Type", 8)) {
             this.setWoodType(Boat.Type.byName(tag.getString("Type")));
         }
-        if (tag.contains("Seat", 8)) {
+        if (tag.contains("Seat", 99)) {
             this.setSeatType(DyeColor.byId(tag.getInt("Seat")));
         }
-        if(tag.contains("Wolf")){
+        if (tag.contains("Wolf")) {
             this.restoreWolfUUID = tag.getUUID("Wolf");
         }
     }
+
     @Override
     public void writeSpawnData(FriendlyByteBuf buffer) {
         UUID id = this.hasWolf() ? this.wolf.getUUID() : this.restoreWolfUUID;
         buffer.writeBoolean(id != null);
-        if(id != null){
+        if (id != null) {
             buffer.writeUUID(id);
         }
     }
+
     //all of this to sync that damn wolf
     @Override
     public void readSpawnData(FriendlyByteBuf additionalData) {
-        if(additionalData.readBoolean()){
+        if (additionalData.readBoolean()) {
             this.restoreWolfUUID = additionalData.readUUID();
         }
     }
@@ -199,7 +200,7 @@ public class SledEntity extends Entity implements IInputListener, IEntityAdditio
                     if (seat != null) {
                         this.spawnAtLocation(ModRegistry.CARPETS.get(seat));
                     }
-                    if(this.hasWolf()){
+                    if (this.hasWolf()) {
                         this.spawnAtLocation(Items.LEAD);
                     }
                 }
@@ -329,7 +330,6 @@ public class SledEntity extends Entity implements IInputListener, IEntityAdditio
         //old move
 
 
-
         this.prevProjectedPos = this.projectedPos;
         this.projectedPos = Vec3.ZERO;
 
@@ -341,7 +341,6 @@ public class SledEntity extends Entity implements IInputListener, IEntityAdditio
                 this.onGround = true;
             }
         }
-
 
 
         if (this.onGround) {
@@ -374,7 +373,7 @@ public class SledEntity extends Entity implements IInputListener, IEntityAdditio
             //adjust bounding box
             //if (localAdditionalY > 0) {
             //bb set in move
-               // this.setBoundingBox(this.makeBoundingBox());
+            // this.setBoundingBox(this.makeBoundingBox());
             //}
             localAdditionalY = 0;
         }
@@ -397,7 +396,7 @@ public class SledEntity extends Entity implements IInputListener, IEntityAdditio
 
         //reset additionalY when is stepping up
 
-        if(this.cachedAdditionalY >0 && oldY<this.getY()) {
+        if (this.cachedAdditionalY > 0 && oldY < this.getY()) {
 
             float newHeight = this.status == Status.ON_SNOW_LAYER ? snowLayerHeight : 0;
             //adjust bounding box
@@ -413,19 +412,19 @@ public class SledEntity extends Entity implements IInputListener, IEntityAdditio
     @Override
     public void tick() {
 
-        if(this.chest != null && chest.isRemoved())this.chest = null;
-        if(this.wolf != null && wolf.isRemoved())this.wolf = null;
+        if (this.chest != null && chest.isRemoved()) this.chest = null;
+        if (this.wolf != null && wolf.isRemoved()) this.wolf = null;
 
         //on first and second tick cause of passengers fuckery needing 2 ticks to get added
-        if(this.restoreWolfUUID != null){
-            for(var p : this.getPassengers()){
-                if(p.getUUID().equals(restoreWolfUUID) && p instanceof TamableAnimal animal){
+        if (this.restoreWolfUUID != null) {
+            for (var p : this.getPassengers()) {
+                if (p.getUUID().equals(restoreWolfUUID) && p instanceof Animal animal) {
                     this.wolf = animal;
                     break;
                 }
             }
             //has 3 attempts to restore the worlf (omg)
-            if(this.tickCount>3) this.restoreWolfUUID = null;
+            if (this.tickCount > 3) this.restoreWolfUUID = null;
         }
         if (this.wolf != null) this.wolf.setInvulnerable(true);
 
@@ -485,8 +484,8 @@ public class SledEntity extends Entity implements IInputListener, IEntityAdditio
             double k = Mth.clamp(this.projectedPos.y, -1, 1);
             if (k > 0) {
                 //decelerate uphill if doesnt have wolf
-                if(!this.hasWolf())
-                this.setDeltaMovement(movement.scale(1 + -0.06 * k));
+                if (!this.hasWolf())
+                    this.setDeltaMovement(movement.scale(1 + -0.06 * k));
             } else {
                 //boost downhill
                 this.boost = true;
@@ -512,7 +511,7 @@ public class SledEntity extends Entity implements IInputListener, IEntityAdditio
         this.checkInsideBlocks();
 
 
-        List<Entity> list = this.level.getEntities(this, this.getBoundingBox().inflate(0.1F, 0.01F, 0.1F),
+        List<Entity> list = this.level.getEntities(this, this.getBoundingBox().inflate(0.15F, 0.01F, 0.15F),
                 EntitySelector.pushableBy(this));
 
         if (!list.isEmpty()) {
@@ -525,7 +524,7 @@ public class SledEntity extends Entity implements IInputListener, IEntityAdditio
                             entity instanceof LivingEntity &&
                             !(entity instanceof WaterAnimal) &&
                             !(entity instanceof Player) &&
-                            ((this.hasWolf() && this.canAddPassenger(entity)) || this.getPassengers().size()<2)) {
+                            ((this.hasWolf() && this.canAddPassenger(entity)) || this.getPassengers().size() < 2)) {
 
                         entity.startRiding(this);
                     } else {
@@ -558,7 +557,7 @@ public class SledEntity extends Entity implements IInputListener, IEntityAdditio
         double lengthSqr = pVec.lengthSqr();
 
         //todo: maye re enable. this pretty much disable collisions with wolf at all times since it causes desync and glitchynes when going uphill
-        if (this.hasWolf() && lengthSqr <0.08) list.add(Shapes.create(this.pullerAABB));
+        if (this.hasWolf() && lengthSqr < 0.08) list.add(Shapes.create(this.pullerAABB));
 
         Vec3 vec3 = lengthSqr == 0.0D ? pVec : collideBoundingBox(this, pVec, aabb, this.level, list);
         boolean flag = pVec.x != vec3.x;
@@ -681,13 +680,11 @@ public class SledEntity extends Entity implements IInputListener, IEntityAdditio
                                     onSnow = true;
                                     f += snowFriction;
                                     ++k1;
-                                }
-                                else if(blockstate.is(ModRegistry.SLED_SAND)){
+                                } else if (blockstate.is(ModRegistry.SLED_SAND)) {
                                     //sand friction
                                     f += 0.83;
                                     ++k1;
-                                }
-                                else if (Shapes.joinIsNotEmpty(blockstate.getCollisionShape(this.level, mutable).move(l1, k2, i2), voxelshape, BooleanOp.AND)) {
+                                } else if (Shapes.joinIsNotEmpty(blockstate.getCollisionShape(this.level, mutable).move(l1, k2, i2), voxelshape, BooleanOp.AND)) {
                                     //decreases friction for blocks and ice in particular
                                     float fr = blockstate.getFriction(this.level, mutable, this);
                                     if (fr > 0.9) fr *= 0.97;
@@ -801,11 +798,10 @@ public class SledEntity extends Entity implements IInputListener, IEntityAdditio
 
             this.setYRot(this.getYRot() + this.deltaRotation);
             if (this.inputUp) {
-                if (this.status.onSnow()){
+                if (this.status.onSnow()) {
                     double acceleration = hasWolf ? 0.017f : 0.015;
                     powah += acceleration;//0.04F;
-                }
-                else powah += 0.037F;
+                } else powah += 0.037F;
             }
 
             if (this.inputDown) {
@@ -862,7 +858,7 @@ public class SledEntity extends Entity implements IInputListener, IEntityAdditio
 
             this.resetFallDistance();
         } else if (pY < 0.0D) {
-            this.fallDistance = (float)((double)this.fallDistance - pY);
+            this.fallDistance = (float) ((double) this.fallDistance - pY);
         }
     }
 
@@ -914,12 +910,12 @@ public class SledEntity extends Entity implements IInputListener, IEntityAdditio
 
     @Override
     public double getPassengersRidingOffset() {
-        return 0.2D + this.getAdditionalY();
+        return 0.2D + this.getAdditionalY() + (this.getSeatType() != null ? 0.0615 : 0);
     }
 
     @Nullable
-    public ContainerHolderEntity tryAddingChest(ItemStack stack){
-        if(ContainerHolderEntity.isChestItem(stack) && this.canAddChest()){
+    public ContainerHolderEntity tryAddingChest(ItemStack stack) {
+        if (ContainerHolderEntity.isChestItem(stack) && this.canAddChest()) {
             ContainerHolderEntity container = new ContainerHolderEntity(level, this, stack.split(1));
             level.addFreshEntity(container);
             return container;
@@ -940,10 +936,10 @@ public class SledEntity extends Entity implements IInputListener, IEntityAdditio
                 this.setSeatType(ModRegistry.CARPETS.inverse().get(stack.getItem()));
                 stack.shrink(1);
                 return InteractionResult.sidedSuccess(player.level.isClientSide);
-            } else if (this.tryAddingChest(stack) != null){
+            } else if (this.tryAddingChest(stack) != null) {
                 return InteractionResult.sidedSuccess(player.level.isClientSide);
             }
-            if(!this.hasWolf()){
+            if (!this.hasWolf()) {
                 Level level = player.level;
                 double radius = 7.0D;
                 double x = player.getX();
@@ -952,24 +948,30 @@ public class SledEntity extends Entity implements IInputListener, IEntityAdditio
 
                 Mob found = null;
 
-                for(Mob mob : level.getEntitiesOfClass(Mob.class, new AABB(x - radius, y - radius, z - radius,
+                for (Mob mob : level.getEntitiesOfClass(Mob.class, new AABB(x - radius, y - radius, z - radius,
                         x + radius, y + radius, z + radius))) {
                     if (mob.getLeashHolder() == player) {
                         found = mob;
                         break;
                     }
                 }
-                if(found != null){
-                    if(this.isValidWolf(found)) {
+                if (found != null) {
+                    if (this.isValidWolf(found)) {
+                        boolean owned = false;
                         if (found instanceof TamableAnimal animal && animal.getOwner() == player) {
+                            owned = true;
+                        } else if (found instanceof Fox fox && fox.trusts(player.getUUID())) {
+                            owned = true;
+                        }
+                        if (owned) {
                             //better be sure
                             //hack so it actually allows it to ride
-                            this.wolf = animal;
+                            this.wolf = (Animal) found;
                             found.dropLeash(true, false);
-                            if(found.startRiding(this) && this.hasPassenger(found)) {
+                            if (found.startRiding(this) && this.hasPassenger(found)) {
                                 this.playSound(SoundEvents.LEASH_KNOT_PLACE, 1.0F, 1.0F);
                                 return InteractionResult.sidedSuccess(player.level.isClientSide);
-                            }else{
+                            } else {
                                 //have to drop lead if it fails since leads has to get broken before it starts riding otherwise it would drop
                                 this.spawnAtLocation(Items.LEAD);
                                 this.wolf = null;
@@ -1029,7 +1031,7 @@ public class SledEntity extends Entity implements IInputListener, IEntityAdditio
         if (this.hasPassenger(entity)) {
 
             //can only have 1 chest so the rider that is chest is THE chest
-            if(this.chest == null && entity instanceof ContainerHolderEntity container){
+            if (this.chest == null && entity instanceof ContainerHolderEntity container) {
                 this.chest = container;
             }
 
@@ -1064,7 +1066,7 @@ public class SledEntity extends Entity implements IInputListener, IEntityAdditio
                 } else {
 
                     //this is an utter mess
-                    isMoreThanOneOnBoard = this.getPassengers().size() > this.getMaxPassengersSize()-1;
+                    isMoreThanOneOnBoard = this.getPassengers().size() > this.getMaxPassengersSize() - 1;
                     if (isMoreThanOneOnBoard) {
                         int i = 0;
                         for (Entity p : this.getPassengers()) {
@@ -1184,7 +1186,6 @@ public class SledEntity extends Entity implements IInputListener, IEntityAdditio
     }
 
 
-
     public enum Status {
         ON_SNOW,
         ON_SNOW_LAYER,
@@ -1212,13 +1213,13 @@ public class SledEntity extends Entity implements IInputListener, IEntityAdditio
     }
 
     public boolean isValidWolf(Entity entity) {
-        return entity.getType().is(ModRegistry.WOLVES) && entity instanceof Animal;
+        return entity.getType().is(ModRegistry.WOLVES) && entity instanceof Animal && entity.getBbWidth() < 1.1;
     }
 
     private float wolfAnimationSpeed = 0;
     private float wolfAnimationPosition = 0;
     @Nullable
-    private TamableAnimal wolf = null;
+    private Animal wolf = null;
     @Nullable
     private ContainerHolderEntity chest = null;
 
@@ -1231,7 +1232,7 @@ public class SledEntity extends Entity implements IInputListener, IEntityAdditio
     }
 
     public void removeChest() {
-        if(!this.level.isClientSide){
+        if (!this.level.isClientSide) {
             this.chest = null;
         }
         //only reset here cause it is called on client only side sometimes
@@ -1240,7 +1241,11 @@ public class SledEntity extends Entity implements IInputListener, IEntityAdditio
     public void removeWolf() {
         if (this.wolf != null) {
             if (!this.level.isClientSide) {
-                this.wolf.setInSittingPose(false);
+                if (this.wolf instanceof TamableAnimal tamableAnimal) {
+                    tamableAnimal.setInSittingPose(false);
+                } else if (this.wolf instanceof Fox fox) {
+                    fox.setSitting(false);
+                }
                 this.wolf.setInvulnerable(false);
                 this.wolf = null;
                 //this.spawnAtLocation(Items.LEAD);
@@ -1249,7 +1254,7 @@ public class SledEntity extends Entity implements IInputListener, IEntityAdditio
     }
 
     @Nullable
-    public Entity getWolf() {
+    public Animal getWolf() {
         return wolf;
     }
 
@@ -1269,7 +1274,16 @@ public class SledEntity extends Entity implements IInputListener, IEntityAdditio
 
             this.wolf.animationSpeed = this.wolfAnimationSpeed;
             this.wolf.animationPosition = this.wolfAnimationPosition;
-            this.wolf.setInSittingPose(this.getDeltaMovement().length() < 0.001);
+            boolean sit = this.getDeltaMovement().length() < 0.001;
+            if (this.wolf instanceof TamableAnimal tamableAnimal) {
+                if (tamableAnimal.isInSittingPose() != sit)
+                    tamableAnimal.setInSittingPose(sit);
+                if (tamableAnimal.isOrderedToSit() != sit)
+                    tamableAnimal.setOrderedToSit(sit);
+            } else if (this.wolf instanceof Fox fox) {
+                if (fox.isSitting() != sit)
+                    fox.setSitting(sit);
+            }
 
         }
     }
@@ -1286,4 +1300,8 @@ public class SledEntity extends Entity implements IInputListener, IEntityAdditio
     }
 
 
+    @Override
+    public boolean shouldRiderSit() {
+        return super.shouldRiderSit();
+    }
 }

@@ -2,12 +2,13 @@
   "replace": false,
   "values": [
     "minecraft:wolf",
+    "minecraft:fox",
     {
       "id" :"quark:shiba",
       "required": false
     },
     {
-      "id" :"alexmobs:grizzly_bear",
+      "id" :"alexsmobs:grizzly_bear",
       "required": false
     }
   ]

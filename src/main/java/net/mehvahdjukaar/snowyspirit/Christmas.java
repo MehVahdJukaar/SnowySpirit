@@ -35,9 +35,10 @@ public class Christmas {
         bus.addListener(ModSetup::init);
         MinecraftForge.EVENT_BUS.register(this);
         WorldGenHandler.init();
-
     }
 
+    //TODO: nerf sled acceleration without wolf to make wolf more relevant. can still be used for downhill descent
+    //TODO: maybe make friction delend also on xRot to better handle slope descent
 
     public static boolean isChristmasTime() {
         return true;

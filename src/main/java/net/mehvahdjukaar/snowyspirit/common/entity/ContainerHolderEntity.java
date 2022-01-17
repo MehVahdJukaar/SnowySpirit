@@ -7,6 +7,8 @@ import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -22,6 +24,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ChestMenu;
+import net.minecraft.world.inventory.ShulkerBoxMenu;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -377,6 +380,12 @@ public class ContainerHolderEntity extends Entity implements Container, MenuProv
         } : super.getSlot(pSlot);
     }
 
+    @Override
+    public Component getDisplayName() {
+        return new TranslatableComponent("message.snowyspirit.container_entity_name",
+                this.containerStack.getItem().getDescription().getString());
+    }
+
     /**
      * For tile entities, ensures the chunk containing the tile entity is saved to disk later - the game won't think it
      * hasn't changed and skip it.
@@ -484,6 +493,8 @@ public class ContainerHolderEntity extends Entity implements Container, MenuProv
     public AbstractContainerMenu createMenu(int id, Inventory pPlayerInventory) {
         if (Christmas.SUPP && SackHelper.isSack(containerStack.getItem())) {
             return SackHelper.createMenu(id, pPlayerInventory, this);
+        } else if (!containerStack.is(ModRegistry.VALID_CONTAINERS)) {
+            return new ShulkerBoxMenu(id, pPlayerInventory, this);
         }
         return ChestMenu.threeRows(id, pPlayerInventory, this);
     }

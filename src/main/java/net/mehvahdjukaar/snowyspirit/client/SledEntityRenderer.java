@@ -19,8 +19,9 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.vehicle.Boat;
+import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -31,14 +32,19 @@ import java.util.stream.Stream;
 public class SledEntityRenderer extends EntityRenderer<SledEntity> {
 
     private final Map<Boat.Type, ResourceLocation> textures;
+    private final Map<DyeColor, ResourceLocation> quiltTextures;
     private final SledModel<SledEntity> model;
+    private final QuiltModel<SledEntity> quiltModel;
 
     public SledEntityRenderer(EntityRendererProvider.Context context) {
         super(context);
         this.shadowRadius = 0.8F;
         this.model = new SledModel<>(context.bakeLayer(ClientSetup.SLED_MODEL));
+        this.quiltModel = new QuiltModel<>(context.bakeLayer(ClientSetup.QUILT_MODEL));
         this.textures = Stream.of(Boat.Type.values()).collect(ImmutableMap.toImmutableMap((e) -> e,
                 (t) -> new ResourceLocation(Christmas.MOD_ID + ":textures/entity/sled/" + t.getName() + ".png")));
+        this.quiltTextures = Stream.of(DyeColor.values()).collect(ImmutableMap.toImmutableMap((e) -> e,
+                (t) -> new ResourceLocation(Christmas.MOD_ID + ":textures/entity/sled/quilt/" + t.getName() + ".png")));
     }
 
     @Override
@@ -78,6 +84,11 @@ public class SledEntityRenderer extends EntityRenderer<SledEntity> {
         VertexConsumer vertexconsumer = bufferSource.getBuffer(model.renderType(resourcelocation));
         model.renderToBuffer(poseStack, vertexconsumer, light, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
 
+        DyeColor color = sled.getSeatType();
+        if(color != null) {
+            vertexconsumer = bufferSource.getBuffer(model.renderType(this.quiltTextures.get(DyeColor.RED)));
+            quiltModel.renderToBuffer(poseStack, vertexconsumer, light, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
+        }
 
         poseStack.popPose();
         super.render(sled, yRot, partialTicks, poseStack, bufferSource, light);
@@ -149,12 +160,12 @@ public class SledEntityRenderer extends EntityRenderer<SledEntity> {
 
     private void renderLeash(SledEntity sled, float pPartialTicks, PoseStack poseStack, MultiBufferSource pBuffer,
                              float yRot, float xRot) {
-        Entity wolf = sled.getWolf();
+        Animal wolf = sled.getWolf();
         if (wolf != null) {
+            boolean bear = wolf.getType().getRegistryName().getPath().equals("grizzly_bear");
+            Vec3 wolfPos = wolf.getRopeHoldPosition(pPartialTicks).add(0, wolf.isBaby() ? 0.1 : 0.25, 0);
 
-            Vec3 wolfPos = wolf.getRopeHoldPosition(pPartialTicks).add(0, 0.25, 0);
-
-            float bbw = wolf.getBbWidth() / 2.875f;
+            float bbw = wolf.getBbWidth() / (2.875f + (bear ? 1.5f : 0));
             Vec3 sledOffset = new Vec3(0.4125f, 0, 0.95f);
             Vec3 ropeOffset = new Vec3(bbw, 0, 0);
 

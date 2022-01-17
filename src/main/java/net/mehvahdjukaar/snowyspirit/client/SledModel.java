@@ -25,7 +25,8 @@ public class SledModel<T extends SledEntity> extends EntityModel<T> {
 
         PartDefinition skiis = front.addOrReplaceChild("skiis", CubeListBuilder.create(), PartPose.offsetAndRotation(0.0F, 0.0F, 4.5F, 1.5708F, 1.5708F, 0.0F));
 
-        PartDefinition slednew = skiis.addOrReplaceChild("slednew", CubeListBuilder.create().texOffs(0, 6).addBox(-15.5F, -9.0F, 8.0F, 31.0F, 3.0F, 3.0F, new CubeDeformation(0.0F))
+        PartDefinition slednew = skiis.addOrReplaceChild("slednew", CubeListBuilder.create()
+                .texOffs(0, 6).addBox(-15.5F, -9.0F, 8.0F, 31.0F, 3.0F, 3.0F, new CubeDeformation(0.0F))
                 .texOffs(0, 12).addBox(-9.5F, -10.0F, 14.0F, 24.0F, 16.0F, 2.0F, new CubeDeformation(0.0F))
                 .texOffs(0, 0).addBox(-15.5F, 2.0F, 8.0F, 31.0F, 3.0F, 3.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, 2.0F, -10.0F));
 
@@ -51,4 +52,5 @@ public class SledModel<T extends SledEntity> extends EntityModel<T> {
     public void renderToBuffer(PoseStack poseStack, VertexConsumer buffer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
         sled.render(poseStack, buffer, packedLight, packedOverlay);
     }
+
 }

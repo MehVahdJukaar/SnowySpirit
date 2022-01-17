@@ -2,6 +2,7 @@ package net.mehvahdjukaar.snowyspirit.init;
 
 import net.mehvahdjukaar.snowyspirit.Christmas;
 import net.mehvahdjukaar.snowyspirit.client.ContainerHolderEntityRenderer;
+import net.mehvahdjukaar.snowyspirit.client.QuiltModel;
 import net.mehvahdjukaar.snowyspirit.client.SledEntityRenderer;
 import net.mehvahdjukaar.snowyspirit.client.SledModel;
 import net.mehvahdjukaar.snowyspirit.client.block_model.GlowLightsModelLoader;
@@ -31,6 +32,7 @@ import org.jetbrains.annotations.Nullable;
 public class ClientSetup {
 
     public static ModelLayerLocation SLED_MODEL = loc("sled");
+    public static ModelLayerLocation QUILT_MODEL = loc("quilt");
 
     private static ModelLayerLocation loc(String name) {
         return new ModelLayerLocation(Christmas.res(name), name);
@@ -39,6 +41,7 @@ public class ClientSetup {
     @SubscribeEvent
     public static void layerDefinitions(EntityRenderersEvent.RegisterLayerDefinitions event) {
         event.registerLayerDefinition(SLED_MODEL, SledModel::createBodyLayer);
+        event.registerLayerDefinition(QUILT_MODEL, QuiltModel::createBodyLayer);
     }
 
     @SubscribeEvent
