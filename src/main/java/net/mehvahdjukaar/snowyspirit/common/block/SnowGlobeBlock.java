@@ -2,6 +2,10 @@ package net.mehvahdjukaar.snowyspirit.common.block;
 
 import net.mehvahdjukaar.selene.blocks.WaterBlock;
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -11,8 +15,11 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+
+import java.util.Random;
 
 public class SnowGlobeBlock extends WaterBlock {
 
@@ -43,8 +50,28 @@ public class SnowGlobeBlock extends WaterBlock {
 
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
-        Level level = context.getLevel();
-        boolean snowy = level.getBiome(context.getClickedPos()).coldEnoughToSnow(context.getClickedPos());
+        boolean snowy = canBeSnowy(context.getClickedPos(), context.getLevel());
         return super.getStateForPlacement(context).setValue(SNOWING, snowy);
+    }
+
+    private boolean canBeSnowy(BlockPos pos, Level level) {
+        return level.getBiome(pos).coldEnoughToSnow(pos);
+    }
+
+    @Override
+    public InteractionResult use(BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer, InteractionHand pHand, BlockHitResult pHit) {
+        if (pState.getValue(SNOWING)) {
+            return InteractionResult.CONSUME;
+        } else {
+            pLevel.setBlock(pPos, pState.setValue(SNOWING, true), 3);
+            pLevel.scheduleTick(pPos, this, 50);
+            return InteractionResult.sidedSuccess(pLevel.isClientSide);
+        }
+    }
+
+    public void tick(BlockState pState, ServerLevel pLevel, BlockPos pPos, Random pRand) {
+        if (pState.getValue(SNOWING) && !this.canBeSnowy(pPos, pLevel)) {
+            pLevel.setBlock(pPos, pState.setValue(SNOWING, false), 3);
+        }
     }
 }

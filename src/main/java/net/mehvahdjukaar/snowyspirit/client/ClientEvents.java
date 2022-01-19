@@ -40,7 +40,7 @@ public class ClientEvents {
         if (event.phase == TickEvent.Phase.END) {
             ClientLevel level = Minecraft.getInstance().level;
             if (level != null) {
-                level.getCapability(CapabilityHandler.WREATH_CAPABILITY).ifPresent(c -> c.updateAllBlocksClient(level));
+                level.getCapability(CapabilityHandler.WREATH_CAPABILITY).ifPresent(c -> c.refreshClientBlocksVisuals(level));
             }
         }
     }

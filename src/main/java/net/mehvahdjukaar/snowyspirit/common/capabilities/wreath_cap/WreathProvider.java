@@ -68,8 +68,6 @@ public class WreathProvider implements IWreathProvider, ICapabilitySerializable<
     @Override
     public void addWreath(BlockPos pos, Direction direction, boolean open, boolean hinge) {
         wreathBlocks.put(pos, new WreathData(direction, open, hinge));
-        //engravedColors.put(pos, GeneralUtility.getBrightestColorFromBlock(Minecraft.getInstance().level.getBlockState(pos).getBlock(), pos));
-        // CHANNEL.sendToServer(new UpdateServerEngravedBlocks(wreathBlocks, engravedFaces, engravedColors));
     }
 
     public void removeWreath(BlockPos pos) {
@@ -87,22 +85,24 @@ public class WreathProvider implements IWreathProvider, ICapabilitySerializable<
     }
 
     @Override
-    public void updateWeathBlock(BlockPos pos, Level level) {
-        BlockState state = level.getBlockState(pos);
-        if (state.getBlock() instanceof DoorBlock) {
-            Direction dir = state.getValue(DoorBlock.FACING);
-            boolean open = state.getValue(DoorBlock.OPEN);
-            boolean hinge = state.getValue(DoorBlock.HINGE) == DoorHingeSide.RIGHT;
-            this.addWreath(pos, dir, open, hinge);
-        } else {
-            this.removeWreath(pos);
+    public void refreshWreathVisual(BlockPos pos, Level level) {
+        if(level.isLoaded(pos)) {
+            BlockState state = level.getBlockState(pos);
+            if (state.getBlock() instanceof DoorBlock) {
+                Direction dir = state.getValue(DoorBlock.FACING);
+                boolean open = state.getValue(DoorBlock.OPEN);
+                boolean hinge = state.getValue(DoorBlock.HINGE) == DoorHingeSide.RIGHT;
+                this.addWreath(pos, dir, open, hinge);
+            } else {
+                this.removeWreath(pos);
+            }
         }
     }
 
     @Override
-    public void updateAllBlocksClient(Level level) {
+    public void refreshClientBlocksVisuals(Level level) {
         Set<BlockPos> positions = new HashSet<>(this.wreathBlocks.keySet());
-        positions.forEach(p -> updateWeathBlock(p, level));
+        positions.forEach(p -> refreshWreathVisual(p, level));
     }
 
     @Override

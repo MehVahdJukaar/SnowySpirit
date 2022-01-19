@@ -96,7 +96,7 @@ public class WreathBlock extends HorizontalDirectionalBlock {
                     if (level instanceof ServerLevel serverLevel) {
                         BlockState state = ModRegistry.WREATH.get().defaultBlockState();
 
-                        c.updateWeathBlock(p, level);
+                        c.refreshWreathVisual(p, level);
                         //pLevel.setBlockAndUpdate(targetPos, state);
                         SoundType soundtype = state.getSoundType(level, p, null);
                         level.playSound(null, p, soundtype.getPlaceSound(), SoundSource.BLOCKS, (soundtype.getVolume() + 1.0F) / 2.0F, soundtype.getPitch() * 0.8F);

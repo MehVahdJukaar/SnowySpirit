@@ -72,7 +72,7 @@ public class ServerEvents {
     }
 
     @SubscribeEvent
-    public static void onPlayerLogin(PlayerEvent.PlayerChangedDimensionEvent event) {
+    public static void onDimensionChanged(PlayerEvent.PlayerChangedDimensionEvent event) {
         ServerPlayer player = (ServerPlayer) event.getPlayer();
         ServerLevel level = player.getLevel();
         IWreathProvider cap = level.getCapability(CapabilityHandler.WREATH_CAPABILITY).orElse(null);

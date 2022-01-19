@@ -49,8 +49,14 @@ public class SledEntityRenderer extends EntityRenderer<SledEntity> {
 
     @Override
     public void render(SledEntity sled, float yRot, float partialTicks, PoseStack poseStack, MultiBufferSource bufferSource, int light) {
+
+        double dy = Mth.lerp(partialTicks, sled.prevAdditionalY, sled.cachedAdditionalY);
         poseStack.pushPose();
-        poseStack.translate(0.0D, 0.375D + Mth.lerp(partialTicks, sled.prevAdditionalY, sled.cachedAdditionalY), 0.0D);
+
+        poseStack.translate(0.0D, 0.375D + dy, 0.0D);
+
+
+
         //same stuff that happens to yRot when its created
         float xRot = sled.getViewXRot(partialTicks);
 
@@ -91,13 +97,16 @@ public class SledEntityRenderer extends EntityRenderer<SledEntity> {
         }
 
         poseStack.popPose();
+
+        this.renderLeash(sled, partialTicks, poseStack, bufferSource, (float) ((90 + yRot) * Math.PI / 180), (float) (xRot * Math.PI / 180), dy);
+
         super.render(sled, yRot, partialTicks, poseStack, bufferSource, light);
 
         if (this.entityRenderDispatcher.shouldRenderHitBoxes()) {
             this.renderDebugHitbox(poseStack, bufferSource.getBuffer(RenderType.lines()), sled, partialTicks);
         }
 
-        this.renderLeash(sled, partialTicks, poseStack, bufferSource, (float) ((90 + yRot) * Math.PI / 180), (float) (xRot * Math.PI / 180));
+
     }
 
     @Override
@@ -159,7 +168,7 @@ public class SledEntityRenderer extends EntityRenderer<SledEntity> {
 
 
     private void renderLeash(SledEntity sled, float pPartialTicks, PoseStack poseStack, MultiBufferSource pBuffer,
-                             float yRot, float xRot) {
+                             float yRot, float xRot, double addY) {
         Animal wolf = sled.getWolf();
         if (wolf != null) {
             boolean bear = wolf.getType().getRegistryName().getPath().equals("grizzly_bear");
@@ -188,7 +197,7 @@ public class SledEntityRenderer extends EntityRenderer<SledEntity> {
                 double wolfOffsetZ = sin * ropeOffset.z - cos * ropeOffset.x * rope;
                 double offsetX = (cos * sledOffset.z + sin * sledOffset.x * rope) * pCos;
                 double offsetZ = (sin * sledOffset.z - cos * sledOffset.x * rope) * pCos;
-                double offsetY = -pSin * sledOffset.length() + sled.cachedAdditionalY + 0.25;
+                double offsetY = -pSin * sledOffset.length() + 0.25 +addY;
                 double pX = sledX + offsetX;
                 double pY = sledY + offsetY;
                 double pZ = sledZ + offsetZ;

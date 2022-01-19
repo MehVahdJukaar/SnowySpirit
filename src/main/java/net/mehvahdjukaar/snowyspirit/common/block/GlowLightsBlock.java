@@ -42,7 +42,7 @@ public class GlowLightsBlock extends Block implements IForgeBlock, EntityBlock, 
     public final DyeColor color;
 
     public GlowLightsBlock(DyeColor color) {
-        super(Properties.copy(Blocks.OAK_LEAVES).lightLevel(s->12));
+        super(Properties.copy(Blocks.OAK_LEAVES).lightLevel(s->12).hasPostProcess((a,b,c)->true).emissiveRendering((a,b,c)->true));
         this.color = color;
     }
 

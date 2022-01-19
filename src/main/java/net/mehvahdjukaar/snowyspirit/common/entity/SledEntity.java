@@ -252,8 +252,8 @@ public class SledEntity extends Entity implements IInputListener, IEntityAdditio
         this.lerpZ = z;
         this.lerpYRot = yRot;
         this.lerpXRot = xRot;
-        //ticks it takes to lerp to
-        this.lerpSteps = 10;
+        //ticks it takes to lerp to (10)
+        this.lerpSteps = 5;
     }
 
     @Override
@@ -328,29 +328,7 @@ public class SledEntity extends Entity implements IInputListener, IEntityAdditio
     @Override
     public void move(MoverType pType, Vec3 wantedPosIncrement) {
 
-        //wolf stuff
-
-        //this is a mess. hacks everywhere
-        this.prevPullerPos = this.pullerPos;
-
         boolean isMoving = wantedPosIncrement != Vec3.ZERO;
-
-        //so wolf can climb up
-        if (isMoving) this.maxUpStep = 2;
-
-        if (this.hasWolf()) {
-            this.pullerAABB = this.pullerDimensions.makeBoundingBox(this.position().add(0, 0, 0));
-
-            this.pullerPos = this.calculateSlopePosition(wantedPosIncrement.add(this.getLookAngle().scale(2)), this.pullerAABB,
-                    this::resetPullerAABB, -1);
-            this.maxUpStep = 1;
-
-            this.pullerPos = this.pullerPos.add(0, 0, 0);
-            this.pullerAABB = this.pullerDimensions.makeBoundingBox(this.position()
-                    .add(this.pullerPos));
-        }
-
-        //end wolf stuff
 
 
         //old move
@@ -414,15 +392,15 @@ public class SledEntity extends Entity implements IInputListener, IEntityAdditio
         this.setDataAdditionalY(localAdditionalY);
         this.cachedAdditionalY = localAdditionalY;
 
-        double oldY = this.getY();
+        Vec3 oldPos = this.position();
 
-        //bb is set here
+        //bb and pos is set here
         super.move(pType, wantedPosIncrement);
 
 
-        //reset additionalY when is stepping up
+        //reset additionalY when has just stepped up
 
-        if (this.cachedAdditionalY > 0 && oldY < this.getY()) {
+        if (this.cachedAdditionalY > 0 && oldPos.y < this.getY()) {
 
             float newHeight = this.status == Status.ON_SNOW_LAYER ? snowLayerHeight : 0;
             //adjust bounding box
@@ -430,6 +408,36 @@ public class SledEntity extends Entity implements IInputListener, IEntityAdditio
             this.cachedAdditionalY = newHeight;
             this.setBoundingBox(this.makeBoundingBox());
         }
+
+        //wolf stuff
+
+        //this is a mess. hacks everywhere
+        this.prevPullerPos = this.pullerPos;
+
+        //so wolf can climb up
+
+        if (this.hasWolf()) {
+            this.pullerAABB = this.pullerDimensions.makeBoundingBox(this.position().add(0, 0, 0));
+
+            //this is extremely inefficent
+
+            Vec3 wantedPullerPos = this.calculateSlopePosition(wantedPosIncrement.add(this.getLookAngle().scale(2)), this.pullerAABB,
+                    this::resetPullerAABB, -1.25f);
+
+            //at most half a block increment is allowed
+            double pxInc = Mth.clamp(wantedPullerPos.x - prevPullerPos.x, -0.75, 0.75);
+            double pyInc;
+            //only slows when going lower than the sled itself. idk why but it overshoots up otherwise and this fixes it
+            if (wantedPullerPos.y < 0 && wantedPullerPos.y < prevPullerPos.y) {
+                pyInc = Mth.clamp(wantedPullerPos.y - prevPullerPos.y, -0.15, 1);
+            } else pyInc = wantedPullerPos.y - prevPullerPos.y;
+            double pzInc = Mth.clamp(wantedPullerPos.z - prevPullerPos.z, -0.75, 0.75);
+            this.pullerPos = prevPullerPos.add(pxInc, pyInc, pzInc);
+
+            this.pullerAABB = this.pullerDimensions.makeBoundingBox(this.position().add(this.pullerPos));
+        }
+
+        //end wolf stuff
     }
 
     //modified collide method to take into account puller AABB
@@ -557,13 +565,13 @@ public class SledEntity extends Entity implements IInputListener, IEntityAdditio
                 if (horizontalSpeed > 0.001) {
                     this.spawnTrailParticles(movement, horizontalSpeed);
                     //reset every tick (this might break)
-                   // this.setSyncedMovement(Vec3.ZERO);
+                    // this.setSyncedMovement(Vec3.ZERO);
                 }
             }
-        }else{
+        } else {
             //resets synced movement
-            if(!controlledByLocalInstance){
-                if(this.getSyncedMovement() != Vec3.ZERO) this.setSyncedMovement(Vec3.ZERO);
+            if (!controlledByLocalInstance) {
+                if (this.getSyncedMovement() != Vec3.ZERO) this.setSyncedMovement(Vec3.ZERO);
             }
         }
     }
@@ -598,28 +606,31 @@ public class SledEntity extends Entity implements IInputListener, IEntityAdditio
                 v = v.yRot((float) ((-yRot / 180 * Math.PI)));
 
                 double cross = v.cross(new Vec3(movement.x, 0, movement.z).normalize()).y;
-                if (random.nextFloat() < (cross * cross) - 0.1) {
-                    Vec3 forward = this.calculateViewVector(xRot, yRot);
-                    float up = (float) Math.min(horizontalSpeed * 0.6, 0.3);
-                    if (cross > 0) {
-                        if (left == null) {
-                            Vec3 a = this.calculateViewVector(xRot, yRot + 24);
-                            left = a.scale(-1f).add(this.position());
-                            Vec3 p = left.add(forward.scale(random.nextFloat(1.85f)));
-                            this.spawnSnowFlakeParticle(level, p,
-                                    movement.x * 0.75 + forward.x * 0.25,
-                                    movement.y + 0.017 + up,
-                                    movement.z * 0.75 + forward.z * 0.25);
-                        }
-                    } else {
-                        if (right == null) {
-                            Vec3 b = this.calculateViewVector(xRot, yRot - 24);
-                            right = b.scale(-1f).add(this.position());
-                            Vec3 p = right.add(forward.scale(random.nextFloat(1.85f)));
-                            this.spawnSnowFlakeParticle(level, p,
-                                    movement.x * 0.75 + forward.x * 0.25,
-                                    movement.y + 0.017 + up,
-                                    movement.z * 0.75 + forward.z * 0.25);
+                //more particles!
+                for (int j = 0; j < 2; j++) {
+                    if (random.nextFloat() < (cross * cross) - 0.1) {
+                        Vec3 forward = this.calculateViewVector(xRot, yRot);
+                        float up = (float) Math.min(horizontalSpeed * 0.6, 0.3);
+                        if (cross > 0) {
+                            if (left == null) {
+                                Vec3 a = this.calculateViewVector(xRot, yRot + 24);
+                                left = a.scale(-1f).add(this.position());
+                                Vec3 p = left.add(forward.scale(random.nextFloat(1.85f)));
+                                this.spawnSnowFlakeParticle(level, p,
+                                        movement.x * 0.75 + forward.x * 0.25,
+                                        movement.y + 0.017 + up,
+                                        movement.z * 0.75 + forward.z * 0.25);
+                            }
+                        } else {
+                            if (right == null) {
+                                Vec3 b = this.calculateViewVector(xRot, yRot - 24);
+                                right = b.scale(-1f).add(this.position());
+                                Vec3 p = right.add(forward.scale(random.nextFloat(1.85f)));
+                                this.spawnSnowFlakeParticle(level, p,
+                                        movement.x * 0.75 + forward.x * 0.25,
+                                        movement.y + 0.017 + up,
+                                        movement.z * 0.75 + forward.z * 0.25);
+                            }
                         }
                     }
                 }
@@ -667,8 +678,8 @@ public class SledEntity extends Entity implements IInputListener, IEntityAdditio
         boolean flag2 = pVec.z != vec3.z;
         boolean flag3 = this.onGround || flag1 && pVec.y < 0.0D;
         if (this.maxUpStep > 0.0F && flag3 && (flag || flag2)) {
-            Vec3 vec31 = collideBoundingBox(this, new Vec3(pVec.x, (double) this.maxUpStep, pVec.z), aabb, this.level, list);
-            Vec3 vec32 = collideBoundingBox(this, new Vec3(0.0D, (double) this.maxUpStep, 0.0D), aabb.expandTowards(pVec.x, 0.0D, pVec.z), this.level, list);
+            Vec3 vec31 = collideBoundingBox(this, new Vec3(pVec.x, this.maxUpStep, pVec.z), aabb, this.level, list);
+            Vec3 vec32 = collideBoundingBox(this, new Vec3(0.0D, this.maxUpStep, 0.0D), aabb.expandTowards(pVec.x, 0.0D, pVec.z), this.level, list);
             if (vec32.y < (double) this.maxUpStep) {
                 Vec3 vec33 = collideBoundingBox(this, new Vec3(pVec.x, 0.0D, pVec.z), aabb.move(vec32), this.level, list).add(vec32);
                 if (vec33.horizontalDistanceSqr() > vec31.horizontalDistanceSqr()) {
@@ -1165,11 +1176,11 @@ public class SledEntity extends Entity implements IInputListener, IEntityAdditio
                 this.chest = container;
             }
             //on client accepts possible wolf (horrible)
-            if(this.level.isClientSide && this.newWolfIndex != -1){
-                if(this.getPassengers().indexOf(entity) == newWolfIndex){
-                    if(this.isValidWolf(entity)) {
+            if (this.level.isClientSide && this.newWolfIndex != -1) {
+                if (this.getPassengers().indexOf(entity) == newWolfIndex) {
+                    if (this.isValidWolf(entity)) {
                         //set accepted wolf
-                        this.wolf = (Animal)entity;
+                        this.wolf = (Animal) entity;
                     }
                     this.newWolfIndex = -1;
                 }

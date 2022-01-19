@@ -16,9 +16,9 @@ public interface IWreathProvider {
 
     boolean hasWreath(BlockPos pos);
 
-    void updateWeathBlock(BlockPos pos, Level level);
+    void refreshWreathVisual(BlockPos pos, Level level);
 
-    void updateAllBlocksClient(Level level);
+    void refreshClientBlocksVisuals(Level level);
 
     void updateAllBlocks(ServerLevel level);
 

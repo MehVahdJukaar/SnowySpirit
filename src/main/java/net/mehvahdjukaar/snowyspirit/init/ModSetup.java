@@ -44,12 +44,12 @@ public class ModSetup {
         public ItemStack execute(BlockSource pSource, ItemStack pStack) {
             Direction direction = pSource.getBlockState().getValue(DispenserBlock.FACING);
             Level level = pSource.getLevel();
-            double d0 = pSource.x() + (double)((float)direction.getStepX() * 1.125F);
-            double d1 = pSource.y() + (double)((float)direction.getStepY() * 1.125F);
-            double d2 = pSource.z() + (double)((float)direction.getStepZ() * 1.125F);
+            double d0 = pSource.x() + (double)((float)direction.getStepX() * 1.2F);
+            double d1 = pSource.y() + (double)((float)direction.getStepY() * 1.2F);
+            double d2 = pSource.z() + (double)((float)direction.getStepZ() * 1.2F);
             BlockPos blockpos = pSource.getPos().relative(direction);
 
-            if (!level.getBlockState(blockpos).isAir() || !level.getFluidState(blockpos.below()).is(FluidTags.WATER)) {
+            if (!level.getBlockState(blockpos).isAir() || !level.getFluidState(blockpos).isEmpty()) {
                 return this.defaultDispenseItemBehavior.dispense(pSource, pStack);
             }
 
