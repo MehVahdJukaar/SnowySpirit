@@ -1,16 +1,15 @@
 package net.mehvahdjukaar.snowyspirit.common.ai;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.mojang.datafixers.util.Pair;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.ai.behavior.*;
+import net.minecraft.world.entity.ai.behavior.Behavior;
+import net.minecraft.world.entity.ai.behavior.BehaviorUtils;
+import net.minecraft.world.entity.ai.behavior.EntityTracker;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.ai.memory.MemoryStatus;
 import net.minecraft.world.entity.npc.Villager;
@@ -47,7 +46,7 @@ public class ThrowSnowballsTask extends Behavior<Villager> {
 
     @Override
     protected boolean canStillUse(ServerLevel pLevel, Villager pEntity, long pGameTime) {
-        if(duration<=0)return false;
+        if (duration <= 0) return false;
         return this.eggs == 0 || this.checkExtraStartConditions(pLevel, pEntity);
     }
 
@@ -87,7 +86,7 @@ public class ThrowSnowballsTask extends Behavior<Villager> {
             pLevel.addFreshEntity(egg);
 
         }
-        if(eggs<=0){
+        if (eggs <= 0) {
             //goes in cooldown when it shot its snowballs
             this.cooldown = 20 * (10 + pLevel.random.nextInt(15)) + pLevel.random.nextInt(20);
         }
@@ -114,25 +113,11 @@ public class ThrowSnowballsTask extends Behavior<Villager> {
     @Nullable
     private LivingEntity getLookTarget(LivingEntity pMob) {
         var v = pMob.getBrain().getMemory(MemoryModuleType.LOOK_TARGET).orElse(null);
-        if(v instanceof EntityTracker entityTracker){
+        if (v instanceof EntityTracker entityTracker) {
             Entity e = entityTracker.getEntity();
-            if(e instanceof LivingEntity entity)return entity;
+            if (e instanceof LivingEntity entity) return entity;
         }
         return null;
-    }
-
-    //TODO: add baby snowball
-    public static ImmutableList<Pair<Integer, ? extends Behavior<? super Villager>>> getPlayPackage(float pWalkingSpeed) {
-        return ImmutableList.of(
-                Pair.of(0, new MoveToTargetSink(80, 120)),
-                Pair.of(5, new PlayTagWithOtherKids()),
-                Pair.of(5, new RunOne<>(
-                        ImmutableMap.of(MemoryModuleType.VISIBLE_VILLAGER_BABIES, MemoryStatus.VALUE_ABSENT),
-                        ImmutableList.of(
-                                Pair.of(InteractWith.of(EntityType.VILLAGER, 8, MemoryModuleType.INTERACTION_TARGET, pWalkingSpeed, 2), 2),
-                                Pair.of(InteractWith.of(EntityType.CAT, 8, MemoryModuleType.INTERACTION_TARGET, pWalkingSpeed, 2), 1),
-                                Pair.of(new VillageBoundRandomStroll(pWalkingSpeed), 1),
-                                Pair.of(new SetWalkTargetFromLookTarget(pWalkingSpeed, 2), 1), Pair.of(new JumpOnBed(pWalkingSpeed), 2), Pair.of(new DoNothing(20, 40), 2)))), Pair.of(99, new UpdateActivityFromSchedule()));
     }
 
 }

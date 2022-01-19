@@ -16,9 +16,9 @@ public class GlowLightsModelLoader implements IModelLoader<GlowLightsModelGeomet
 
     @Override
     public GlowLightsModelGeometry read(JsonDeserializationContext context, JsonObject json) {
-        BlockModel model;
-        model = ModelLoaderRegistry.ExpandedBlockModelDeserializer.INSTANCE
+        BlockModel model = ModelLoaderRegistry.ExpandedBlockModelDeserializer.INSTANCE
                 .getAdapter(BlockModel.class).fromJsonTree(json.get("overlay"));
-        return new GlowLightsModelGeometry(model);
+        boolean translucent = json.has("translucent") && json.get("translucent").getAsBoolean();
+        return new GlowLightsModelGeometry(model, translucent);
     }
 }

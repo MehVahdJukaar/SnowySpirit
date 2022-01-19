@@ -2,6 +2,7 @@ package net.mehvahdjukaar.snowyspirit.client.block_model;
 
 import net.mehvahdjukaar.snowyspirit.common.block.GlowLightsBlockTile;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.BlockModelShaper;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.ItemOverrides;
@@ -12,6 +13,7 @@ import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.client.model.data.EmptyModelData;
 import net.minecraftforge.client.model.data.IDynamicBakedModel;
 import net.minecraftforge.client.model.data.IModelData;
@@ -26,9 +28,11 @@ import java.util.Random;
 public class GlowLightsBakedModel implements IDynamicBakedModel {
     private final BlockModelShaper blockModelShaper;
     private final BakedModel overlay;
+    private final boolean translucent;
 
-    public GlowLightsBakedModel(BakedModel overlay) {
+    public GlowLightsBakedModel(BakedModel overlay, boolean translucent) {
         this.overlay = overlay;
+        this.translucent = translucent;
         this.blockModelShaper = Minecraft.getInstance().getBlockRenderer().getBlockModelShaper();
     }
 
@@ -38,19 +42,27 @@ public class GlowLightsBakedModel implements IDynamicBakedModel {
 
         //always on cutout layer
         List<BakedQuad> quads = new ArrayList<>();
-
         if (state != null) {
-            try {
-                BlockState mimic = extraData.getData(GlowLightsBlockTile.MIMIC);
-                if (mimic != null && !mimic.isAir()) {
-                    BakedModel model = blockModelShaper.getBlockModel(mimic);
+            RenderType layer = MinecraftForgeClient.getRenderType();
+            boolean onTranslucent = layer == RenderType.translucent();
 
-                    quads.addAll(model.getQuads(mimic, side, rand, EmptyModelData.INSTANCE));
+            //always cutout
+            if (!onTranslucent) {
+                try {
+                    BlockState mimic = extraData.getData(GlowLightsBlockTile.MIMIC);
+                    if (mimic != null && !mimic.isAir()) {
+                        BakedModel model = blockModelShaper.getBlockModel(mimic);
+
+                        quads.addAll(model.getQuads(mimic, side, rand, EmptyModelData.INSTANCE));
+                    }
+
+                } catch (Exception ignored) {
                 }
+            }
 
+            //need to be added later so they go ontop
+            if (onTranslucent == translucent) {
                 quads.addAll(overlay.getQuads(state, side, rand, EmptyModelData.INSTANCE));
-
-            } catch (Exception ignored) {
             }
         }
 

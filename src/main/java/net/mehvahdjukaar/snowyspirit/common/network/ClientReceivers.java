@@ -21,4 +21,5 @@ public class ClientReceivers {
         IWreathProvider pCap = pLevel.getCapability(CapabilityHandler.WREATH_CAPABILITY).orElse(null);
         message.pos.forEach(p -> pCap.updateWeathBlock(p, pLevel));
     }
+
 }

@@ -38,6 +38,9 @@ public class NetworkHandler {
         register(ClientBoundSyncAllWreaths.class, ClientBoundSyncAllWreaths::buffer,
                 ClientBoundSyncAllWreaths::new, ClientBoundSyncAllWreaths::handler);
 
+        register(ServerBoundUpdateSledState.class, ServerBoundUpdateSledState::buffer,
+                ServerBoundUpdateSledState::new, ServerBoundUpdateSledState::handler);
+
     }
 
     public static void sendToAllTrackingClients(Entity entity, ServerLevel world, Message message) {

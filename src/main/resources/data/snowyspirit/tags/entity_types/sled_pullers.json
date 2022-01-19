@@ -8,6 +8,10 @@
       "required": false
     },
     {
+      "id" :"quark:foxhound",
+      "required": false
+    },
+    {
       "id" :"alexsmobs:grizzly_bear",
       "required": false
     }

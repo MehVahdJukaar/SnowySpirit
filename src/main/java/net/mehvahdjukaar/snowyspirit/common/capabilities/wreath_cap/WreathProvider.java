@@ -109,15 +109,18 @@ public class WreathProvider implements IWreathProvider, ICapabilitySerializable<
     public void updateAllBlocks(ServerLevel level) {
         Set<BlockPos> positions = new HashSet<>(this.wreathBlocks.keySet());
         positions.forEach(p -> {
-            BlockState state = level.getBlockState(p);
-            if (!(state.getBlock() instanceof DoorBlock)) {
-                this.removeWreath(p);
-                ItemEntity itementity = new ItemEntity(level, p.getX() + 0.5, p.getY() + 0.5, p.getZ() + 0.5,
-                        ModRegistry.WREATH_ITEM.get().getDefaultInstance());
-                itementity.setDefaultPickUpDelay();
-                level.addFreshEntity(itementity);
-                level.levelEvent(LevelEvent.PARTICLES_DESTROY_BLOCK, p, Block.getId(ModRegistry.WREATH.get().defaultBlockState()));
-                //drop
+            //prevents removing when not loaded
+            if(level.isLoaded(p)) {
+                BlockState state = level.getBlockState(p);
+                if (!(state.getBlock() instanceof DoorBlock)) {
+                    this.removeWreath(p);
+                    ItemEntity itementity = new ItemEntity(level, p.getX() + 0.5, p.getY() + 0.5, p.getZ() + 0.5,
+                            ModRegistry.WREATH_ITEM.get().getDefaultInstance());
+                    itementity.setDefaultPickUpDelay();
+                    level.addFreshEntity(itementity);
+                    level.levelEvent(LevelEvent.PARTICLES_DESTROY_BLOCK, p, Block.getId(ModRegistry.WREATH.get().defaultBlockState()));
+                    //drop
+                }
             }
         });
     }

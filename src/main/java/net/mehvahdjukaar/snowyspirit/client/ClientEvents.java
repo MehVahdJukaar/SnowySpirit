@@ -31,8 +31,6 @@ import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
-import java.util.Random;
-
 @Mod.EventBusSubscriber(modid = Christmas.MOD_ID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class ClientEvents {
 
@@ -62,10 +60,8 @@ public class ClientEvents {
 
             poseStack.pushPose();
 
-
             MultiBufferSource.BufferSource bufferSource = mc.renderBuffers().bufferSource();
             RenderSystem.enableDepthTest();
-            poseStack.translate(-cameraPos.x(), -cameraPos.y(), -cameraPos.z());
 
             for (var entry : capability.getWreathBlocks().entrySet()) {
                 BlockPos pos = entry.getKey();
@@ -73,7 +69,7 @@ public class ClientEvents {
                 if (mc.player.distanceToSqr(Vec3.atCenterOf(pos)) < dist) {
 
                     poseStack.pushPose();
-                    poseStack.translate(pos.getX(), pos.getY(), pos.getZ());
+                    poseStack.translate(pos.getX() - cameraPos.x(), pos.getY() - cameraPos.y(), pos.getZ() - cameraPos.z());
 
                     //int pPackedLight = getLight(pos, level);
                     WreathProvider.WreathData data = entry.getValue();
@@ -99,7 +95,6 @@ public class ClientEvents {
                     poseStack.popPose();
                     //render stuff
                     poseStack.popPose();
-
                 }
             }
             RenderSystem.disableDepthTest();
@@ -114,7 +109,7 @@ public class ClientEvents {
         ForgeHooksClient.setRenderType(RenderType.cutout());
         blockRenderer.getModelRenderer().tesselateBlock(world,
                 blockRenderer.getBlockModel(state), state, pos, matrixStack,
-                buffer.getBuffer(RenderType.cutout()), false, new Random(), 0,
+                buffer.getBuffer(RenderType.cutout()), false, world.random, 0,
                 OverlayTexture.NO_OVERLAY);
         ForgeHooksClient.setRenderType(null);
     }

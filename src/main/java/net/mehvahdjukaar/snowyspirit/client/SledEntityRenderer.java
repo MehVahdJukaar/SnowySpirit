@@ -71,7 +71,7 @@ public class SledEntityRenderer extends EntityRenderer<SledEntity> {
         poseStack.scale(0.75F, 0.75F, 0.75F);
         poseStack.translate(-0.5, 0, -0.5);
 
-        //TODO: add carpets
+        //TODO: add carpets colors
 
         poseStack.popPose();
 

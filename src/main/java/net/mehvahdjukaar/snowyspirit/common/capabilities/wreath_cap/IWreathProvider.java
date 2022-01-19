@@ -22,7 +22,7 @@ public interface IWreathProvider {
 
     void updateAllBlocks(ServerLevel level);
 
-    public record WreathData(Direction face, Boolean open, Boolean hinge) {
+    record WreathData(Direction face, Boolean open, Boolean hinge) {
     }
 }
 

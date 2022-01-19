@@ -16,15 +16,17 @@ import java.util.function.Function;
 public class GlowLightsModelGeometry implements IModelGeometry<GlowLightsModelGeometry> {
 
     private final BlockModel overlay;
+    private final boolean translucent;
 
-    protected GlowLightsModelGeometry(BlockModel overlay) {
+    protected GlowLightsModelGeometry(BlockModel overlay, boolean translucent) {
         this.overlay = overlay;
+        this.translucent = translucent;
     }
 
     @Override
     public BakedModel bake(IModelConfiguration owner, ModelBakery bakery, Function<Material, TextureAtlasSprite> spriteGetter, ModelState modelTransform, ItemOverrides overrides, ResourceLocation modelLocation) {
         BakedModel bakedOverlay = this.overlay.bake(bakery, overlay, spriteGetter, modelTransform, modelLocation, true);
-        return new GlowLightsBakedModel(bakedOverlay);
+        return new GlowLightsBakedModel(bakedOverlay, translucent);
     }
 
     @Override

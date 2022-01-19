@@ -60,7 +60,7 @@ public class ClientSetup {
             ItemBlockRenderTypes.setRenderLayer(v.get(), RenderType.translucent());
         }
         for(var v : ModRegistry.GLOW_LIGHTS_BLOCKS.values()){
-            ItemBlockRenderTypes.setRenderLayer(v.get(), RenderType.cutout());
+            ItemBlockRenderTypes.setRenderLayer(v.get(), r->r == RenderType.translucent() || r == RenderType.cutout());
         }
 
     }

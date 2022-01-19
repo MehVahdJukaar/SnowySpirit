@@ -27,6 +27,7 @@ public class EggnogItem extends Item {
      * Called when the player finishes using this Item (E.g. finishes eating.). Not called when the player stops using
      * the Item before the action is complete.
      */
+    @Override
     public ItemStack finishUsingItem(ItemStack pStack, Level pLevel, LivingEntity pEntityLiving) {
         super.finishUsingItem(pStack, pLevel, pEntityLiving);
         if (pEntityLiving instanceof ServerPlayer serverplayer) {
@@ -55,6 +56,7 @@ public class EggnogItem extends Item {
     /**
      * How long it takes to use or consume an item
      */
+    @Override
     public int getUseDuration(ItemStack pStack) {
         return DRINK_DURATION;
     }
@@ -62,22 +64,21 @@ public class EggnogItem extends Item {
     /**
      * returns the action that specifies what animation to play when the items is being used
      */
+    @Override
     public UseAnim getUseAnimation(ItemStack pStack) {
         return UseAnim.DRINK;
     }
 
+    @Override
     public SoundEvent getDrinkingSound() {
         return SoundEvents.HONEY_DRINK;
     }
 
+    @Override
     public SoundEvent getEatingSound() {
         return SoundEvents.HONEY_DRINK;
     }
 
-    /**
-     * Called to trigger the item's "innate" right click behavior. To handle when this item is used on a Block, see
-     * {@link #onItemUse}.
-     */
     @Override
     public InteractionResultHolder<ItemStack> use(Level pLevel, Player pPlayer, InteractionHand pHand) {
         return ItemUtils.startUsingInstantly(pLevel, pPlayer, pHand);
