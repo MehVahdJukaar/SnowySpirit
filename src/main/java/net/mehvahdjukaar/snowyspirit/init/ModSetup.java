@@ -1,6 +1,5 @@
 package net.mehvahdjukaar.snowyspirit.init;
 
-import net.mehvahdjukaar.selene.util.DispenserHelper;
 import net.mehvahdjukaar.snowyspirit.common.ai.WinterVillagerAI;
 import net.mehvahdjukaar.snowyspirit.common.entity.SledEntity;
 import net.mehvahdjukaar.snowyspirit.common.generation.WorldGenHandler;
@@ -9,18 +8,22 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.BlockSource;
 import net.minecraft.core.Direction;
 import net.minecraft.core.dispenser.DefaultDispenseItemBehavior;
-import net.minecraft.tags.FluidTags;
 import net.minecraft.world.entity.vehicle.Boat;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.ComposterBlock;
 import net.minecraft.world.level.block.DispenserBlock;
-import net.minecraft.world.level.block.entity.DispenserBlockEntity;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 
 public class ModSetup {
 
     public static void init(final FMLCommonSetupEvent event) {
         event.enqueueWork(() -> {
+
+            ComposterBlock.COMPOSTABLES.put(ModRegistry.GINGER_FLOWER.get(), 0.3F);
+            ComposterBlock.COMPOSTABLES.put(ModRegistry.GINGER.get(), 0.65F);
+            ComposterBlock.COMPOSTABLES.put(ModRegistry.GINGER_WILD_ITEM.get(), 0.65F);
+
             NetworkHandler.registerMessages();
             WorldGenHandler.setup(event);
             WinterVillagerAI.init();
@@ -44,9 +47,9 @@ public class ModSetup {
         public ItemStack execute(BlockSource pSource, ItemStack pStack) {
             Direction direction = pSource.getBlockState().getValue(DispenserBlock.FACING);
             Level level = pSource.getLevel();
-            double d0 = pSource.x() + (double)((float)direction.getStepX() * 1.2F);
-            double d1 = pSource.y() + (double)((float)direction.getStepY() * 1.2F);
-            double d2 = pSource.z() + (double)((float)direction.getStepZ() * 1.2F);
+            double d0 = pSource.x() + (double) ((float) direction.getStepX() * 1.2F);
+            double d1 = pSource.y() + (double) ((float) direction.getStepY() * 1.2F);
+            double d2 = pSource.z() + (double) ((float) direction.getStepZ() * 1.2F);
             BlockPos blockpos = pSource.getPos().relative(direction);
 
             if (!level.getBlockState(blockpos).isAir() || !level.getFluidState(blockpos).isEmpty()) {

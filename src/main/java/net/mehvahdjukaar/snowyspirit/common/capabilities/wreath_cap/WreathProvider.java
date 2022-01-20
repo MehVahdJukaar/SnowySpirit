@@ -70,8 +70,15 @@ public class WreathProvider implements IWreathProvider, ICapabilitySerializable<
         wreathBlocks.put(pos, new WreathData(direction, open, hinge));
     }
 
-    public void removeWreath(BlockPos pos) {
-        wreathBlocks.remove(pos);
+    public void removeWreath(BlockPos p, Level level, boolean animationAndDrop) {
+        wreathBlocks.remove(p);
+        if(animationAndDrop){
+            ItemEntity itementity = new ItemEntity(level, p.getX() + 0.5, p.getY() + 0.5, p.getZ() + 0.5,
+                    ModRegistry.WREATH_ITEM.get().getDefaultInstance());
+            itementity.setDefaultPickUpDelay();
+            level.addFreshEntity(itementity);
+            level.levelEvent(LevelEvent.PARTICLES_DESTROY_BLOCK, p, Block.getId(ModRegistry.WREATH.get().defaultBlockState()));
+        }
     }
 
     @Override
@@ -94,7 +101,7 @@ public class WreathProvider implements IWreathProvider, ICapabilitySerializable<
                 boolean hinge = state.getValue(DoorBlock.HINGE) == DoorHingeSide.RIGHT;
                 this.addWreath(pos, dir, open, hinge);
             } else {
-                this.removeWreath(pos);
+                this.removeWreath(pos, level,false);
             }
         }
     }
@@ -113,18 +120,10 @@ public class WreathProvider implements IWreathProvider, ICapabilitySerializable<
             if(level.isLoaded(p)) {
                 BlockState state = level.getBlockState(p);
                 if (!(state.getBlock() instanceof DoorBlock)) {
-                    this.removeWreath(p);
-                    ItemEntity itementity = new ItemEntity(level, p.getX() + 0.5, p.getY() + 0.5, p.getZ() + 0.5,
-                            ModRegistry.WREATH_ITEM.get().getDefaultInstance());
-                    itementity.setDefaultPickUpDelay();
-                    level.addFreshEntity(itementity);
-                    level.levelEvent(LevelEvent.PARTICLES_DESTROY_BLOCK, p, Block.getId(ModRegistry.WREATH.get().defaultBlockState()));
-                    //drop
+                    this.removeWreath(p, level,true);
                 }
             }
         });
     }
 
-
-    ;
 }

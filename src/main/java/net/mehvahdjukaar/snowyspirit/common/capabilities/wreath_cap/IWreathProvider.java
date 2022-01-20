@@ -10,7 +10,7 @@ import java.util.Map;
 public interface IWreathProvider {
     void addWreath(BlockPos pos, Direction direction, boolean open, boolean hinge);
 
-    void removeWreath(BlockPos pos);
+    void removeWreath(BlockPos pos, Level level, boolean animationAndDrop);
 
     Map<BlockPos, WreathData> getWreathBlocks();
 

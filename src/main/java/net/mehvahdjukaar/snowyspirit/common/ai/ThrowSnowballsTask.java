@@ -1,6 +1,7 @@
 package net.mehvahdjukaar.snowyspirit.common.ai;
 
 import com.google.common.collect.ImmutableMap;
+import net.mehvahdjukaar.snowyspirit.Christmas;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -39,6 +40,7 @@ public class ThrowSnowballsTask extends Behavior<Villager> {
     @Override
     protected boolean checkExtraStartConditions(ServerLevel pLevel, Villager pOwner) {
         if (cooldown-- > 0) return false;
+        if(!Christmas.isChristmasSeason(pOwner.level)) return false;
         LivingEntity livingentity = this.getLookTarget(pOwner);
 
         return BehaviorUtils.canSee(pOwner, livingentity) && livingentity.distanceToSqr(pOwner.getX(), pOwner.getY(), pOwner.getZ()) < maxRange * maxRange;

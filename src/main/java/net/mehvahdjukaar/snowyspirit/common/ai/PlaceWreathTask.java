@@ -2,6 +2,7 @@ package net.mehvahdjukaar.snowyspirit.common.ai;
 
 
 import com.google.common.collect.ImmutableMap;
+import net.mehvahdjukaar.snowyspirit.Christmas;
 import net.mehvahdjukaar.snowyspirit.common.block.WreathBlock;
 import net.mehvahdjukaar.snowyspirit.common.capabilities.CapabilityHandler;
 import net.mehvahdjukaar.snowyspirit.init.ModRegistry;
@@ -45,6 +46,7 @@ public class PlaceWreathTask extends Behavior<Villager> {
     protected boolean checkExtraStartConditions(ServerLevel pLevel, Villager pOwner) {
         if (cooldown-- > 0) return false;
         if (pOwner.isBaby()) return false;
+        if(!Christmas.isChristmasSeason(pOwner.level)) return false;
         //doesnt always start and gets put on cooldown
         if (!ForgeEventFactory.getMobGriefingEvent(pLevel, pOwner)) {
             cooldown = 20 * 60;

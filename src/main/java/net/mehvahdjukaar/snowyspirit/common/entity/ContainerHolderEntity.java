@@ -2,7 +2,7 @@ package net.mehvahdjukaar.snowyspirit.common.entity;
 
 import net.mehvahdjukaar.snowyspirit.Christmas;
 import net.mehvahdjukaar.snowyspirit.init.ModRegistry;
-import net.mehvahdjukaar.snowyspirit.suppcompat.SackHelper;
+import net.mehvahdjukaar.snowyspirit.integration.suppcompat.SackHelper;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;

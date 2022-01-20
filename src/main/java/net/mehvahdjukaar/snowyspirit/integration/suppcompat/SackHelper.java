@@ -1,4 +1,4 @@
-package net.mehvahdjukaar.snowyspirit.suppcompat;
+package net.mehvahdjukaar.snowyspirit.integration.suppcompat;
 
 import net.mehvahdjukaar.snowyspirit.common.entity.ContainerHolderEntity;
 import net.mehvahdjukaar.supplementaries.common.configs.ServerConfigs;

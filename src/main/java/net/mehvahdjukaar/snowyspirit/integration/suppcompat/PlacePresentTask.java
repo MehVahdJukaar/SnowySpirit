@@ -1,4 +1,4 @@
-package net.mehvahdjukaar.snowyspirit.suppcompat;
+package net.mehvahdjukaar.snowyspirit.integration.suppcompat;
 
 
 import com.google.common.collect.ImmutableMap;
@@ -51,6 +51,7 @@ public class PlacePresentTask extends Behavior<Villager> {
     protected boolean checkExtraStartConditions(ServerLevel pLevel, Villager pOwner) {
         if (cooldown-- > 0) return false;
         if (pOwner.isBaby()) return false;
+        if(!Christmas.isChristmasSeason(pOwner.level)) return false;
         //doesnt always start and gets put on cooldown
         if (!ForgeEventFactory.getMobGriefingEvent(pLevel, pOwner) || pLevel.random.nextInt(5)!=0) {
             cooldown = 20 * 50;

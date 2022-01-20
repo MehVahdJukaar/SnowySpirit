@@ -101,9 +101,7 @@ public class WreathBlock extends HorizontalDirectionalBlock {
                         SoundType soundtype = state.getSoundType(level, p, null);
                         level.playSound(null, p, soundtype.getPlaceSound(), SoundSource.BLOCKS, (soundtype.getVolume() + 1.0F) / 2.0F, soundtype.getPitch() * 0.8F);
                         //send packet to clients
-                        NetworkHandler.sendToAllInRangeClients(p, serverLevel, Integer.MAX_VALUE,
-                                new ClientBoundSyncWreath(p, true,
-                                        door.getValue(DoorBlock.FACING), door.getValue(DoorBlock.OPEN)));
+                        NetworkHandler.sendToAllInRangeClients(p, serverLevel, Integer.MAX_VALUE, new ClientBoundSyncWreath(p, true));
 
                     }
                     return true;

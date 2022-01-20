@@ -13,7 +13,12 @@ public class ClientReceivers {
     public static void handleSyncWreathPacket(ClientBoundSyncWreath message) {
         Level pLevel = Minecraft.getInstance().level;
         IWreathProvider pCap = pLevel.getCapability(CapabilityHandler.WREATH_CAPABILITY).orElse(null);
-        pCap.refreshWreathVisual(message.pos, pLevel);
+        if(message.hasWreath) {
+            pCap.refreshWreathVisual(message.pos, pLevel);
+        }
+        else{
+            pCap.removeWreath(message.pos, pLevel, false);
+        }
 
     }
 
