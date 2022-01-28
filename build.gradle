@@ -27,7 +27,7 @@ mixin {
 }
 
 
-version = '1.18-1.0.10'
+version = '1.18-1.1.0'
 group = 'net.mehvahdjukaar.snowyspirit' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'snowyspirit'
 
@@ -115,6 +115,8 @@ dependencies {
     implementation fg.deobf("curse.maven:configured-457570:3546349")
     implementation fg.deobf("curse.maven:jei-238222:3550020")
     implementation fg.deobf("curse.maven:serene-seasons-291874:3582836")
+    implementation fg.deobf("curse.maven:snow-real-magic-308663:3601344")
+    implementation fg.deobf("curse.maven:kiwi-303657:3577626")
     //implementation fg.deobf("mezz.jei:jei-1.17.1:8.0.0.12:api")
 
     // For more info...

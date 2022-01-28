@@ -73,26 +73,31 @@ public class ClientEvents {
 
                     //int pPackedLight = getLight(pos, level);
                     WreathProvider.WreathData data = entry.getValue();
-                    Direction dir = data.face();
-                    boolean open = data.open();
+                    Direction dir = data.face;
+                    boolean open = data.open;
                     if (open) {
-                        dir = data.hinge() ? dir.getCounterClockWise() : dir.getClockWise();
+                        dir = data.hinge ? dir.getCounterClockWise() : dir.getClockWise();
                     }
                     BlockState state = ModRegistry.WREATH.get().defaultBlockState();
                     BlockRenderDispatcher blockRenderer = mc.getBlockRenderer();
                     poseStack.translate(0.5, 0.5, 0.5);
-                    poseStack.pushPose();
-                    poseStack.mulPose(Vector3f.YP.rotationDegrees(-dir.toYRot()));
-                    poseStack.translate(-0.5, -0.5, -1.5);
-                    renderBlockState(state, poseStack, bufferSource, blockRenderer, level, pos);
 
-                    poseStack.popPose();
-                    poseStack.pushPose();
-                    poseStack.mulPose(Vector3f.YP.rotationDegrees(-dir.getOpposite().toYRot()));
-                    poseStack.translate(-0.5, -0.5, -0.5 - 0.1875);
-                    renderBlockState(state, poseStack, bufferSource, blockRenderer, level, pos);
+                    var dim = open ? data.openDimensions : data.closedDimensions;
 
-                    poseStack.popPose();
+                    if(dim != null) {
+                        poseStack.pushPose();
+                        poseStack.mulPose(Vector3f.YP.rotationDegrees(-dir.toYRot()));
+                        poseStack.translate(-0.5, -0.5, -0.5 + dim.getSecond());
+                        renderBlockState(state, poseStack, bufferSource, blockRenderer, level, pos);
+                        poseStack.popPose();
+
+                        poseStack.pushPose();
+                        poseStack.mulPose(Vector3f.YP.rotationDegrees(-dir.getOpposite().toYRot()));
+                        poseStack.translate(-0.5, -0.5, -0.5 + dim.getFirst());
+                        renderBlockState(state, poseStack, bufferSource, blockRenderer, level, pos);
+                        poseStack.popPose();
+                    }
+
                     //render stuff
                     poseStack.popPose();
                 }

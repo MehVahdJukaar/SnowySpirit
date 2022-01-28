@@ -1,5 +1,6 @@
 package net.mehvahdjukaar.snowyspirit.common.capabilities.wreath_cap;
 
+import com.mojang.datafixers.util.Pair;
 import net.mehvahdjukaar.snowyspirit.common.capabilities.CapabilityHandler;
 import net.mehvahdjukaar.snowyspirit.init.ModRegistry;
 import net.minecraft.core.BlockPos;
@@ -14,6 +15,8 @@ import net.minecraft.world.level.block.DoorBlock;
 import net.minecraft.world.level.block.LevelEvent;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.DoorHingeSide;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 import net.minecraftforge.common.util.LazyOptional;
@@ -61,18 +64,18 @@ public class WreathProvider implements IWreathProvider, ICapabilitySerializable<
         for (int i = 0; i < total.getInt("Count"); i++) {
             CompoundTag tag = total.getCompound(i + "");
             BlockPos pos = NbtUtils.readBlockPos(tag);
-            this.addWreath(pos, Direction.NORTH, true, true);
+            this.addWreath(pos);
         }
     }
 
     @Override
-    public void addWreath(BlockPos pos, Direction direction, boolean open, boolean hinge) {
-        wreathBlocks.put(pos, new WreathData(direction, open, hinge));
+    public WreathData addWreath(BlockPos pos) {
+        return wreathBlocks.computeIfAbsent(pos, WreathData::new);
     }
 
     public void removeWreath(BlockPos p, Level level, boolean animationAndDrop) {
         wreathBlocks.remove(p);
-        if(animationAndDrop){
+        if (animationAndDrop) {
             ItemEntity itementity = new ItemEntity(level, p.getX() + 0.5, p.getY() + 0.5, p.getZ() + 0.5,
                     ModRegistry.WREATH_ITEM.get().getDefaultInstance());
             itementity.setDefaultPickUpDelay();
@@ -93,16 +96,43 @@ public class WreathProvider implements IWreathProvider, ICapabilitySerializable<
 
     @Override
     public void refreshWreathVisual(BlockPos pos, Level level) {
-        if(level.isLoaded(pos)) {
+        if (level.isLoaded(pos)) {
             BlockState state = level.getBlockState(pos);
             if (state.getBlock() instanceof DoorBlock) {
                 Direction dir = state.getValue(DoorBlock.FACING);
                 boolean open = state.getValue(DoorBlock.OPEN);
                 boolean hinge = state.getValue(DoorBlock.HINGE) == DoorHingeSide.RIGHT;
-                this.addWreath(pos, dir, open, hinge);
+                WreathData data = this.addWreath(pos);
+                data.face = dir;
+                data.hinge = hinge;
+                data.open = open;
+                if (data.needsInitialization) {
+                    this.calculateDoorDimensions(level, pos, state, data);
+                    data.needsInitialization = false;
+                }
             } else {
-                this.removeWreath(pos, level,false);
+                this.removeWreath(pos, level, false);
             }
+        }
+    }
+
+    private void calculateDoorDimensions(Level level, BlockPos pos, BlockState state, WreathData data) {
+        state = state.setValue(DoorBlock.FACING, Direction.NORTH).setValue(DoorBlock.OPEN, Boolean.FALSE)
+                .setValue(DoorBlock.HINGE, DoorHingeSide.RIGHT);
+        VoxelShape shape = state.getShape(level, pos);
+        AABB bounds = shape.bounds();
+        if (bounds.maxX - bounds.minX >= 1) {
+            double front = bounds.minZ -1;
+            double back = -bounds.maxZ;
+            data.closedDimensions = Pair.of((float) front, (float) back);
+        }
+        state = state.setValue(DoorBlock.OPEN, Boolean.TRUE).setValue(DoorBlock.FACING, Direction.EAST);
+        shape = state.getShape(level, pos);
+        bounds = shape.bounds();
+        if (bounds.maxX - bounds.minX >= 1) {
+            double front = bounds.minZ -1;
+            double back = -bounds.maxZ;
+            data.openDimensions = Pair.of((float) front, (float) back);
         }
     }
 
@@ -117,10 +147,10 @@ public class WreathProvider implements IWreathProvider, ICapabilitySerializable<
         Set<BlockPos> positions = new HashSet<>(this.wreathBlocks.keySet());
         positions.forEach(p -> {
             //prevents removing when not loaded
-            if(level.isLoaded(p)) {
+            if (level.isLoaded(p)) {
                 BlockState state = level.getBlockState(p);
                 if (!(state.getBlock() instanceof DoorBlock)) {
-                    this.removeWreath(p, level,true);
+                    this.removeWreath(p, level, true);
                 }
             }
         });

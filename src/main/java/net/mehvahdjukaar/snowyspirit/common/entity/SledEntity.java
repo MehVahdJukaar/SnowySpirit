@@ -1,11 +1,15 @@
 package net.mehvahdjukaar.snowyspirit.common.entity;
 
 import com.google.common.collect.Lists;
+import net.mehvahdjukaar.snowyspirit.Christmas;
 import net.mehvahdjukaar.snowyspirit.common.IInputListener;
 import net.mehvahdjukaar.snowyspirit.common.network.NetworkHandler;
 import net.mehvahdjukaar.snowyspirit.common.network.ServerBoundUpdateSledState;
 import net.mehvahdjukaar.snowyspirit.init.ModRegistry;
 import net.minecraft.BlockUtil;
+import net.minecraft.CrashReport;
+import net.minecraft.CrashReportCategory;
+import net.minecraft.ReportedException;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
@@ -35,6 +39,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.PowderSnowBlock;
 import net.minecraft.world.level.block.SnowLayerBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
@@ -457,8 +462,8 @@ public class SledEntity extends Entity implements IInputListener, IEntityAdditio
                     break;
                 }
             }
-            //has 3 attempts to restore the wolf (omg)
-            if (this.tickCount > 3) this.restoreWolfUUID = null;
+            //has 10 attempts to restore the wolf (omg)
+            if (this.tickCount > 10) this.restoreWolfUUID = null;
         }
         if (this.wolf != null) this.wolf.setInvulnerable(true);
 
@@ -575,6 +580,38 @@ public class SledEntity extends Entity implements IInputListener, IEntityAdditio
             }
         }
     }
+
+    //hardcoded to ignore powder snow
+    @Override
+    protected void checkInsideBlocks() {
+        AABB aabb = this.getBoundingBox();
+        BlockPos blockpos = new BlockPos(aabb.minX + 0.001D, aabb.minY + 0.001D, aabb.minZ + 0.001D);
+        BlockPos blockpos1 = new BlockPos(aabb.maxX - 0.001D, aabb.maxY - 0.001D, aabb.maxZ - 0.001D);
+        if (this.level.hasChunksAt(blockpos, blockpos1)) {
+            BlockPos.MutableBlockPos blockPos = new BlockPos.MutableBlockPos();
+
+            for(int i = blockpos.getX(); i <= blockpos1.getX(); ++i) {
+                for(int j = blockpos.getY(); j <= blockpos1.getY(); ++j) {
+                    for(int k = blockpos.getZ(); k <= blockpos1.getZ(); ++k) {
+                        blockPos.set(i, j, k);
+                        BlockState blockstate = this.level.getBlockState(blockPos);
+                        if(!(blockstate.getBlock() instanceof PowderSnowBlock)) {
+                            try {
+                                blockstate.entityInside(this.level, blockPos, this);
+                                this.onInsideBlock(blockstate);
+                            } catch (Throwable throwable) {
+                                CrashReport crashreport = CrashReport.forThrowable(throwable, "Colliding entity with block");
+                                CrashReportCategory crashreportcategory = crashreport.addCategory("Block being collided with");
+                                CrashReportCategory.populateBlockDetails(crashreportcategory, this.level, blockPos, blockstate);
+                                throw new ReportedException(crashreport);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
 
     private void spawnTrailParticles(Vec3 movement, double horizontalSpeed) {
         if (this.status.onSnow() && this.onGround) {

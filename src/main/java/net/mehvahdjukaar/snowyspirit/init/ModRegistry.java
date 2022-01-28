@@ -122,6 +122,10 @@ public class ModRegistry {
             () -> new Item(new Item.Properties().tab(CreativeModeTab.TAB_FOOD).food(new FoodProperties
                     .Builder().nutrition(2).saturationMod(0.4f).build())));
 
+    public static final RegistryObject<Item> GINGERBREAD_COOKIE = regItem("gingerbread_cookie",
+            () -> new Item(new Item.Properties().tab(CreativeModeTab.TAB_FOOD).food(new FoodProperties
+                    .Builder().nutrition(1).fast().saturationMod(0.4f).build())));
+
     public static final RegistryObject<Item> EGGNOG = regItem("eggnog", EggnogItem::new);
 
     public static final RegistryObject<Item> WINTER_DISC = ITEMS.register("winter_disc",
@@ -157,6 +161,11 @@ public class ModRegistry {
             () -> new ItemNameBlockItem(GINGER_CROP.get(), new Item.Properties().tab(CreativeModeTab.TAB_MISC)));
     public static final RegistryObject<Item> GINGER = regItem("ginger",
             () -> new Item(new Item.Properties().tab(CreativeModeTab.TAB_FOOD)));
+
+    //pot
+    public static final RegistryObject<Block> GINGER_POT = BLOCKS.register("potted_ginger", () -> new FlowerPotBlock(
+            () -> (FlowerPotBlock) Blocks.FLOWER_POT, GINGER_CROP, BlockBehaviour.Properties.copy(Blocks.FLOWER_POT)));
+
 
     public static final Map<DyeColor, RegistryObject<Block>> GUMDROPS_BUTTONS = new HashMap<>();
     public static final Map<DyeColor, RegistryObject<Item>> GUMDROPS_BUTTON_ITEMS = new HashMap<>();

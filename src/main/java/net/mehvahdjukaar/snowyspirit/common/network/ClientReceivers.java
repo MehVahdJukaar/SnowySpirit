@@ -26,7 +26,7 @@ public class ClientReceivers {
     public static void handleSyncAlWreathsPacket(ClientBoundSyncAllWreaths message) {
         Level pLevel = Minecraft.getInstance().level;
         IWreathProvider pCap = pLevel.getCapability(CapabilityHandler.WREATH_CAPABILITY).orElse(null);
-        message.pos.forEach(p -> pCap.addWreath(p, Direction.NORTH, true, true));
+        message.pos.forEach(pCap::addWreath);
     }
 
 }

@@ -1,5 +1,6 @@
 package net.mehvahdjukaar.snowyspirit.common.capabilities.wreath_cap;
 
+import com.mojang.datafixers.util.Pair;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -8,7 +9,7 @@ import net.minecraft.world.level.Level;
 import java.util.Map;
 
 public interface IWreathProvider {
-    void addWreath(BlockPos pos, Direction direction, boolean open, boolean hinge);
+    WreathData addWreath(BlockPos pos);
 
     void removeWreath(BlockPos pos, Level level, boolean animationAndDrop);
 
@@ -22,7 +23,16 @@ public interface IWreathProvider {
 
     void updateAllBlocks(ServerLevel level);
 
-    record WreathData(Direction face, Boolean open, Boolean hinge) {
+    class WreathData{
+        public Direction face = Direction.NORTH;
+        public boolean open = true;
+        public boolean hinge = true;
+
+        public boolean needsInitialization = true;
+        public Pair<Float, Float> openDimensions = null;
+        public Pair<Float, Float> closedDimensions = null;
+
+        public WreathData(BlockPos pos) {}
     }
 }
 

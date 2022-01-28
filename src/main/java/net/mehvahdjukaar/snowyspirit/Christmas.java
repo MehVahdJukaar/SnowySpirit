@@ -18,6 +18,7 @@ import net.minecraftforge.fml.event.config.ModConfigEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import snownee.snow.SnowRealMagic;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -28,6 +29,7 @@ import java.util.Date;
 @Mod(Christmas.MOD_ID)
 public class Christmas {
     public static final String MOD_ID = "snowyspirit";
+
 
     public static ResourceLocation res(String name) {
         return new ResourceLocation(MOD_ID, name);
@@ -52,7 +54,7 @@ public class Christmas {
 
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Configs.buildConfig());
     }
-
+//TODO: sync xRot, chest weight, configs, tweak values
     //TODO: nerf sled acceleration without wolf to make wolf more relevant. can still be used for downhill descent
     //TODO: maybe make friction delend also on xRot to better handle slope descent
 
@@ -78,11 +80,12 @@ public class Christmas {
             Date today = new Date(0, Calendar.getInstance().get(Calendar.MONTH), Calendar.getInstance().get(Calendar.DATE));
 
             //if seasonal use pumpkin placement time window
-            IS_CHRISTMAS_REAL_TIME = today.before(start) && !today.after(end);
+            IS_CHRISTMAS_REAL_TIME = today.after(start) && today.before(end);
 
             SERENE_SEASONS = ModList.get().isLoaded("sereneseasons") && Configs.SERENE_SEASONS_COMPAT.get();
 
             if (SERENE_SEASONS) {
+
                 SereneSeasonsCompat.refresh();
             }
         }

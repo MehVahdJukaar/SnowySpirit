@@ -56,7 +56,6 @@ public class SledEntityRenderer extends EntityRenderer<SledEntity> {
         poseStack.translate(0.0D, 0.375D + dy, 0.0D);
 
 
-
         //same stuff that happens to yRot when its created
         float xRot = sled.getViewXRot(partialTicks);
 
@@ -91,8 +90,8 @@ public class SledEntityRenderer extends EntityRenderer<SledEntity> {
         model.renderToBuffer(poseStack, vertexconsumer, light, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
 
         DyeColor color = sled.getSeatType();
-        if(color != null) {
-            vertexconsumer = bufferSource.getBuffer(model.renderType(this.quiltTextures.get(DyeColor.RED)));
+        if (color != null) {
+            vertexconsumer = bufferSource.getBuffer(model.renderType(this.quiltTextures.get(color)));
             quiltModel.renderToBuffer(poseStack, vertexconsumer, light, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
         }
 
@@ -197,7 +196,7 @@ public class SledEntityRenderer extends EntityRenderer<SledEntity> {
                 double wolfOffsetZ = sin * ropeOffset.z - cos * ropeOffset.x * rope;
                 double offsetX = (cos * sledOffset.z + sin * sledOffset.x * rope) * pCos;
                 double offsetZ = (sin * sledOffset.z - cos * sledOffset.x * rope) * pCos;
-                double offsetY = -pSin * sledOffset.length() + 0.25 +addY;
+                double offsetY = -pSin * sledOffset.length() + 0.25 + addY;
                 double pX = sledX + offsetX;
                 double pY = sledY + offsetY;
                 double pZ = sledZ + offsetZ;

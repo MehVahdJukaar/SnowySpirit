@@ -13,7 +13,9 @@ import net.minecraft.client.color.block.BlockColors;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -56,12 +58,16 @@ public class ClientSetup {
         ItemBlockRenderTypes.setRenderLayer(ModRegistry.GINGER_WILD.get(), RenderType.cutout());
         ItemBlockRenderTypes.setRenderLayer(ModRegistry.SNOW_GLOBE.get(), RenderType.cutout());
         ItemBlockRenderTypes.setRenderLayer(ModRegistry.WREATH.get(), RenderType.cutout());
-        for(var v : ModRegistry.GUMDROPS_BUTTONS.values()){
+        ItemBlockRenderTypes.setRenderLayer(ModRegistry.GINGER_POT.get(), RenderType.cutout());
+        for (var v : ModRegistry.GUMDROPS_BUTTONS.values()) {
             ItemBlockRenderTypes.setRenderLayer(v.get(), RenderType.translucent());
         }
-        for(var v : ModRegistry.GLOW_LIGHTS_BLOCKS.values()){
-            ItemBlockRenderTypes.setRenderLayer(v.get(), r->r == RenderType.translucent() || r == RenderType.cutout());
+        for (var v : ModRegistry.GLOW_LIGHTS_BLOCKS.values()) {
+            ItemBlockRenderTypes.setRenderLayer(v.get(), r -> r == RenderType.translucent() || r == RenderType.cutout());
         }
+
+        ItemProperties.register(ModRegistry.GINGERBREAD_COOKIE.get(), new ResourceLocation("shape"),
+                (stack, world, entity, s) -> entity == null ? 0 : System.identityHashCode(stack) % 4);
 
     }
 
@@ -87,7 +93,7 @@ public class ClientSetup {
             return col(state, world, pos, tint);
         }
 
-        public static int col(BlockState state, BlockAndTintGetter level, BlockPos pos, int tint){
+        public static int col(BlockState state, BlockAndTintGetter level, BlockPos pos, int tint) {
             if (level != null && pos != null) {
                 if (level.getBlockEntity(pos) instanceof GlowLightsBlockTile tile) {
                     BlockState mimic = tile.mimic;
@@ -99,10 +105,10 @@ public class ClientSetup {
             return -1;
         }
 
-        public static class noParticle implements BlockColor{
+        public static class noParticle implements BlockColor {
             @Override
             public int getColor(BlockState state, @Nullable BlockAndTintGetter world, @Nullable BlockPos pos, int tint) {
-                if(tint  == 0) return -1;
+                if (tint == 0) return -1;
                 return col(state, world, pos, tint);
             }
         }

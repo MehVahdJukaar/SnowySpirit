@@ -35,6 +35,6 @@ public class QuiltModel<T extends SledEntity> extends EntityModel<T> {
 
     @Override
     public void renderToBuffer(PoseStack poseStack, VertexConsumer buffer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
-        quilt.render(poseStack, buffer, packedLight, packedOverlay);
+        quilt.render(poseStack, buffer, packedLight, packedOverlay, red, green, blue, alpha);
     }
 }
