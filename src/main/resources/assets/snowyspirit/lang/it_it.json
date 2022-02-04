@@ -32,6 +32,7 @@
   "block.snowyspirit.gumdrop_gray": "Caramella gommosa grigia",
   "block.snowyspirit.gumdrop_black": "Caramella gommosa nera",
   "block.snowyspirit.gumdrop_brown": "Caramella gommosa marrone",
+  "entity.snowyspirit.sled": "Slitta",
   "entity.snowyspirit.container_entity": "Slitta con baule",
   "message.snowyspirit.container_entity_name": "Slitta %s",
   "block.snowyspirit.glow_lights_red": "Luci natalizie rosse",
