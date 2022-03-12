@@ -3,7 +3,7 @@
   "group": "glow_lights",
   "ingredients": [
     {"item": "minecraft:glowstone_dust"},
-    {"tag": "forge:dyes/cyan"},
+    {"tag": "forge:dyes/light_blue"},
     {"tag": "forge:string"}
   ],
   "result": {
