@@ -1,5 +1,6 @@
 package net.mehvahdjukaar.snowyspirit.common.items;
 
+import net.mehvahdjukaar.selene.block_set.wood.WoodType;
 import net.mehvahdjukaar.snowyspirit.common.entity.SledEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.stats.Stats;
@@ -8,7 +9,6 @@ import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySelector;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.vehicle.Boat;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -25,11 +25,11 @@ import java.util.function.Predicate;
 public class SledItem extends Item {
 
     private static final Predicate<Entity> ENTITY_PREDICATE = EntitySelector.NO_SPECTATORS.and(Entity::isPickable);
-    private final Boat.Type type;
+    public final WoodType woodType;
 
-    public SledItem(Boat.Type type) {
+    public SledItem(WoodType type) {
         super((new Item.Properties()).stacksTo(1).tab(CreativeModeTab.TAB_TRANSPORTATION));
-        this.type = type;
+        this.woodType = type;
     }
 
     @Override
@@ -54,7 +54,7 @@ public class SledItem extends Item {
 
             if (hitresult.getType() == HitResult.Type.BLOCK) {
                 SledEntity boat = new SledEntity(pLevel, hitresult.getLocation().x, hitresult.getLocation().y, hitresult.getLocation().z);
-                boat.setWoodType(this.type);
+                boat.setWoodType(this.woodType);
                 boat.setYRot(pPlayer.getYRot());
                 if (!pLevel.noCollision(boat, boat.getBoundingBox())) {
                     return InteractionResultHolder.fail(itemstack);

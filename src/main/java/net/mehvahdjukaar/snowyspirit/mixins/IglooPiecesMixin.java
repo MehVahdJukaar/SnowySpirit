@@ -13,10 +13,10 @@ import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.levelgen.Heightmap;
-import net.minecraft.world.level.levelgen.feature.StructurePieceType;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.levelgen.structure.IglooPieces;
 import net.minecraft.world.level.levelgen.structure.TemplateStructurePiece;
+import net.minecraft.world.level.levelgen.structure.pieces.StructurePieceType;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureManager;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
@@ -32,14 +32,15 @@ import java.util.Random;
 public abstract class IglooPiecesMixin extends TemplateStructurePiece {
 
 
+    public IglooPiecesMixin(StructurePieceType p_210083_, int p_210084_, StructureManager p_210085_, ResourceLocation p_210086_, String p_210087_, StructurePlaceSettings p_210088_, BlockPos p_210089_) {
+        super(p_210083_, p_210084_, p_210085_, p_210086_, p_210087_, p_210088_, p_210089_);
+    }
+
     @Shadow
     private static StructurePlaceSettings makeSettings(Rotation pRotation, ResourceLocation pLocation) {
         return null;
     }
 
-    public IglooPiecesMixin(StructurePieceType pType, int pGenDepth, StructureManager pStructureManager, ResourceLocation pLocation, String pTemplateName, StructurePlaceSettings pPlaceSettings, BlockPos pTemplatePosition) {
-        super(pType, pGenDepth, pStructureManager, pLocation, pTemplateName, pPlaceSettings, pTemplatePosition);
-    }
 
     @Inject(method = "postProcess", at = @At("RETURN"))
     private void getCollisionShape(WorldGenLevel worldGenLevel, StructureFeatureManager pStructureFeatureManager,

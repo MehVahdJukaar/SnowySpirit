@@ -54,9 +54,9 @@ public class WorldGenHandler {
                 Set<BiomeDictionary.Type> types = BiomeDictionary.getTypes(key);
                 if (types.contains(JUNGLE)) {
                     if (types.contains(SPARSE)) {
-                        event.getGeneration().addFeature(GenerationStep.Decoration.VEGETAL_DECORATION, ConfiguredFeaturesRegistry.PLACED_WILD_GINGER_PATCH_DENSE);
+                        event.getGeneration().addFeature(GenerationStep.Decoration.VEGETAL_DECORATION, ConfiguredFeaturesRegistry.WILD_GINGER_DENSE);
                     } else {
-                        event.getGeneration().addFeature(GenerationStep.Decoration.VEGETAL_DECORATION, ConfiguredFeaturesRegistry.PLACED_WILD_GINGER_PATCH);
+                        event.getGeneration().addFeature(GenerationStep.Decoration.VEGETAL_DECORATION, ConfiguredFeaturesRegistry.WILD_GINGER);
                     }
                 }
             }

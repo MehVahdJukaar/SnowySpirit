@@ -55,7 +55,7 @@ public class SnowGlobeBlock extends WaterBlock {
     }
 
     private boolean canBeSnowy(BlockPos pos, Level level) {
-        return level.getBiome(pos).coldEnoughToSnow(pos);
+        return level.getBiome(pos).value().coldEnoughToSnow(pos);
     }
 
     @Override

@@ -1,6 +1,8 @@
 package net.mehvahdjukaar.snowyspirit.common.entity;
 
 import com.google.common.collect.Lists;
+import net.mehvahdjukaar.selene.block_set.wood.WoodType;
+import net.mehvahdjukaar.selene.block_set.wood.WoodTypeRegistry;
 import net.mehvahdjukaar.snowyspirit.Christmas;
 import net.mehvahdjukaar.snowyspirit.common.IInputListener;
 import net.mehvahdjukaar.snowyspirit.common.network.NetworkHandler;
@@ -19,6 +21,7 @@ import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.tags.ItemTags;
@@ -63,7 +66,7 @@ public class SledEntity extends Entity implements IInputListener, IEntityAdditio
     private static final EntityDataAccessor<Integer> DATA_ID_HURT = SynchedEntityData.defineId(SledEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> DATA_ID_HURT_DIR = SynchedEntityData.defineId(SledEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Float> DATA_ID_DAMAGE = SynchedEntityData.defineId(SledEntity.class, EntityDataSerializers.FLOAT);
-    private static final EntityDataAccessor<Integer> DATA_ID_TYPE = SynchedEntityData.defineId(SledEntity.class, EntityDataSerializers.INT);
+    private static final EntityDataAccessor<String> DATA_ID_TYPE = SynchedEntityData.defineId(SledEntity.class, EntityDataSerializers.STRING);
     private static final EntityDataAccessor<Integer> DATA_SEAT_TYPE = SynchedEntityData.defineId(SledEntity.class, EntityDataSerializers.INT);
 
     private static final EntityDataAccessor<Float> DATA_ADDITIONAL_Y = SynchedEntityData.defineId(SledEntity.class, EntityDataSerializers.FLOAT);
@@ -71,7 +74,6 @@ public class SledEntity extends Entity implements IInputListener, IEntityAdditio
     private static final EntityDataAccessor<Float> DATA_SYNCED_DX = SynchedEntityData.defineId(SledEntity.class, EntityDataSerializers.FLOAT);
     private static final EntityDataAccessor<Float> DATA_SYNCED_DY = SynchedEntityData.defineId(SledEntity.class, EntityDataSerializers.FLOAT);
     private static final EntityDataAccessor<Float> DATA_SYNCED_DZ = SynchedEntityData.defineId(SledEntity.class, EntityDataSerializers.FLOAT);
-
 
     private float deltaRotation;
     private int lerpSteps;
@@ -114,7 +116,7 @@ public class SledEntity extends Entity implements IInputListener, IEntityAdditio
 
     @Override
     protected void addAdditionalSaveData(CompoundTag tag) {
-        tag.putString("Type", this.getWoodType().getName());
+        tag.putString("Type", this.getWoodType().toString());
         if (this.getSeatType() != null) {
             tag.putInt("Seat", this.getSeatType().getId());
         }
@@ -129,7 +131,7 @@ public class SledEntity extends Entity implements IInputListener, IEntityAdditio
     @Override
     protected void readAdditionalSaveData(CompoundTag tag) {
         if (tag.contains("Type", 8)) {
-            this.setWoodType(Boat.Type.byName(tag.getString("Type")));
+            this.setWoodType(WoodTypeRegistry.fromNBT(tag.getString("Type")));
         }
         if (tag.contains("Seat", 99)) {
             this.setSeatType(DyeColor.byId(tag.getInt("Seat")));
@@ -158,7 +160,7 @@ public class SledEntity extends Entity implements IInputListener, IEntityAdditio
 
     @Override
     protected void defineSynchedData() {
-        this.entityData.define(DATA_ID_TYPE, Boat.Type.OAK.ordinal());
+        this.entityData.define(DATA_ID_TYPE, WoodType.OAK_WOOD_TYPE.toString());
         this.entityData.define(DATA_SEAT_TYPE, 0);
         this.entityData.define(DATA_ID_HURT, 0);
         this.entityData.define(DATA_ID_HURT_DIR, 1);
@@ -1040,12 +1042,12 @@ public class SledEntity extends Entity implements IInputListener, IEntityAdditio
         return this.entityData.get(DATA_ID_HURT_DIR);
     }
 
-    public void setWoodType(Boat.Type type) {
-        this.entityData.set(DATA_ID_TYPE, type.ordinal());
+    public void setWoodType(WoodType type) {
+        this.entityData.set(DATA_ID_TYPE, type.toString());
     }
 
-    public Boat.Type getWoodType() {
-        return Boat.Type.byId(this.entityData.get(DATA_ID_TYPE));
+    public WoodType getWoodType() {
+        return WoodTypeRegistry.fromNBT(this.entityData.get(DATA_ID_TYPE));
     }
 
     @Nullable
@@ -1365,7 +1367,7 @@ public class SledEntity extends Entity implements IInputListener, IEntityAdditio
     }
 
     public Item getSledItem() {
-        return ModRegistry.SLED_ITEMS.get(this.getWoodType()).get();
+        return ModRegistry.SLED_ITEMS.get(this.getWoodType());
     }
 
     //if it can prevent freezing

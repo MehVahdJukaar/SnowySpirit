@@ -6,6 +6,8 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Matrix3f;
 import com.mojang.math.Matrix4f;
 import com.mojang.math.Vector3f;
+import net.mehvahdjukaar.selene.block_set.wood.WoodType;
+import net.mehvahdjukaar.selene.block_set.wood.WoodTypeRegistry;
 import net.mehvahdjukaar.snowyspirit.Christmas;
 import net.mehvahdjukaar.snowyspirit.common.entity.SledEntity;
 import net.mehvahdjukaar.snowyspirit.init.ClientSetup;
@@ -31,7 +33,7 @@ import java.util.stream.Stream;
 
 public class SledEntityRenderer extends EntityRenderer<SledEntity> {
 
-    private final Map<Boat.Type, ResourceLocation> textures;
+    private final Map<WoodType, ResourceLocation> textures;
     private final Map<DyeColor, ResourceLocation> quiltTextures;
     private final SledModel<SledEntity> model;
     private final QuiltModel<SledEntity> quiltModel;
@@ -41,8 +43,8 @@ public class SledEntityRenderer extends EntityRenderer<SledEntity> {
         this.shadowRadius = 0.8F;
         this.model = new SledModel<>(context.bakeLayer(ClientSetup.SLED_MODEL));
         this.quiltModel = new QuiltModel<>(context.bakeLayer(ClientSetup.QUILT_MODEL));
-        this.textures = Stream.of(Boat.Type.values()).collect(ImmutableMap.toImmutableMap((e) -> e,
-                (t) -> new ResourceLocation(Christmas.MOD_ID + ":textures/entity/sled/" + t.getName() + ".png")));
+        this.textures = WoodTypeRegistry.WOOD_TYPES.values().stream().collect(ImmutableMap.toImmutableMap((e) -> e,
+                (t) -> Christmas.res("textures/entity/sled/" + t.getTexturePath() + ".png")));
         this.quiltTextures = Stream.of(DyeColor.values()).collect(ImmutableMap.toImmutableMap((e) -> e,
                 (t) -> new ResourceLocation(Christmas.MOD_ID + ":textures/entity/sled/quilt/" + t.getName() + ".png")));
     }

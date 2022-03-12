@@ -525,7 +525,7 @@ public class ContainerHolderEntity extends Entity implements Container, MenuProv
     public static boolean isChestItem(ItemStack stack) {
         Item i = stack.getItem();
         if (Christmas.SUPP && SackHelper.isSack(i)) return true;
-        return ModRegistry.VALID_CONTAINERS.contains(i) ||
+        return stack.is(ModRegistry.VALID_CONTAINERS) ||
                 (i instanceof BlockItem bi && (bi.getBlock() instanceof ShulkerBoxBlock));
     }
 

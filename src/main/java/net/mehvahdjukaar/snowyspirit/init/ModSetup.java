@@ -1,5 +1,6 @@
 package net.mehvahdjukaar.snowyspirit.init;
 
+import net.mehvahdjukaar.selene.block_set.wood.WoodType;
 import net.mehvahdjukaar.snowyspirit.common.ai.WinterVillagerAI;
 import net.mehvahdjukaar.snowyspirit.common.entity.SledEntity;
 import net.mehvahdjukaar.snowyspirit.common.generation.WorldGenHandler;
@@ -8,7 +9,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.BlockSource;
 import net.minecraft.core.Direction;
 import net.minecraft.core.dispenser.DefaultDispenseItemBehavior;
-import net.minecraft.world.entity.vehicle.Boat;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
@@ -32,7 +32,7 @@ public class ModSetup {
             WinterVillagerAI.init();
 
             ModRegistry.SLED_ITEMS.forEach((key, value) ->
-                    DispenserBlock.registerBehavior(value.get(), new SledDispenserBehavior(key)));
+                    DispenserBlock.registerBehavior(value, new SledDispenserBehavior(key)));
 
         });
     }
@@ -40,9 +40,9 @@ public class ModSetup {
 
     public static class SledDispenserBehavior extends DefaultDispenseItemBehavior {
         private final DefaultDispenseItemBehavior defaultDispenseItemBehavior = new DefaultDispenseItemBehavior();
-        private final Boat.Type type;
+        private final WoodType type;
 
-        public SledDispenserBehavior(Boat.Type pType) {
+        public SledDispenserBehavior(WoodType pType) {
             this.type = pType;
         }
 

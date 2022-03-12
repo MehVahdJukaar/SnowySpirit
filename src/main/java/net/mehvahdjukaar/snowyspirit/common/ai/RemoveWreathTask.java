@@ -85,7 +85,7 @@ public class RemoveWreathTask extends Behavior<Villager> {
         pOwner.getBrain().setMemory(MemoryModuleType.WALK_TARGET, new WalkTarget(pos, this.speedModifier, 2));
 
         pOwner.getBrain().setMemory(MemoryModuleType.LOOK_TARGET, new BlockPosTracker(pos));
-        if (pos.closerThan(pOwner.position(), 2.3)) {
+        if (pos.closerToCenterThan(pOwner.position(), 2.3)) {
             this.ticksSinceReached++;
 
             BlockState state = pLevel.getBlockState(pos);

@@ -4,6 +4,8 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableMap;
 import com.mojang.serialization.Codec;
+import net.mehvahdjukaar.selene.block_set.BlockSetManager;
+import net.mehvahdjukaar.selene.block_set.wood.WoodType;
 import net.mehvahdjukaar.snowyspirit.Christmas;
 import net.mehvahdjukaar.snowyspirit.common.block.*;
 import net.mehvahdjukaar.snowyspirit.common.entity.ContainerHolderEntity;
@@ -11,13 +13,19 @@ import net.mehvahdjukaar.snowyspirit.common.entity.SledEntity;
 import net.mehvahdjukaar.snowyspirit.common.items.EggnogItem;
 import net.mehvahdjukaar.snowyspirit.common.items.GlowLightsItem;
 import net.mehvahdjukaar.snowyspirit.common.items.SledItem;
+import net.mehvahdjukaar.supplementaries.Supplementaries;
+import net.mehvahdjukaar.supplementaries.common.items.SignPostItem;
+import net.mehvahdjukaar.supplementaries.setup.RegistryConstants;
+import net.mehvahdjukaar.supplementaries.setup.RegistryHelper;
 import net.minecraft.core.GlobalPos;
+import net.minecraft.core.Registry;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.EntityTypeTags;
 import net.minecraft.tags.ItemTags;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
@@ -33,11 +41,14 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.material.MaterialColor;
 import net.minecraftforge.common.Tags;
+import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.RegistryObject;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -54,10 +65,10 @@ public class ModRegistry {
         }
     }
 
-    public static final Tags.IOptionalNamedTag<Item> VALID_CONTAINERS = ItemTags.createOptional(Christmas.res("sled_container"));
-    public static final Tags.IOptionalNamedTag<EntityType<?>> WOLVES = EntityTypeTags.createOptional(Christmas.res("sled_pullers"));
-    public static final Tags.IOptionalNamedTag<Block> SLED_SNOW = BlockTags.createOptional(Christmas.res("sled_snow"));
-    public static final Tags.IOptionalNamedTag<Block> SLED_SAND = BlockTags.createOptional(Christmas.res("sled_sand"));
+    public static final TagKey<Item> VALID_CONTAINERS = ItemTags.create(Christmas.res("sled_container"));
+    public static final TagKey<EntityType<?>> WOLVES = TagKey.create(Registry.ENTITY_TYPE_REGISTRY,Christmas.res("sled_pullers"));
+    public static final TagKey<Block> SLED_SNOW = BlockTags.create(Christmas.res("sled_snow"));
+    public static final TagKey<Block> SLED_SAND = BlockTags.create(Christmas.res("sled_sand"));
 
 
     public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, Christmas.MOD_ID);
@@ -82,6 +93,21 @@ public class ModRegistry {
         SCHEDULES.register(bus);
         MEMORY_MODULE_TYPES.register(bus);
         POI_SENSORS.register(bus);
+
+        BlockSetManager.addBlockSetRegistrationCallback(ModRegistry::registerSledsItems, Item.class, WoodType.class);
+    }
+
+    //sign posts
+    public static void registerSledsItems(RegistryEvent.Register<Item> event, Collection<WoodType> woodTypes) {
+        IForgeRegistry<Item> registry = event.getRegistry();
+        for (WoodType wood : woodTypes) {
+            if (wood.canBurn()) {
+                String name = wood.getVariantId("sled");
+                Item item = new SledItem(wood).setRegistryName(name);
+                registry.register(item);
+                SLED_ITEMS.put(wood, (SledItem) item);
+            }
+        }
     }
 
     private static RegistryObject<Item> regItem(String name, Supplier<? extends Item> sup) {
@@ -111,8 +137,7 @@ public class ModRegistry {
                     .build("container_entity"));
 
 
-    public static final Map<Boat.Type, RegistryObject<Item>> SLED_ITEMS = Stream.of(Boat.Type.values()).collect(ImmutableMap.toImmutableMap((e) -> e,
-            (t) -> regItem("sled_" + t.getName(), () -> new SledItem(t))));
+    public static final Map<WoodType, SledItem> SLED_ITEMS = new HashMap<>();
 
     public static final RegistryObject<Block> CANDY_CANE_BLOCK = BLOCKS.register("candy_cane_block", () ->
             new RotatedPillarBlock(BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_PINK)

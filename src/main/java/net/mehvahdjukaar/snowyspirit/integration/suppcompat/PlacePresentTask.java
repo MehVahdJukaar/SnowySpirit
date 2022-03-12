@@ -99,7 +99,7 @@ public class PlacePresentTask extends Behavior<Villager> {
             pOwner.getBrain().setMemory(MemoryModuleType.WALK_TARGET, new WalkTarget(targetPos, this.speedModifier, 2));
 
             pOwner.getBrain().setMemory(MemoryModuleType.LOOK_TARGET, new BlockPosTracker(targetPos));
-            if (targetPos.closerThan(pOwner.position(), 2.3)) {
+            if (targetPos.closerToCenterThan(pOwner.position(), 2.3)) {
                 this.ticksSinceReached++;
                 if (ticksSinceReached > 20) {
                     ItemStack stack = pOwner.getMainHandItem();

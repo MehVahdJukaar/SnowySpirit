@@ -2,14 +2,18 @@ package net.mehvahdjukaar.snowyspirit;
 
 
 import net.mehvahdjukaar.snowyspirit.common.generation.WorldGenHandler;
+import net.mehvahdjukaar.snowyspirit.dynamicpack.ClientDynamicResourcesHandler;
+import net.mehvahdjukaar.snowyspirit.dynamicpack.ServerDynamicResourcesHandler;
 import net.mehvahdjukaar.snowyspirit.init.Configs;
 import net.mehvahdjukaar.snowyspirit.init.ModRegistry;
 import net.mehvahdjukaar.snowyspirit.init.ModSetup;
 import net.mehvahdjukaar.snowyspirit.integration.SereneSeasonsCompat;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
@@ -18,7 +22,6 @@ import net.minecraftforge.fml.event.config.ModConfigEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import snownee.snow.SnowRealMagic;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -30,12 +33,11 @@ import java.util.Date;
 public class Christmas {
     public static final String MOD_ID = "snowyspirit";
 
-
     public static ResourceLocation res(String name) {
         return new ResourceLocation(MOD_ID, name);
     }
 
-    private static final Logger LOGGER = LogManager.getLogger();
+    public static final Logger LOGGER = LogManager.getLogger();
 
     public static boolean SUPP = ModList.get().isLoaded("supplementaries");
 
@@ -51,10 +53,12 @@ public class Christmas {
         ModRegistry.init(bus);
         WorldGenHandler.init();
 
+        ServerDynamicResourcesHandler.registerBus(bus);
+        DistExecutor.runWhenOn(Dist.CLIENT, () -> () -> ClientDynamicResourcesHandler.registerBus(bus));
 
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Configs.buildConfig());
     }
-//TODO: sync xRot, chest weight, configs, tweak values
+    //TODO: sync xRot, chest weight, configs, tweak values
     //TODO: nerf sled acceleration without wolf to make wolf more relevant. can still be used for downhill descent
     //TODO: maybe make friction delend also on xRot to better handle slope descent
 
