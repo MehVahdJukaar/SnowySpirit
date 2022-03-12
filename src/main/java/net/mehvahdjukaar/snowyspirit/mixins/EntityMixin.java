@@ -19,7 +19,7 @@ public abstract class EntityMixin extends Entity{
         super(pEntityType, pLevel);
     }
 
-    @Inject(method = "canFreeze", at = @At("RETURN"), cancellable = true)
+    @Inject(method = "canFreeze()Z", at = @At("RETURN"), cancellable = true)
     private void canFreeze(CallbackInfoReturnable<Boolean> cir) {
         if (cir.getReturnValue()) {
             if (this.isPassenger()) {

@@ -2,7 +2,6 @@ package net.mehvahdjukaar.snowyspirit.init;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
-import com.google.common.collect.ImmutableMap;
 import com.mojang.serialization.Codec;
 import net.mehvahdjukaar.selene.block_set.BlockSetManager;
 import net.mehvahdjukaar.selene.block_set.wood.WoodType;
@@ -13,17 +12,12 @@ import net.mehvahdjukaar.snowyspirit.common.entity.SledEntity;
 import net.mehvahdjukaar.snowyspirit.common.items.EggnogItem;
 import net.mehvahdjukaar.snowyspirit.common.items.GlowLightsItem;
 import net.mehvahdjukaar.snowyspirit.common.items.SledItem;
-import net.mehvahdjukaar.supplementaries.Supplementaries;
-import net.mehvahdjukaar.supplementaries.common.items.SignPostItem;
-import net.mehvahdjukaar.supplementaries.setup.RegistryConstants;
-import net.mehvahdjukaar.supplementaries.setup.RegistryHelper;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.core.Registry;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.tags.BlockTags;
-import net.minecraft.tags.EntityTypeTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntityType;
@@ -32,7 +26,6 @@ import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.ai.sensing.SensorType;
 import net.minecraft.world.entity.schedule.Activity;
 import net.minecraft.world.entity.schedule.Schedule;
-import net.minecraft.world.entity.vehicle.Boat;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.block.*;
@@ -40,7 +33,6 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.material.MaterialColor;
-import net.minecraftforge.common.Tags;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
@@ -53,7 +45,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
-import java.util.stream.Stream;
 
 public class ModRegistry {
 
@@ -66,7 +57,7 @@ public class ModRegistry {
     }
 
     public static final TagKey<Item> VALID_CONTAINERS = ItemTags.create(Christmas.res("sled_container"));
-    public static final TagKey<EntityType<?>> WOLVES = TagKey.create(Registry.ENTITY_TYPE_REGISTRY,Christmas.res("sled_pullers"));
+    public static final TagKey<EntityType<?>> WOLVES = TagKey.create(Registry.ENTITY_TYPE_REGISTRY, Christmas.res("sled_pullers"));
     public static final TagKey<Block> SLED_SNOW = BlockTags.create(Christmas.res("sled_snow"));
     public static final TagKey<Block> SLED_SAND = BlockTags.create(Christmas.res("sled_sand"));
 
@@ -201,7 +192,7 @@ public class ModRegistry {
     static {
         for (DyeColor c : DyeColor.values()) {
             GUMDROPS_BUTTONS.put(c, BLOCKS.register("gumdrop_" + c.getName(), () -> new GumdropButton(c)));
-            GUMDROPS_BUTTON_ITEMS.put(c,regBlockItem(GUMDROPS_BUTTONS.get(c), CreativeModeTab.TAB_DECORATIONS));
+            GUMDROPS_BUTTON_ITEMS.put(c, regBlockItem(GUMDROPS_BUTTONS.get(c), CreativeModeTab.TAB_DECORATIONS));
         }
         for (DyeColor c : DyeColor.values()) {
             GLOW_LIGHTS_BLOCKS.put(c, BLOCKS.register("glow_lights_" + c.getName(), () -> new GlowLightsBlock(c)));
