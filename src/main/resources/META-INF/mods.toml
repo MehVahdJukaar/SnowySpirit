@@ -48,6 +48,6 @@ Winter themed mod that adds working sleds and winter related items with related 
 
     modId="selene"
     mandatory=true
-    versionRange="[1.18.2-1.14.0,]"
+    versionRange="[1.18.2-1.14.1,]"
     ordering="NONE"
     side="BOTH"

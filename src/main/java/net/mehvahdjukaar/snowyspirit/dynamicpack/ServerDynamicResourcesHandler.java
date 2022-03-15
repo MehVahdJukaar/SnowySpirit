@@ -4,24 +4,21 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Stopwatch;
 import net.mehvahdjukaar.selene.block_set.wood.WoodType;
 import net.mehvahdjukaar.selene.resourcepack.DynamicDataPack;
-import net.mehvahdjukaar.selene.resourcepack.DynamicDataPack.TagType;
 import net.mehvahdjukaar.snowyspirit.Christmas;
 import net.mehvahdjukaar.snowyspirit.common.items.SledItem;
 import net.mehvahdjukaar.snowyspirit.init.ModRegistry;
 import net.minecraft.advancements.critereon.InventoryChangeTrigger;
+import net.minecraft.core.Registry;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
-import net.minecraft.data.recipes.ShapelessRecipeBuilder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraftforge.common.crafting.ConditionalRecipe;
 import net.minecraftforge.common.crafting.conditions.ModLoadedCondition;
-import net.minecraftforge.eventbus.EventBus;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,10 +31,10 @@ public class ServerDynamicResourcesHandler {
 
     //fired on mod setup
     public static void registerBus(IEventBus forgeBus) {
-        DYNAMIC_DATA_PACK.registerPack((EventBus) forgeBus);
+        DYNAMIC_DATA_PACK.registerPack(forgeBus);
         FMLJavaModLoadingContext.get().getModEventBus()
                 .addListener(ServerDynamicResourcesHandler::generateAssets);
-        DYNAMIC_DATA_PACK.generateDebugResources = true;
+        DYNAMIC_DATA_PACK.generateDebugResources = false;
     }
 
     public static void generateAssets(final FMLCommonSetupEvent event) {
@@ -55,7 +52,7 @@ public class ServerDynamicResourcesHandler {
                 makeSledRecipe(sled, DYNAMIC_DATA_PACK::addRecipe);
             }
             //tag
-            DYNAMIC_DATA_PACK.addTag(Christmas.res("sleds"), posts, TagType.ITEMS);
+            DYNAMIC_DATA_PACK.addTag(Christmas.res("sleds"), posts, Registry.ITEM_REGISTRY);
         }
 
         Christmas.LOGGER.info("Generated runtime data resources in: {} seconds", watch.elapsed().toSeconds());

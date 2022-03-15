@@ -16,6 +16,7 @@ import net.mehvahdjukaar.snowyspirit.init.ModRegistry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.loading.FMLLoader;
 import org.apache.logging.log4j.Logger;
 
 public class ClientDynamicResourcesHandler extends ResourcePackAwareDynamicTextureProvider {
@@ -27,7 +28,7 @@ public class ClientDynamicResourcesHandler extends ResourcePackAwareDynamicTextu
     public static void registerBus(IEventBus bus) {
         DYNAMIC_TEXTURE_PACK.registerPack(bus);
 
-        DYNAMIC_TEXTURE_PACK.generateDebugResources = true;
+        DYNAMIC_TEXTURE_PACK.generateDebugResources = false;
     }
 
     @Override
