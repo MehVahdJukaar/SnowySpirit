@@ -10,6 +10,7 @@ import net.mehvahdjukaar.snowyspirit.init.ModSetup;
 import net.mehvahdjukaar.snowyspirit.integration.SereneSeasonsCompat;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.SoundType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -53,11 +54,18 @@ public class Christmas {
         ModRegistry.init(bus);
         WorldGenHandler.init();
 
-        ServerDynamicResourcesHandler.registerBus(bus);
-        DistExecutor.runWhenOn(Dist.CLIENT, () -> () -> ClientDynamicResourcesHandler.registerBus(bus));
+        var serverRes = new ServerDynamicResourcesHandler();
+        serverRes.register(bus);
+
+        DistExecutor.runWhenOn(Dist.CLIENT, () -> () -> {
+            var clientRes = new ClientDynamicResourcesHandler();
+            clientRes.register(bus);
+        });
 
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Configs.buildConfig());
+        ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, Configs.buildClientConfig());
     }
+    //TODO: add advancements
     //TODO: sync xRot, chest weight, configs, tweak values
     //TODO: nerf sled acceleration without wolf to make wolf more relevant. can still be used for downhill descent
     //TODO: maybe make friction delend also on xRot to better handle slope descent

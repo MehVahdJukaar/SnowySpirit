@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import net.mehvahdjukaar.selene.block_set.wood.WoodType;
 import net.mehvahdjukaar.selene.block_set.wood.WoodTypeRegistry;
 import net.mehvahdjukaar.snowyspirit.Christmas;
+import net.mehvahdjukaar.snowyspirit.client.SledSoundInstance;
 import net.mehvahdjukaar.snowyspirit.common.IInputListener;
 import net.mehvahdjukaar.snowyspirit.common.network.NetworkHandler;
 import net.mehvahdjukaar.snowyspirit.common.network.ServerBoundUpdateSledState;
@@ -12,6 +13,8 @@ import net.minecraft.BlockUtil;
 import net.minecraft.CrashReport;
 import net.minecraft.CrashReportCategory;
 import net.minecraft.ReportedException;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.resources.sounds.MinecartSoundInstance;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
@@ -34,6 +37,7 @@ import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.animal.Fox;
 import net.minecraft.world.entity.animal.WaterAnimal;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.vehicle.AbstractMinecart;
 import net.minecraft.world.entity.vehicle.Boat;
 import net.minecraft.world.entity.vehicle.DismountHelper;
 import net.minecraft.world.item.DyeColor;
@@ -93,6 +97,7 @@ public class SledEntity extends Entity implements IInputListener, IEntityAdditio
         super(entityType, level);
         this.blocksBuilding = true;
         this.maxUpStep = 1;
+
     }
 
     public SledEntity(Level level, double x, double y, double z) {
@@ -155,6 +160,9 @@ public class SledEntity extends Entity implements IInputListener, IEntityAdditio
     public void readSpawnData(FriendlyByteBuf additionalData) {
         if (additionalData.readBoolean()) {
             this.restoreWolfUUID = additionalData.readUUID();
+        }
+        if(level.isClientSide) {
+            Minecraft.getInstance().getSoundManager().play(new SledSoundInstance(this));
         }
     }
 

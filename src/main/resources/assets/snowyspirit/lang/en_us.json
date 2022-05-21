@@ -1,4 +1,6 @@
 {
+  "item.snowyspirit.sled": "%s Sled",
+  "subtitle.snowyspirit.sled": "Sled sliding",
   "item.snowyspirit.sled_oak": "Oak Sled",
   "item.snowyspirit.sled_birch": "Birch Sled",
   "item.snowyspirit.sled_spruce": "Spruce Sled",
@@ -73,5 +75,8 @@
   "item.snowyspirit.winter_disc": "Music Disc",
   "subtitle.snowyspirit.music.winter": "A Carol",
   "block.snowyspirit.snow_globe": "Snow Globe",
-  "item.snowyspirit.gingerbread_cookie": "Gingerbread Cookie"
+  "item.snowyspirit.gingerbread_cookie": "Gingerbread Cookie",
+
+
+  "block_type.snowyspirit.sled": "Sled"
 }

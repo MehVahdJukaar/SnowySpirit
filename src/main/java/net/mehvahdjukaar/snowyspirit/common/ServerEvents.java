@@ -10,11 +10,13 @@ import net.mehvahdjukaar.snowyspirit.init.ModRegistry;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.projectile.Snowball;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
@@ -80,6 +82,7 @@ public class ServerEvents {
             NetworkHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> player),
                     new ClientBoundSyncAllWreaths(cap.getWreathBlocks().keySet()));
     }
+
 
 
 }

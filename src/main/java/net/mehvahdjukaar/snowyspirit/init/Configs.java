@@ -41,5 +41,17 @@ public class Configs {
         return SERVER_SPEC;
     }
 
+    public static ForgeConfigSpec CLIENT_SPEC;
+    public static ForgeConfigSpec.BooleanValue RESOURCE_PACK_SUPPORT;
+
+    public static ForgeConfigSpec buildClientConfig() {
+        ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
+        RESOURCE_PACK_SUPPORT = builder.comment("Allows dynamic resource generations for leaf piles and bark to pick textures from installed resource pack. Will only really work well if those texture pack have a similar format to vanilla otherwise it will result in glitched textures")
+                .define("dynamic_textures_from_resource_packs", false);
+        CLIENT_SPEC = builder.build();
+        return CLIENT_SPEC;
+    }
+
+
 
 }

@@ -14,6 +14,10 @@
     {
       "id" :"alexsmobs:grizzly_bear",
       "required": false
+    },
+    {
+      "id" :"doggytalents:dog",
+      "required": false
     }
   ]
 }

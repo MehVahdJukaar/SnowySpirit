@@ -105,7 +105,9 @@ dependencies {
 
     minecraft "net.minecraftforge:forge:${project.minecraft_version}-${project.forge_version}"
 
-    implementation fg.deobf("curse.maven:serene-seasons-291874:3693807")
+   // implementation fg.deobf("curse.maven:serene-seasons-291874:3693807")
+    implementation fg.deobf("curse.maven:blue-skies-312918:3784833")
+    implementation fg.deobf("curse.maven:structure-gel-api-378802:3768705")
     //implementation fg.deobf("curse.maven:map-atlases-forge-519759:3641038")
 
 

@@ -1,13 +1,19 @@
 {
   "music.winter": {
-    "category": "record",
     "sounds": [
       {
         "name": "snowyspirit:music/winter",
         "stream": true
       }
     ],
-    "stream": true,
     "subtitle": "subtitle.snowyspirit.music.winter"
+  },
+  "entity.sled": {
+    "sounds": [
+      {
+        "name": "snowyspirit:entity/sled"
+      }
+    ],
+    "subtitle": "subtitle.supplementaries.sled"
   }
 }

@@ -1,39 +1,26 @@
 package net.mehvahdjukaar.snowyspirit.dynamicpack;
 
-import com.mojang.blaze3d.platform.NativeImage;
-import net.mehvahdjukaar.selene.block_set.wood.WoodType;
-import net.mehvahdjukaar.selene.resourcepack.AssetGenerators;
-import net.mehvahdjukaar.selene.resourcepack.DynamicTexturePack;
-import net.mehvahdjukaar.selene.resourcepack.RPUtils;
-import net.mehvahdjukaar.selene.resourcepack.RPUtils.ResType;
-import net.mehvahdjukaar.selene.resourcepack.RPUtils.StaticResource;
-import net.mehvahdjukaar.selene.resourcepack.ResourcePackAwareDynamicTextureProvider;
-import net.mehvahdjukaar.selene.textures.Palette;
-import net.mehvahdjukaar.selene.textures.Respriter;
-import net.mehvahdjukaar.selene.textures.SpriteUtils;
+import net.mehvahdjukaar.selene.client.asset_generators.LangBuilder;
+import net.mehvahdjukaar.selene.client.asset_generators.textures.Palette;
+import net.mehvahdjukaar.selene.client.asset_generators.textures.Respriter;
+import net.mehvahdjukaar.selene.client.asset_generators.textures.SpriteUtils;
+import net.mehvahdjukaar.selene.client.asset_generators.textures.TextureImage;
+import net.mehvahdjukaar.selene.resourcepack.*;
 import net.mehvahdjukaar.snowyspirit.Christmas;
+import net.mehvahdjukaar.snowyspirit.init.Configs;
 import net.mehvahdjukaar.snowyspirit.init.ModRegistry;
+import net.minecraft.client.resources.sounds.MinecartSoundInstance;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.loading.FMLLoader;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
 import org.apache.logging.log4j.Logger;
 
-public class ClientDynamicResourcesHandler extends ResourcePackAwareDynamicTextureProvider {
+public class ClientDynamicResourcesHandler extends RPAwareDynamicTextureProvider {
 
-    public static final ClientDynamicResourcesHandler INSTANCE = new ClientDynamicResourcesHandler();
-    public static final DynamicTexturePack DYNAMIC_TEXTURE_PACK =
-            new DynamicTexturePack(Christmas.res("virtual_resourcepack"));
-
-    public static void registerBus(IEventBus bus) {
-        DYNAMIC_TEXTURE_PACK.registerPack(bus);
-
-        DYNAMIC_TEXTURE_PACK.generateDebugResources = false;
-    }
-
-    @Override
-    public DynamicTexturePack getDynamicPack() {
-        return DYNAMIC_TEXTURE_PACK;
+    public ClientDynamicResourcesHandler() {
+        super(new DynamicTexturePack(Christmas.res("virtual_resourcepack")));
+        this.dynamicPack.generateDebugResources = false;
     }
 
     @Override
@@ -42,105 +29,81 @@ public class ClientDynamicResourcesHandler extends ResourcePackAwareDynamicTextu
     }
 
     @Override
-    public boolean hasTexturePackSupport() {
-        return false;
+    public boolean dependsOnLoadedPacks() {
+        return Configs.RESOURCE_PACK_SUPPORT.get();
     }
 
     @Override
     public void generateStaticAssetsOnStartup(ResourceManager manager) {
-        //generate static resources
+        //LangBuilder langBuilder = new LangBuilder();
 
-        AssetGenerators.LangBuilder langBuilder = new AssetGenerators.LangBuilder();
+        StaticResource itemModel = StaticResource.getOrLog(manager,
+                ResType.ITEM_MODELS.getPath(Christmas.res("sled_oak")));
 
-        //------sleds item models-----
-        {
-            StaticResource itemModel = getResOrLog(manager,
-                    RPUtils.resPath(Christmas.res("sled_oak"), ResType.ITEM_MODELS));
+        ModRegistry.SLED_ITEMS.forEach((wood, sled) -> {
+            //if(wood.isVanilla())continue;
+            // langBuilder.addEntry(sled, wood.getNameForTranslation("sled"));
 
-            for (var e : ModRegistry.SLED_ITEMS.entrySet()) {
-                WoodType wood = e.getKey();
-                if (!wood.isVanilla() || true) {
-                    var v = e.getValue();
-                    langBuilder.addEntry(v, e.getKey().getNameForTranslation("sled"));
-
-                    try {
-                        DYNAMIC_TEXTURE_PACK.addSimilarJsonResource(itemModel,
-                                "sled_oak", wood.getVariantId("sled"));
-                    } catch (Exception ex) {
-                        getLogger().error("Failed to generate Sled item model for {} : {}", v, ex);
-                    }
-                }
+            try {
+                dynamicPack.addSimilarJsonResource(itemModel,
+                        "sled_oak", wood.getVariantId("sled"));
+            } catch (Exception ex) {
+                getLogger().error("Failed to generate Sled item model for {} : {}", sled, ex);
             }
-        }
+        });
 
-        DYNAMIC_TEXTURE_PACK.addLang(Christmas.res("en_us"), langBuilder.build());
+        //dynamicPack.addLang(Christmas.res("en_us"), langBuilder.build());
     }
 
     @Override
-    public void regenerateTextures(ResourceManager manager) {
+    public void regenerateDynamicAssets(ResourceManager manager) {
         //entity textures
-        try (NativeImage template = readImage(manager, Christmas.res("textures/entity/sled/oak.png"))) {
+        try (TextureImage template = TextureImage.open(manager, Christmas.res("entity/sled/oak"))) {
 
-            Respriter respriter = new Respriter(template);
+            Respriter respriter = Respriter.of(template);
 
-            for (var e : ModRegistry.SLED_ITEMS.entrySet()) {
-                WoodType wood = e.getKey();
+            ModRegistry.SLED_ITEMS.forEach((wood, sled) -> {
                 //if (wood.isVanilla()) continue;
-                ResourceLocation textureRes = Christmas.res(
-                        String.format("entity/sled/%s", wood.getTexturePath()));
-                if (this.alreadyHasTextureAtLocation(manager, textureRes)) continue;
-                var v = e.getValue();
+                ResourceLocation textureRes = Christmas.res("entity/sled/" + wood.getTexturePath());
+                if (this.alreadyHasTextureAtLocation(manager, textureRes)) return;
 
-                NativeImage newImage = null;
 
-                try (NativeImage plankPalette = RPUtils.findFirstBlockTexture(manager, wood.plankBlock)) {
-                    Palette targetPalette = SpriteUtils.extrapolateWoodItemPalette(plankPalette);
-                    newImage = respriter.recolorImage(targetPalette);
+                try (TextureImage plankTexture = TextureImage.open(manager,
+                             RPUtils.findFirstBlockTextureLocation(manager, wood.planks))) {
+                    //Palette targetPalette = SpriteUtils.extrapolateWoodItemPalette(plankTexture);
+                    var targetPalette = Palette.fromImage(plankTexture);
+                    TextureImage newImage = respriter.recolor(targetPalette);
+                    //TextureImage newImage = respriter.recolorWithAnimationOf(plankTexture);
+                    dynamicPack.addAndCloseTexture(textureRes, newImage);
 
                 } catch (Exception ex) {
-                    getLogger().error("Failed to generate Sign Post item texture for for {} : {}", v, ex);
+                    getLogger().error("Failed to generate Sign Post item texture for for {} : {}", sled, ex);
                 }
-
-                if (newImage != null) {
-
-                    DYNAMIC_TEXTURE_PACK.addTexture(textureRes, newImage);
-                }
-            }
+            });
         } catch (Exception ex) {
             getLogger().error("Could not generate any Sled entity texture : ", ex);
         }
 
         //item textures
-        try (NativeImage template = readImage(manager, Christmas.res("textures/items/sleds/sled_oak.png"));
-             NativeImage boatMask = readImage(manager, Christmas.res("textures/items/sleds/boat_mask.png"));
-             NativeImage sledMask = readImage(manager, Christmas.res("textures/items/sleds/sled_mask.png"))) {
+        try (TextureImage template = TextureImage.open(manager, Christmas.res("items/sleds/sled_oak"));
+             TextureImage boatMask = TextureImage.open(manager, Christmas.res("items/sleds/boat_mask"));
+             TextureImage sledMask = TextureImage.open(manager, Christmas.res("items/sleds/sled_mask"))) {
 
             Palette palette = Palette.fromImage(template, sledMask);
-            Respriter respriter = new Respriter(template, palette);
+            Respriter respriter = Respriter.ofPalette(template, palette);
 
-            for (var e : ModRegistry.SLED_ITEMS.entrySet()) {
-                WoodType wood = e.getKey();
+            ModRegistry.SLED_ITEMS.forEach((wood, sled) -> {
                 //if (wood.isVanilla()) continue;
-                ResourceLocation textureRes = Christmas.res(
-                        String.format("items/sleds/%s", wood.getVariantId("sled")));
-                if (this.alreadyHasTextureAtLocation(manager, textureRes)) continue;
-                var v = e.getValue();
+                ResourceLocation textureRes = Christmas.res("items/sleds/"+sled.getRegistryName().getPath());
+                if (this.alreadyHasTextureAtLocation(manager, textureRes)) return;
 
-                NativeImage newImage = null;
+                TextureImage newImage = null;
                 if (wood.boatItem != null) {
-                    try (NativeImage vanillaBoat = RPUtils.findFirstItemTexture(manager, wood.boatItem.get())) {
+                    try (TextureImage vanillaBoat = TextureImage.open(manager,
+                                 RPUtils.findFirstItemTextureLocation(manager, wood.boatItem.get()))) {
 
                         Palette targetPalette = Palette.fromImage(vanillaBoat, boatMask);
-                        newImage = respriter.recolorImage(targetPalette);
-
-                        /*
-                        try (NativeImage scribbles = recolorFromVanilla(manager, vanillaBoat,
-                                Christmas.res("textures/items/hanging_signs/sign_scribbles_mask.png"),
-                                Christmas.res("textures/items/sign_posts/scribbles_template.png"));) {
-                            SpriteUtils.mergeImages(newImage, scribbles);
-                        } catch (Exception ex) {
-                            getLogger().error("Could not properly color Sign Post item texture for {} : {}", v, ex);
-                        }*/
+                        newImage = respriter.recolor(targetPalette);
 
                     } catch (Exception ex) {
                         getLogger().error("Could not find boat texture for wood type {}. Using plank texture : {}", wood, ex);
@@ -148,22 +111,28 @@ public class ClientDynamicResourcesHandler extends ResourcePackAwareDynamicTextu
                 }
                 //if it failed use plank one
                 if (newImage == null) {
-                    try (NativeImage plankPalette = RPUtils.findFirstBlockTexture(manager, wood.plankBlock)) {
+                    try (TextureImage plankPalette = TextureImage.open(manager,
+                                 RPUtils.findFirstBlockTextureLocation(manager, wood.planks))) {
                         Palette targetPalette = SpriteUtils.extrapolateWoodItemPalette(plankPalette);
-                        newImage = respriter.recolorImage(targetPalette);
+                        newImage = respriter.recolor(targetPalette);
 
                     } catch (Exception ex) {
-                        getLogger().error("Failed to generate Sign Post item texture for for {} : {}", v, ex);
+                        getLogger().error("Failed to generate Sign Post item texture for for {} : {}", sled, ex);
                     }
                 }
                 if (newImage != null) {
-
-                    DYNAMIC_TEXTURE_PACK.addTexture(textureRes, newImage);
+                    dynamicPack.addAndCloseTexture(textureRes, newImage);
                 }
-            }
+            });
         } catch (Exception ex) {
             getLogger().error("Could not generate any Sleds item texture : ", ex);
         }
     }
 
+    @Override
+    public void addDynamicTranslations(DynamicLanguageManager.LanguageAccessor lang) {
+        ModRegistry.SLED_ITEMS.forEach((wood, sled) -> {
+            LangBuilder.addDynamicEntry(lang, "item.snowyspirit.sled", wood, sled);
+        });
+    }
 }

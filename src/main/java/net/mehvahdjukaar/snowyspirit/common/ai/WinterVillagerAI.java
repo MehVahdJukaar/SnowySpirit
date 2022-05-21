@@ -9,6 +9,7 @@ import net.mehvahdjukaar.snowyspirit.integration.suppcompat.PlacePresentTask;
 import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.entity.npc.VillagerType;
 import net.minecraft.world.entity.schedule.Activity;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.ModList;
 
 public class WinterVillagerAI {
@@ -17,7 +18,8 @@ public class WinterVillagerAI {
 
     public static void init(){
 
-        VillagerAIManager.addVillagerAiEventListener(WinterVillagerAI::onVillagerBrainInitialize);
+        MinecraftForge.EVENT_BUS.addListener(WinterVillagerAI::onVillagerBrainInitialize);
+        //VillagerAIManager.addVillagerAiEventListener(WinterVillagerAI::onVillagerBrainInitialize);
 
         VillagerAIManager.registerMemory(ModRegistry.PLACED_PRESENT.get());
         VillagerAIManager.registerMemory(ModRegistry.WREATH_POS.get());

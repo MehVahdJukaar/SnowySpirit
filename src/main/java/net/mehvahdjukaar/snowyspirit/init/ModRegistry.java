@@ -114,6 +114,7 @@ public class ModRegistry {
     }
 
     public static final RegistryObject<SoundEvent> WINTER_MUSIC = makeSoundEvent("music.winter");
+    public static final RegistryObject<SoundEvent> SLED_SOUND = makeSoundEvent("entity.sled");
 
     public static final RegistryObject<EntityType<SledEntity>> SLED = ENTITIES.register("sled",
             () -> EntityType.Builder.<SledEntity>of(SledEntity::new, MobCategory.MISC)
