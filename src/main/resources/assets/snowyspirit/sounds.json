@@ -11,9 +11,16 @@
   "entity.sled": {
     "sounds": [
       {
-        "name": "snowyspirit:entity/sled"
+        "name": "snowyspirit:entity/sled_wind"
       }
     ],
-    "subtitle": "subtitle.supplementaries.sled"
+    "subtitle": "subtitle.snowyspirit.sled"
+  },
+  "entity.sled_snow": {
+    "sounds": [
+      {
+        "name": "snowyspirit:entity/sled_snow"
+      }
+    ]
   }
 }

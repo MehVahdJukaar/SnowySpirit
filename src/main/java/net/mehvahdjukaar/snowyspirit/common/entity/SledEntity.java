@@ -162,7 +162,8 @@ public class SledEntity extends Entity implements IInputListener, IEntityAdditio
             this.restoreWolfUUID = additionalData.readUUID();
         }
         if(level.isClientSide) {
-            Minecraft.getInstance().getSoundManager().play(new SledSoundInstance(this));
+            Minecraft.getInstance().getSoundManager().play(new SledSoundInstance(this, false));
+            Minecraft.getInstance().getSoundManager().play(new SledSoundInstance(this,true));
         }
     }
 
@@ -798,6 +799,10 @@ public class SledEntity extends Entity implements IInputListener, IEntityAdditio
             this.setPos(d0, d1, d2);
             this.setRot(this.getYRot(), this.getXRot());
         }
+    }
+
+    public Status getCurrentStatus(){
+        return this.status;
     }
 
     /**

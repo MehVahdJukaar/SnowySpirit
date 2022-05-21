@@ -9,17 +9,20 @@ import net.minecraft.util.Mth;
 public class SledSoundInstance extends AbstractTickableSoundInstance {
     public static final int DELAY = 20;
     public static final float CUTOFF_SPEED = 0.05f;
-    public static final int SPEED_DIVIDER = 18;
+    public static final int SPEED_DIVIDER = 25;
     private final SledEntity sled;
     private int time;
     private int fastTime;
+    private final boolean isSnow;
+    private int ticksOnSnow = 0;
 
-    public SledSoundInstance(SledEntity sledEntity) {
-        super(ModRegistry.SLED_SOUND.get(), SoundSource.PLAYERS);
+    public SledSoundInstance(SledEntity sledEntity, boolean isSnow) {
+        super(isSnow ? ModRegistry.SLED_SOUND_SNOW.get() : ModRegistry.SLED_SOUND.get(), SoundSource.PLAYERS);
         this.sled = sledEntity;
         this.looping = true;
         this.delay = 0;
         this.volume = 0.0F;
+        this.isSnow = isSnow;
     }
 
     @Override
@@ -55,6 +58,18 @@ public class SledSoundInstance extends AbstractTickableSoundInstance {
 
             if (this.time < DELAY) {
                 this.volume *= (float) (this.fastTime - DELAY) / DELAY;
+            }
+
+            if (this.isSnow) {
+                if (!this.sled.getCurrentStatus().onSnow()) {
+                    this.volume = 0;
+                    this.ticksOnSnow = 0;
+                } else {
+                    this.ticksOnSnow++;
+                    if (this.ticksOnSnow < 5)
+                        this.volume *= (float) (this.ticksOnSnow - 5) / 5;
+                    this.volume = Math.min(0.8f, volume); //so it never gets pitch shifted
+                }
             }
 
             float f1 = 0.8F;
