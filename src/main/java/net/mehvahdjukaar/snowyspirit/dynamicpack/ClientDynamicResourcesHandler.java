@@ -1,5 +1,6 @@
 package net.mehvahdjukaar.snowyspirit.dynamicpack;
 
+import net.mehvahdjukaar.selene.block_set.BlockType;
 import net.mehvahdjukaar.selene.client.asset_generators.LangBuilder;
 import net.mehvahdjukaar.selene.client.asset_generators.textures.Palette;
 import net.mehvahdjukaar.selene.client.asset_generators.textures.Respriter;
@@ -9,17 +10,16 @@ import net.mehvahdjukaar.selene.resourcepack.*;
 import net.mehvahdjukaar.snowyspirit.Christmas;
 import net.mehvahdjukaar.snowyspirit.init.Configs;
 import net.mehvahdjukaar.snowyspirit.init.ModRegistry;
-import net.minecraft.client.resources.sounds.MinecartSoundInstance;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraft.sounds.SoundEvent;
-import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.ItemLike;
 import org.apache.logging.log4j.Logger;
 
 public class ClientDynamicResourcesHandler extends RPAwareDynamicTextureProvider {
 
     public ClientDynamicResourcesHandler() {
-        super(new DynamicTexturePack(Christmas.res("virtual_resourcepack")));
+        super(new DynamicTexturePack(Christmas.res("generated_pack")));
         this.dynamicPack.generateDebugResources = false;
     }
 
@@ -35,15 +35,11 @@ public class ClientDynamicResourcesHandler extends RPAwareDynamicTextureProvider
 
     @Override
     public void generateStaticAssetsOnStartup(ResourceManager manager) {
-        //LangBuilder langBuilder = new LangBuilder();
-
         StaticResource itemModel = StaticResource.getOrLog(manager,
                 ResType.ITEM_MODELS.getPath(Christmas.res("sled_oak")));
 
         ModRegistry.SLED_ITEMS.forEach((wood, sled) -> {
             //if(wood.isVanilla())continue;
-            // langBuilder.addEntry(sled, wood.getNameForTranslation("sled"));
-
             try {
                 dynamicPack.addSimilarJsonResource(itemModel,
                         "sled_oak", wood.getVariantId("sled"));
@@ -51,8 +47,6 @@ public class ClientDynamicResourcesHandler extends RPAwareDynamicTextureProvider
                 getLogger().error("Failed to generate Sled item model for {} : {}", sled, ex);
             }
         });
-
-        //dynamicPack.addLang(Christmas.res("en_us"), langBuilder.build());
     }
 
     @Override
@@ -69,7 +63,7 @@ public class ClientDynamicResourcesHandler extends RPAwareDynamicTextureProvider
 
 
                 try (TextureImage plankTexture = TextureImage.open(manager,
-                             RPUtils.findFirstBlockTextureLocation(manager, wood.planks))) {
+                        RPUtils.findFirstBlockTextureLocation(manager, wood.planks))) {
                     //Palette targetPalette = SpriteUtils.extrapolateWoodItemPalette(plankTexture);
                     var targetPalette = Palette.fromImage(plankTexture);
                     TextureImage newImage = respriter.recolor(targetPalette);
@@ -94,13 +88,14 @@ public class ClientDynamicResourcesHandler extends RPAwareDynamicTextureProvider
 
             ModRegistry.SLED_ITEMS.forEach((wood, sled) -> {
                 //if (wood.isVanilla()) continue;
-                ResourceLocation textureRes = Christmas.res("items/sleds/"+sled.getRegistryName().getPath());
+                ResourceLocation textureRes = Christmas.res("items/sleds/" + sled.getRegistryName().getPath());
                 if (this.alreadyHasTextureAtLocation(manager, textureRes)) return;
 
                 TextureImage newImage = null;
-                if (wood.boatItem != null) {
+                Item boat = wood.getItemOfThis("boat");
+                if (boat != null) {
                     try (TextureImage vanillaBoat = TextureImage.open(manager,
-                                 RPUtils.findFirstItemTextureLocation(manager, wood.boatItem.get()))) {
+                            RPUtils.findFirstItemTextureLocation(manager, boat))) {
 
                         Palette targetPalette = Palette.fromImage(vanillaBoat, boatMask);
                         newImage = respriter.recolor(targetPalette);
@@ -112,7 +107,7 @@ public class ClientDynamicResourcesHandler extends RPAwareDynamicTextureProvider
                 //if it failed use plank one
                 if (newImage == null) {
                     try (TextureImage plankPalette = TextureImage.open(manager,
-                                 RPUtils.findFirstBlockTextureLocation(manager, wood.planks))) {
+                            RPUtils.findFirstBlockTextureLocation(manager, wood.planks))) {
                         Palette targetPalette = SpriteUtils.extrapolateWoodItemPalette(plankPalette);
                         newImage = respriter.recolor(targetPalette);
 
@@ -130,9 +125,7 @@ public class ClientDynamicResourcesHandler extends RPAwareDynamicTextureProvider
     }
 
     @Override
-    public void addDynamicTranslations(DynamicLanguageManager.LanguageAccessor lang) {
-        ModRegistry.SLED_ITEMS.forEach((wood, sled) -> {
-            LangBuilder.addDynamicEntry(lang, "item.snowyspirit.sled", wood, sled);
-        });
+    public void addDynamicTranslations(AfterLanguageLoadEvent lang) {
+        ModRegistry.SLED_ITEMS.forEach((wood, sled) -> LangBuilder.addDynamicEntry(lang, "item.snowyspirit.sled",(BlockType) wood, sled));
     }
 }

@@ -8,6 +8,7 @@ import net.mehvahdjukaar.snowyspirit.client.SledSoundInstance;
 import net.mehvahdjukaar.snowyspirit.common.IInputListener;
 import net.mehvahdjukaar.snowyspirit.common.network.NetworkHandler;
 import net.mehvahdjukaar.snowyspirit.common.network.ServerBoundUpdateSledState;
+import net.mehvahdjukaar.snowyspirit.init.ClientSetup;
 import net.mehvahdjukaar.snowyspirit.init.ModRegistry;
 import net.minecraft.BlockUtil;
 import net.minecraft.CrashReport;
@@ -55,6 +56,8 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.BooleanOp;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.entity.IEntityAdditionalSpawnData;
 import net.minecraftforge.network.NetworkHooks;
 import org.jetbrains.annotations.NotNull;
@@ -162,10 +165,11 @@ public class SledEntity extends Entity implements IInputListener, IEntityAdditio
             this.restoreWolfUUID = additionalData.readUUID();
         }
         if(level.isClientSide) {
-            Minecraft.getInstance().getSoundManager().play(new SledSoundInstance(this, false));
-            Minecraft.getInstance().getSoundManager().play(new SledSoundInstance(this,true));
+            ClientSetup.playSledSounds(this);
         }
     }
+
+
 
     @Override
     protected void defineSynchedData() {

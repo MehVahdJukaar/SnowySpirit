@@ -97,6 +97,7 @@ public class ModRegistry {
                 Item item = new SledItem(wood).setRegistryName(name);
                 registry.register(item);
                 SLED_ITEMS.put(wood, (SledItem) item);
+                wood.addChild("sled", item);
             }
         }
     }

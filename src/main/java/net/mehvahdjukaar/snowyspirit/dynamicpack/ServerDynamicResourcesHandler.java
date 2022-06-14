@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import net.mehvahdjukaar.selene.block_set.wood.WoodType;
 import net.mehvahdjukaar.selene.resourcepack.DynamicDataPack;
 import net.mehvahdjukaar.selene.resourcepack.RPAwareDynamicDataProvider;
+import net.mehvahdjukaar.selene.resourcepack.resources.TagBuilder;
 import net.mehvahdjukaar.snowyspirit.Christmas;
 import net.mehvahdjukaar.snowyspirit.common.items.SledItem;
 import net.mehvahdjukaar.snowyspirit.init.ModRegistry;
@@ -26,7 +27,7 @@ import java.util.function.Consumer;
 public class ServerDynamicResourcesHandler extends RPAwareDynamicDataProvider {
 
     public ServerDynamicResourcesHandler() {
-        super(new DynamicDataPack(Christmas.res("virtual_resourcepack")));
+        super(new DynamicDataPack(Christmas.res("generated_pack")));
         this.dynamicPack.generateDebugResources = false;
     }
 
@@ -46,16 +47,12 @@ public class ServerDynamicResourcesHandler extends RPAwareDynamicDataProvider {
 
     @Override
     public void generateStaticAssetsOnStartup(ResourceManager manager) {
-        List<ResourceLocation> posts = new ArrayList<>();
-
-        //recipes
+        TagBuilder builder = TagBuilder.of(Christmas.res("sleds"));
         ModRegistry.SLED_ITEMS.forEach((wood,sled)->{
-            posts.add(sled.getRegistryName());
-
+            builder.add(sled.getRegistryName());
             makeSledRecipe(sled, dynamicPack::addRecipe);
         });
-        //tag
-        dynamicPack.addTag(Christmas.res("sleds"), posts, Registry.ITEM_REGISTRY);
+        dynamicPack.addTag(builder, Registry.ITEM_REGISTRY);
     }
 
     public static void makeConditionalWoodRec(FinishedRecipe r, WoodType wood, Consumer<FinishedRecipe> consumer, String name) {

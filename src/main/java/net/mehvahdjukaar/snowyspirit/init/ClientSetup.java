@@ -1,12 +1,10 @@
 package net.mehvahdjukaar.snowyspirit.init;
 
 import net.mehvahdjukaar.snowyspirit.Christmas;
-import net.mehvahdjukaar.snowyspirit.client.ContainerHolderEntityRenderer;
-import net.mehvahdjukaar.snowyspirit.client.QuiltModel;
-import net.mehvahdjukaar.snowyspirit.client.SledEntityRenderer;
-import net.mehvahdjukaar.snowyspirit.client.SledModel;
+import net.mehvahdjukaar.snowyspirit.client.*;
 import net.mehvahdjukaar.snowyspirit.client.block_model.GlowLightsModelLoader;
 import net.mehvahdjukaar.snowyspirit.common.block.GlowLightsBlockTile;
+import net.mehvahdjukaar.snowyspirit.common.entity.SledEntity;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.color.block.BlockColor;
 import net.minecraft.client.color.block.BlockColors;
@@ -20,6 +18,7 @@ import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.ColorHandlerEvent;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
@@ -84,6 +83,11 @@ public class ClientSetup {
         colors.register(new MimicBlockColor(), ModRegistry.GLOW_LIGHTS_BLOCKS.values().stream()
                 .map(RegistryObject::get).toArray(Block[]::new));
 
+    }
+
+    public static void playSledSounds(SledEntity sledEntity) {
+        Minecraft.getInstance().getSoundManager().play(new SledSoundInstance(sledEntity, false));
+        Minecraft.getInstance().getSoundManager().play(new SledSoundInstance(sledEntity,true));
     }
 
     public static class MimicBlockColor implements BlockColor {

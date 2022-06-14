@@ -13,7 +13,7 @@ version="${file.jarVersion}" #mandatory
 
 displayName="Snowy Spirit" #mandatory
 
-logoFile= "../icon2.png" #optional
+logoFile= "icon.png" #optional
 
 credits="MehVahdJukaar, PlantKillable, AlleCraft, Meman" #optional
 
@@ -48,6 +48,6 @@ Winter themed mod that adds working sleds and winter related items with related 
 
     modId="selene"
     mandatory=true
-    versionRange="[1.18.2-1.16.0,]"
+    versionRange="[1.18.2-1.17.0,]"
     ordering="NONE"
     side="BOTH"
