@@ -1,0 +1,7 @@
+
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "snowyspirit:items/sleds/sled_oak"
+  }
+}

@@ -1,0 +1,56 @@
+{
+  "variants": {
+    "facing=down,powered=false": {
+      "model": "snowyspirit:block/gumdrop_magenta",
+      "x": 180
+    },
+    "facing=down,powered=true": {
+      "model": "snowyspirit:block/gumdrop_pressed_magenta",
+      "x": 180
+    },
+    "facing=up,powered=false": {
+      "model": "snowyspirit:block/gumdrop_magenta"
+    },
+    "facing=up,powered=true": {
+      "model": "snowyspirit:block/gumdrop_pressed_magenta"
+    },
+    "facing=east,powered=false": {
+      "model": "snowyspirit:block/gumdrop_magenta",
+      "y": 90,
+      "x": 90
+    },
+    "facing=east,powered=true": {
+      "model": "snowyspirit:block/gumdrop_pressed_magenta",
+      "y": 90,
+      "x": 90
+    },
+    "facing=north,powered=false": {
+      "model": "snowyspirit:block/gumdrop_magenta",
+      "x": 90
+    },
+    "facing=north,powered=true": {
+      "model": "snowyspirit:block/gumdrop_pressed_magenta",
+      "x": 90
+    },
+    "facing=south,powered=false": {
+      "model": "snowyspirit:block/gumdrop_magenta",
+      "y": 180,
+      "x": 90
+    },
+    "facing=south,powered=true": {
+      "model": "snowyspirit:block/gumdrop_pressed_magenta",
+      "y": 180,
+      "x": 90
+    },
+    "facing=west,powered=false": {
+      "model": "snowyspirit:block/gumdrop_magenta",
+      "y": 270,
+      "x": 90
+    },
+    "facing=west,powered=true": {
+      "model": "snowyspirit:block/gumdrop_pressed_magenta",
+      "y": 270,
+      "x": 90
+    }
+  }
+}

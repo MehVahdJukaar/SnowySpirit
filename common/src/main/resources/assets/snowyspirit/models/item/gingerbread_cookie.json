@@ -1,0 +1,27 @@
+{
+  "credit": "Made with Blockbench",
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "snowyspirit:items/gingerbread_cookie_0"
+  },
+  "overrides": [
+    {
+      "predicate": {
+        "shape": 1
+      },
+      "model": "snowyspirit:item/gingerbread_cookie_1"
+    },
+    {
+      "predicate": {
+        "shape": 2
+      },
+      "model": "snowyspirit:item/gingerbread_cookie_2"
+    },
+    {
+      "predicate": {
+        "shape": 3
+      },
+      "model": "snowyspirit:item/gingerbread_cookie_3"
+    }
+  ]
+}

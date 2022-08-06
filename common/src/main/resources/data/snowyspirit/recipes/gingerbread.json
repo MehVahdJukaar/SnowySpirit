@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {"item": "snowyspirit:ginger"},
+    {"item": "minecraft:wheat"},
+    {"item": "minecraft:wheat"},
+    {"item": "minecraft:wheat"}
+  ],
+  "result": {
+    "item": "snowyspirit:gingerbread",
+    "count": 2
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {"tag": "snowyspirit:gingerbreads"},
+    {"tag": "snowyspirit:gumdrops"}
+  ],
+  "result": {
+    "item": "snowyspirit:gingerbread_cookie",
+    "count": 16
+  }
+}

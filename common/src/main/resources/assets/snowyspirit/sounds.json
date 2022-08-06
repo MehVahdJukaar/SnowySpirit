@@ -1,0 +1,26 @@
+{
+  "music.winter": {
+    "sounds": [
+      {
+        "name": "snowyspirit:music/winter",
+        "stream": true
+      }
+    ],
+    "subtitle": "subtitle.snowyspirit.music.winter"
+  },
+  "entity.sled": {
+    "sounds": [
+      {
+        "name": "snowyspirit:entity/sled_wind"
+      }
+    ],
+    "subtitle": "subtitle.snowyspirit.sled"
+  },
+  "entity.sled_snow": {
+    "sounds": [
+      {
+        "name": "snowyspirit:entity/sled_snow"
+      }
+    ]
+  }
+}

@@ -1,0 +1,6 @@
+accessWidener   v2  named
+
+#collide
+accessible method net/minecraft/world/entity/Entity collide (Lnet/minecraft/world/phys/Vec3;)Lnet/minecraft/world/phys/Vec3;
+#fox
+accessible method net/minecraft/world/entity/animal/Fox m_28529_ (Ljava/util/UUID;)Z

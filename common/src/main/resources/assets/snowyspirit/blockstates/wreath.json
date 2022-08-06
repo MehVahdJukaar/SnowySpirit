@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=west": {
+      "model": "snowyspirit:block/wreath",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "snowyspirit:block/wreath"
+    },
+    "facing=north": {
+      "model": "snowyspirit:block/wreath",
+      "y": 180
+    },
+    "facing=east": {
+      "model": "snowyspirit:block/wreath",
+      "y": 270
+    }
+  }
+}

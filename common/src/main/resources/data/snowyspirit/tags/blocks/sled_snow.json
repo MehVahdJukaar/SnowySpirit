@@ -1,0 +1,18 @@
+{
+  "replace": false,
+  "values": [
+    "#minecraft:snow",
+    {
+      "id" :"snowrealmagic:bottom_snow",
+      "required": false
+    },
+    {
+      "id" :"snowrealmagic:slab",
+      "required": false
+    },
+    {
+      "id" :"snowrealmagic:stairs",
+      "required": false
+    }
+  ]
+}

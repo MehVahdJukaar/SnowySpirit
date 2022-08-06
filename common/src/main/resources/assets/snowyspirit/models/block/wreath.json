@@ -1,0 +1,20 @@
+{
+	"credit": "Made with Blockbench",
+	"ambientocclusion": false,
+	"textures": {
+		"particle": "snowyspirit:blocks/wreath",
+		"vine": "snowyspirit:blocks/wreath"
+	},
+	"elements": [
+		{
+			"from": [0, 0, 0.5],
+			"to": [16, 16, 0.5],
+			"shade": false,
+			"rotation": {"angle": 0, "axis": "y", "origin": [8, 8, 7.5]},
+			"faces": {
+				"north": {"uv": [16, 0, 0, 16], "texture": "#vine"},
+				"south": {"uv": [0, 0, 16, 16], "texture": "#vine"}
+			}
+		}
+	]
+}
