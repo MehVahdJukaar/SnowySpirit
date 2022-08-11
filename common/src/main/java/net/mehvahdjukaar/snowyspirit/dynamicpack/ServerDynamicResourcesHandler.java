@@ -1,12 +1,17 @@
 package net.mehvahdjukaar.snowyspirit.dynamicpack;
 
 import com.google.common.base.Preconditions;
+import net.mehvahdjukaar.moonlight.api.platform.PlatformHelper;
+import net.mehvahdjukaar.moonlight.api.resources.SimpleTagBuilder;
+import net.mehvahdjukaar.moonlight.api.resources.pack.DynServerResourcesProvider;
+import net.mehvahdjukaar.moonlight.api.resources.pack.DynamicDataPack;
 import net.mehvahdjukaar.moonlight.block_set.wood.WoodType;
 import net.mehvahdjukaar.moonlight.resources.SimpleTagBuilder;
 import net.mehvahdjukaar.moonlight.resources.pack.DynServerResourcesProvider;
 import net.mehvahdjukaar.moonlight.resources.pack.DynamicDataPack;
 import net.mehvahdjukaar.snowyspirit.SnowySpirit;
 import net.mehvahdjukaar.snowyspirit.common.items.SledItem;
+import net.mehvahdjukaar.snowyspirit.configs.RegistryConfigs;
 import net.mehvahdjukaar.snowyspirit.reg.ModRegistry;
 import net.minecraft.advancements.critereon.InventoryChangeTrigger;
 import net.minecraft.core.Registry;
@@ -25,7 +30,7 @@ public class ServerDynamicResourcesHandler extends DynServerResourcesProvider {
 
     public ServerDynamicResourcesHandler() {
         super(new DynamicDataPack(SnowySpirit.res("generated_pack")));
-        this.getPack().generateDebugResources = false;
+        this.dynamicPack.generateDebugResources = PlatformHelper.isDev() || RegistryConfigs.DEBUG_RESOURCES.get();
     }
 
     @Override
@@ -35,7 +40,7 @@ public class ServerDynamicResourcesHandler extends DynServerResourcesProvider {
 
     @Override
     public boolean dependsOnLoadedPacks() {
-        return false;
+        return RegistryConfigs.PACK_DEPENDANT_ASSETS.get();
     }
 
     @Override

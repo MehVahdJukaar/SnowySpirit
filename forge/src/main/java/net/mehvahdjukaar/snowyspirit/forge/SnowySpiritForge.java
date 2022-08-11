@@ -17,7 +17,7 @@ import java.util.function.Supplier;
  * Author: MehVahdJukaar
  */
 @Mod(Randomium.MOD_ID)
-public class RandomiumForge {
+public class SnowySpiritForge {
     public static final String MOD_ID = Randomium.MOD_ID;
 
     public RandomiumForge() {

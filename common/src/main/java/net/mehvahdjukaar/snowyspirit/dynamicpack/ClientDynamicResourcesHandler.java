@@ -1,19 +1,20 @@
 package net.mehvahdjukaar.snowyspirit.dynamicpack;
 
-import net.mehvahdjukaar.moonlight.block_set.BlockType;
-import net.mehvahdjukaar.moonlight.client.language.AfterLanguageLoadEvent;
-import net.mehvahdjukaar.moonlight.client.language.LangBuilder;
-import net.mehvahdjukaar.moonlight.client.textures.Palette;
-import net.mehvahdjukaar.moonlight.client.textures.Respriter;
-import net.mehvahdjukaar.moonlight.client.textures.SpriteUtils;
-import net.mehvahdjukaar.moonlight.client.textures.TextureImage;
-import net.mehvahdjukaar.moonlight.resources.RPUtils;
-import net.mehvahdjukaar.moonlight.resources.ResType;
-import net.mehvahdjukaar.moonlight.resources.StaticResource;
-import net.mehvahdjukaar.moonlight.resources.pack.DynClientResourcesProvider;
-import net.mehvahdjukaar.moonlight.resources.pack.DynamicTexturePack;
-import net.mehvahdjukaar.moonlight.util.Utils;
+import net.mehvahdjukaar.moonlight.api.events.AfterLanguageLoadEvent;
+import net.mehvahdjukaar.moonlight.api.platform.PlatformHelper;
+import net.mehvahdjukaar.moonlight.api.resources.RPUtils;
+import net.mehvahdjukaar.moonlight.api.resources.ResType;
+import net.mehvahdjukaar.moonlight.api.resources.StaticResource;
+import net.mehvahdjukaar.moonlight.api.resources.assets.LangBuilder;
+import net.mehvahdjukaar.moonlight.api.resources.pack.DynClientResourcesProvider;
+import net.mehvahdjukaar.moonlight.api.resources.pack.DynamicTexturePack;
+import net.mehvahdjukaar.moonlight.api.resources.textures.Palette;
+import net.mehvahdjukaar.moonlight.api.resources.textures.Respriter;
+import net.mehvahdjukaar.moonlight.api.resources.textures.SpriteUtils;
+import net.mehvahdjukaar.moonlight.api.resources.textures.TextureImage;
+import net.mehvahdjukaar.moonlight.api.util.Utils;
 import net.mehvahdjukaar.snowyspirit.SnowySpirit;
+import net.mehvahdjukaar.snowyspirit.configs.RegistryConfigs;
 import net.mehvahdjukaar.snowyspirit.reg.ModRegistry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -24,7 +25,7 @@ public class ClientDynamicResourcesHandler extends DynClientResourcesProvider {
 
     public ClientDynamicResourcesHandler() {
         super(new DynamicTexturePack(SnowySpirit.res("generated_pack")));
-        this.getPack().generateDebugResources = false;
+        this.dynamicPack.generateDebugResources = PlatformHelper.isDev() || RegistryConfigs.DEBUG_RESOURCES.get();
     }
 
     @Override
@@ -34,7 +35,7 @@ public class ClientDynamicResourcesHandler extends DynClientResourcesProvider {
 
     @Override
     public boolean dependsOnLoadedPacks() {
-        return true ;//Configs.RESOURCE_PACK_SUPPORT.get();
+        return RegistryConfigs.PACK_DEPENDANT_ASSETS.get();
     }
 
     @Override
@@ -130,6 +131,6 @@ public class ClientDynamicResourcesHandler extends DynClientResourcesProvider {
 
     @Override
     public void addDynamicTranslations(AfterLanguageLoadEvent lang) {
-        ModRegistry.SLED_ITEMS.forEach((wood, sled) -> LangBuilder.addDynamicEntry(lang, "item.snowyspirit.sled",wood, sled));
+        ModRegistry.SLED_ITEMS.forEach((wood, sled) -> LangBuilder.addDynamicEntry(lang, "item.snowyspirit.sled", wood, sled));
     }
 }

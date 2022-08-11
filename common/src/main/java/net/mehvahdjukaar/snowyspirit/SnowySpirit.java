@@ -2,9 +2,9 @@ package net.mehvahdjukaar.snowyspirit;
 
 
 import net.mehvahdjukaar.moonlight.api.platform.PlatformHelper;
+import net.mehvahdjukaar.snowyspirit.configs.RegistryConfigs;
 import net.mehvahdjukaar.snowyspirit.dynamicpack.ClientDynamicResourcesHandler;
 import net.mehvahdjukaar.snowyspirit.dynamicpack.ServerDynamicResourcesHandler;
-import net.mehvahdjukaar.snowyspirit.reg.Configs;
 import net.mehvahdjukaar.snowyspirit.reg.ModRegistry;
 import net.mehvahdjukaar.snowyspirit.reg.ModSetup;
 import net.mehvahdjukaar.snowyspirit.integration.SereneSeasonsCompat;
@@ -40,6 +40,7 @@ public class SnowySpirit {
     public static final Logger LOGGER = LogManager.getLogger();
 
     public static boolean SUPP = PlatformHelper.isModLoaded("supplementaries");
+    public static boolean SERENE_SEASONS_INSTALLED = PlatformHelper.isModLoaded("sereneseasons");
 
     public SnowySpirit() {
         
@@ -94,7 +95,7 @@ public class SnowySpirit {
             //if seasonal use pumpkin placement time window
             IS_CHRISTMAS_REAL_TIME = today.after(start) && today.before(end);
 
-            SERENE_SEASONS = ModList.get().isLoaded("sereneseasons") && Configs.SERENE_SEASONS_COMPAT.get();
+            SERENE_SEASONS = SERENE_SEASONS_INSTALLED && RegistryConfigs.SERENE_SEASONS_COMPAT.get();
 
             if (SERENE_SEASONS) {
 

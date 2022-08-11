@@ -1,8 +1,7 @@
 package net.mehvahdjukaar.snowyspirit.common.items;
 
-import net.mehvahdjukaar.moonlight.block_set.wood.WoodType;
-import net.mehvahdjukaar.moonlight.impl.items.BlockTypeBasedBlockItem;
-import net.mehvahdjukaar.moonlight.impl.items.WoodBasedBlockItem;
+import net.mehvahdjukaar.moonlight.api.item.WoodBasedItem;
+import net.mehvahdjukaar.moonlight.api.set.wood.WoodType;
 import net.mehvahdjukaar.snowyspirit.common.entity.SledEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.stats.Stats;
@@ -14,40 +13,23 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.FurnaceBlockEntity;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.event.furnace.FurnaceFuelBurnTimeEvent;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.function.Predicate;
 
-//TODO use WoodBasedBlockItem
-@Deprecated
-public class SledItem extends Item {
+public class SledItem extends WoodBasedItem {
 
     private static final Predicate<Entity> ENTITY_PREDICATE = EntitySelector.NO_SPECTATORS.and(Entity::isPickable);
 
-    private final WoodType woodType;
 
     public SledItem(WoodType type) {
-        super(new Item.Properties().stacksTo(1).tab(CreativeModeTab.TAB_TRANSPORTATION));
-        this.woodType = type;
-    }
-
-    public WoodType getWoodType() {
-        return woodType;
-    }
-
-    @Override
-    public int getBurnTime(ItemStack itemStack, @Nullable RecipeType<?> recipeType) {
-        return 200;
+        super(new Item.Properties().stacksTo(1).tab(CreativeModeTab.TAB_TRANSPORTATION), type, 200);
     }
 
     @Override
@@ -72,7 +54,7 @@ public class SledItem extends Item {
 
             if (hitresult.getType() == HitResult.Type.BLOCK) {
                 SledEntity boat = new SledEntity(pLevel, hitresult.getLocation().x, hitresult.getLocation().y, hitresult.getLocation().z);
-                boat.setWoodType(this.woodType);
+                boat.setWoodType(this.getBlockType());
                 boat.setYRot(pPlayer.getYRot());
                 if (!pLevel.noCollision(boat, boat.getBoundingBox())) {
                     return InteractionResultHolder.fail(itemstack);

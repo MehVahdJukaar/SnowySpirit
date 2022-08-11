@@ -1,5 +1,6 @@
 package net.mehvahdjukaar.snowyspirit.integration;
 
+import net.mehvahdjukaar.moonlight.api.platform.configs.ConfigBuilder;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.ForgeConfigSpec;
 import sereneseasons.api.season.Season;
@@ -19,7 +20,7 @@ public class SereneSeasonsCompat {
     }
 
 
-    public static void addConfig(ForgeConfigSpec.Builder builder) {
+    public static void addConfig(ConfigBuilder builder) {
         ALLOWED_SUB_SEASONS = builder.comment("Sub Seasons in which the mod will be active")
                 .define("winter_season_sub_seasons",
                 List.of(Season.SubSeason.MID_WINTER, Season.SubSeason.LATE_WINTER));

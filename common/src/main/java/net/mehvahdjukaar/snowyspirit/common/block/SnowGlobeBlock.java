@@ -1,5 +1,6 @@
 package net.mehvahdjukaar.snowyspirit.common.block;
 
+import net.mehvahdjukaar.moonlight.api.block.WaterBlock;
 import net.mehvahdjukaar.moonlight.impl.blocks.WaterBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;

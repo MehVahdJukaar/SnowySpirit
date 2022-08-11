@@ -5,7 +5,7 @@ import net.mehvahdjukaar.moonlight.villager_ai.VillagerAIManager;
 import net.mehvahdjukaar.moonlight.villager_ai.VillagerBrainEvent;
 import net.mehvahdjukaar.snowyspirit.SnowySpirit;
 import net.mehvahdjukaar.snowyspirit.reg.ModRegistry;
-import net.mehvahdjukaar.snowyspirit.integration.suppcompat.PlacePresentTask;
+import net.mehvahdjukaar.snowyspirit.integration.supplementaries.PlacePresentTask;
 import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.entity.npc.VillagerType;
 import net.minecraft.world.entity.schedule.Activity;

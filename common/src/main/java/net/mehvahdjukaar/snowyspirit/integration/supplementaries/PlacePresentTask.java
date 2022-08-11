@@ -1,11 +1,12 @@
-package net.mehvahdjukaar.snowyspirit.integration.suppcompat;
+package net.mehvahdjukaar.snowyspirit.integration.supplementaries;
 
 
 import com.google.common.collect.ImmutableMap;
 import net.mehvahdjukaar.snowyspirit.SnowySpirit;
-import net.mehvahdjukaar.snowyspirit.reg.ModRegistry;
+import net.mehvahdjukaar.snowyspirit.reg.ModMemoryModules;
 import net.mehvahdjukaar.supplementaries.common.block.blocks.PresentBlock;
 import net.mehvahdjukaar.supplementaries.common.block.tiles.PresentBlockTile;
+import net.mehvahdjukaar.supplementaries.reg.ModRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -39,7 +40,7 @@ public class PlacePresentTask extends Behavior<Villager> {
     public PlacePresentTask(float speed) {
         super(ImmutableMap.of(
                         // MemoryModuleType.INTERACTION_TARGET, MemoryStatus.VALUE_ABSENT,
-                        ModRegistry.PLACED_PRESENT.get(), MemoryStatus.VALUE_ABSENT,
+                        ModMemoryModules.PLACED_PRESENT.get(), MemoryStatus.VALUE_ABSENT,
                         MemoryModuleType.MEETING_POINT, MemoryStatus.VALUE_PRESENT,
                         MemoryModuleType.WALK_TARGET, MemoryStatus.VALUE_ABSENT),
                 190, 270);
@@ -108,7 +109,7 @@ public class PlacePresentTask extends Behavior<Villager> {
                         pLevel.setBlockAndUpdate(targetPos, state);
                         SoundType soundtype = state.getSoundType(pLevel, targetPos, null);
                         pLevel.playSound(null, targetPos, soundtype.getPlaceSound(), SoundSource.BLOCKS, (soundtype.getVolume() + 1.0F) / 2.0F, soundtype.getPitch() * 0.8F);
-                        pOwner.getBrain().setMemory(ModRegistry.PLACED_PRESENT.get(), true);
+                        pOwner.getBrain().setMemory(ModMemoryModules.PLACED_PRESENT.get(), true);
                         if (pLevel.getBlockEntity(targetPos) instanceof PresentBlockTile tile) {
                             tile.setLootTable(SnowySpirit.res("chests/present_villager"), pLevel.getRandom().nextLong());
                             tile.setSender(pOwner.getName().getString());
@@ -154,8 +155,8 @@ public class PlacePresentTask extends Behavior<Villager> {
     }
 
     public ItemStack getRandomPresent(RandomSource random) {
-        return net.mehvahdjukaar.supplementaries.setup.ModRegistry.PRESENTS_ITEMS
-                .get(DyeColor.values()[random.nextInt(DyeColor.values().length)]).get().getDefaultInstance();
+        return ModRegistry.PRESENTS
+                .get(DyeColor.values()[random.nextInt(DyeColor.values().length)]).get().asItem().getDefaultInstance();
     }
 
     public static void clearHeldItem(Villager self) {

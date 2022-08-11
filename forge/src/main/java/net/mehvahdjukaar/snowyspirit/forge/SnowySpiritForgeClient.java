@@ -7,7 +7,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
 @Mod.EventBusSubscriber(modid = RandomiumForge.MOD_ID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.FORGE)
-public class RandomiumForgeClient {
+public class SnowySpiritForgeClient {
 
     @SubscribeEvent
     public static void test(TickEvent.ClientTickEvent tickEvent) {
