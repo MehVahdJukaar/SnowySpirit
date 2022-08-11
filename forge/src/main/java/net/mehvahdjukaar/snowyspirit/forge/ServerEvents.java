@@ -1,11 +1,11 @@
-package net.mehvahdjukaar.snowyspirit.common;
+package net.mehvahdjukaar.snowyspirit.forge;
 
 import net.mehvahdjukaar.snowyspirit.SnowySpirit;
 import net.mehvahdjukaar.snowyspirit.common.block.WreathBlock;
-import net.mehvahdjukaar.snowyspirit.common.capabilities.CapabilityHandler;
-import net.mehvahdjukaar.snowyspirit.common.capabilities.wreath_cap.IWreathProvider;
 import net.mehvahdjukaar.snowyspirit.common.network.ClientBoundSyncAllWreaths;
 import net.mehvahdjukaar.snowyspirit.common.network.NetworkHandler;
+import net.mehvahdjukaar.snowyspirit.forge.capabilities.CapabilityHandler;
+import net.mehvahdjukaar.snowyspirit.forge.capabilities.wreath_cap.IWreathProvider;
 import net.mehvahdjukaar.snowyspirit.reg.ModRegistry;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -15,7 +15,6 @@ import net.minecraft.world.level.Level;
 import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
@@ -42,11 +41,11 @@ public class ServerEvents {
     public static void onRightClickBlock(PlayerInteractEvent.RightClickBlock event) {
 
         ItemStack stack = event.getItemStack();
-        if (stack.is(ModRegistry.WREATH_ITEM.get())) {
-            Level level = event.getWorld();
+        if (stack.is(ModRegistry.WREATH.get().asItem())) {
+            Level level = event.getLevel();
 
             if (WreathBlock.placeWreathOnDoor(event.getPos(), level)) {
-                if (!event.getPlayer().getAbilities().instabuild) {
+                if (!event.getEntity().getAbilities().instabuild) {
                     stack.shrink(1);
                 }
                 event.setCanceled(true);
@@ -81,7 +80,6 @@ public class ServerEvents {
             NetworkHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> player),
                     new ClientBoundSyncAllWreaths(cap.getWreathBlocks().keySet()));
     }
-
 
 
 }

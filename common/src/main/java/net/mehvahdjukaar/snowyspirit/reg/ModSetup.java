@@ -1,10 +1,9 @@
 package net.mehvahdjukaar.snowyspirit.reg;
 
-import net.mehvahdjukaar.moonlight.block_set.wood.WoodType;
+import net.mehvahdjukaar.moonlight.api.set.wood.WoodType;
 import net.mehvahdjukaar.moonlight.util.Utils;
 import net.mehvahdjukaar.snowyspirit.common.ai.WinterVillagerAI;
 import net.mehvahdjukaar.snowyspirit.common.entity.SledEntity;
-import net.mehvahdjukaar.snowyspirit.common.generation.ConfiguredFeaturesRegistry;
 import net.mehvahdjukaar.snowyspirit.common.network.NetworkHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.BlockSource;
@@ -16,26 +15,26 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.ComposterBlock;
 import net.minecraft.world.level.block.DispenserBlock;
 import net.minecraft.world.level.block.FlowerPotBlock;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 
 public class ModSetup {
 
-    public static void init(final FMLCommonSetupEvent event) {
-        event.enqueueWork(() -> {
-            ((FlowerPotBlock) Blocks.FLOWER_POT).addPlant(Utils.getID(ModRegistry.GINGER.get()), ModRegistry.GINGER_POT);
+    public static void setup() {
 
-            ComposterBlock.COMPOSTABLES.put(ModRegistry.GINGER_FLOWER.get(), 0.3F);
-            ComposterBlock.COMPOSTABLES.put(ModRegistry.GINGER.get(), 0.65F);
-            ComposterBlock.COMPOSTABLES.put(ModRegistry.GINGER_WILD_ITEM.get(), 0.65F);
+        NetworkHandler.registerMessages();
 
-            NetworkHandler.registerMessages();
-            ConfiguredFeaturesRegistry.registerFeatures();
-            WinterVillagerAI.init();
+        ((FlowerPotBlock) Blocks.FLOWER_POT).addPlant(Utils.getID(ModRegistry.GINGER.get()), ModRegistry.GINGER_POT);
 
-            ModRegistry.SLED_ITEMS.forEach((key, value) ->
-                    DispenserBlock.registerBehavior(value, new SledDispenserBehavior(key)));
+        ComposterBlock.COMPOSTABLES.put(ModRegistry.GINGER_FLOWER.get(), 0.3F);
+        ComposterBlock.COMPOSTABLES.put(ModRegistry.GINGER.get(), 0.65F);
+        ComposterBlock.COMPOSTABLES.put(ModRegistry.GINGER_WILD.get(), 0.65F);
 
-        });
+
+        ModWorldgenRegistry.registerFeatures();
+        WinterVillagerAI.setup();
+
+        ModRegistry.SLED_ITEMS.forEach((key, value) ->
+                DispenserBlock.registerBehavior(value, new SledDispenserBehavior(key)));
+
     }
 
 

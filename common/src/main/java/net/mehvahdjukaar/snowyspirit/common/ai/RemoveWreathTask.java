@@ -2,10 +2,10 @@ package net.mehvahdjukaar.snowyspirit.common.ai;
 
 import com.google.common.collect.ImmutableMap;
 import net.mehvahdjukaar.snowyspirit.SnowySpirit;
-import net.mehvahdjukaar.snowyspirit.common.capabilities.CapabilityHandler;
-import net.mehvahdjukaar.snowyspirit.common.network.ClientBoundSyncWreath;
+import net.mehvahdjukaar.snowyspirit.forge.capabilities.CapabilityHandler;
+import net.mehvahdjukaar.snowyspirit.common.network.ClientBoundSyncWreathMessage;
 import net.mehvahdjukaar.snowyspirit.common.network.NetworkHandler;
-import net.mehvahdjukaar.snowyspirit.reg.ModRegistry;
+import net.mehvahdjukaar.snowyspirit.reg.ModMemoryModules;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.server.level.ServerLevel;
@@ -31,7 +31,7 @@ public class RemoveWreathTask extends Behavior<Villager> {
     public RemoveWreathTask(float speed) {
         super(ImmutableMap.of(
                         MemoryModuleType.INTERACTION_TARGET, MemoryStatus.VALUE_ABSENT,
-                        ModRegistry.WREATH_POS.get(), MemoryStatus.VALUE_PRESENT,
+                        ModMemoryModules.WREATH_POS.get(), MemoryStatus.VALUE_PRESENT,
                         MemoryModuleType.WALK_TARGET, MemoryStatus.VALUE_ABSENT),
                 270, 350);
         this.speedModifier = speed * 1.1f;
@@ -46,7 +46,7 @@ public class RemoveWreathTask extends Behavior<Villager> {
             cooldown = 20 * 60;
             return false;
         }
-        GlobalPos globalpos = pOwner.getBrain().getMemory(ModRegistry.WREATH_POS.get()).get();
+        GlobalPos globalpos = pOwner.getBrain().getMemory(ModMemoryModules.WREATH_POS.get()).get();
         return globalpos.dimension() == pLevel.dimension() && !pOwner.isBaby();
     }
 
@@ -55,7 +55,7 @@ public class RemoveWreathTask extends Behavior<Villager> {
         this.cooldown = 20 * (5 + pLevel.random.nextInt(20)) + pLevel.random.nextInt(20);
         this.ticksSinceReached = 0;
         this.lastBreakProgress = -1;
-        GlobalPos globalpos = pEntity.getBrain().getMemory(ModRegistry.WREATH_POS.get()).get();
+        GlobalPos globalpos = pEntity.getBrain().getMemory(ModMemoryModules.WREATH_POS.get()).get();
 
         pEntity.getBrain().eraseMemory(MemoryModuleType.INTERACTION_TARGET);
         pEntity.getBrain().setMemory(MemoryModuleType.WALK_TARGET, new WalkTarget(globalpos.pos(), this.speedModifier, 1));
@@ -70,12 +70,12 @@ public class RemoveWreathTask extends Behavior<Villager> {
 
     @Override
     protected boolean canStillUse(ServerLevel pLevel, Villager pEntity, long pGameTime) {
-        return pEntity.getBrain().hasMemoryValue(ModRegistry.WREATH_POS.get());
+        return pEntity.getBrain().hasMemoryValue(ModMemoryModules.WREATH_POS.get());
     }
 
     @Override
     protected void tick(ServerLevel pLevel, Villager pOwner, long pGameTime) {
-        BlockPos pos = pOwner.getBrain().getMemory(ModRegistry.WREATH_POS.get()).get().pos();
+        BlockPos pos = pOwner.getBrain().getMemory(ModMemoryModules.WREATH_POS.get()).get().pos();
 
         //hax
         pOwner.getBrain().eraseMemory(MemoryModuleType.INTERACTION_TARGET);
@@ -100,14 +100,14 @@ public class RemoveWreathTask extends Behavior<Villager> {
 
                     if (ticksSinceReached > 10) {
 
-                        pOwner.getBrain().eraseMemory(ModRegistry.WREATH_POS.get());
+                        pOwner.getBrain().eraseMemory(ModMemoryModules.WREATH_POS.get());
                         c.removeWreath(pos, pLevel, true);
-                        NetworkHandler.sendToAllInRangeClients(pos, pLevel, Integer.MAX_VALUE, new ClientBoundSyncWreath(pos, false));
+                        NetworkHandler.CHANNEL.sendToAllInRangeClients(pos, pLevel, Integer.MAX_VALUE, new ClientBoundSyncWreathMessage(pos, false));
                     }
                     return;
                 }
             }
-            pOwner.getBrain().eraseMemory(ModRegistry.WREATH_POS.get());
+            pOwner.getBrain().eraseMemory(ModMemoryModules.WREATH_POS.get());
 
         }
     }

@@ -1,13 +1,13 @@
-package net.mehvahdjukaar.snowyspirit.client;
+package net.mehvahdjukaar.snowyspirit.forge;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Vector3f;
 import net.mehvahdjukaar.snowyspirit.SnowySpirit;
 import net.mehvahdjukaar.snowyspirit.common.IInputListener;
-import net.mehvahdjukaar.snowyspirit.common.capabilities.CapabilityHandler;
-import net.mehvahdjukaar.snowyspirit.common.capabilities.wreath_cap.IWreathProvider;
-import net.mehvahdjukaar.snowyspirit.common.capabilities.wreath_cap.WreathProvider;
+import net.mehvahdjukaar.snowyspirit.forge.capabilities.CapabilityHandler;
+import net.mehvahdjukaar.snowyspirit.forge.capabilities.wreath_cap.IWreathProvider;
+import net.mehvahdjukaar.snowyspirit.forge.capabilities.wreath_cap.WreathProvider;
 import net.mehvahdjukaar.snowyspirit.reg.ModRegistry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;

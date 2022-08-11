@@ -2,15 +2,15 @@ package net.mehvahdjukaar.snowyspirit.common.entity;
 
 import com.google.common.collect.Lists;
 import net.mehvahdjukaar.moonlight.api.entity.IExtraClientSpawnData;
+import net.mehvahdjukaar.moonlight.api.platform.PlatformHelper;
 import net.mehvahdjukaar.moonlight.api.set.wood.WoodType;
 import net.mehvahdjukaar.moonlight.api.set.wood.WoodTypeRegistry;
-import net.mehvahdjukaar.moonlight.block_set.wood.WoodType;
-import net.mehvahdjukaar.moonlight.block_set.wood.WoodTypeRegistry;
 import net.mehvahdjukaar.snowyspirit.common.IInputListener;
 import net.mehvahdjukaar.snowyspirit.common.network.NetworkHandler;
 import net.mehvahdjukaar.snowyspirit.common.network.ServerBoundUpdateSledState;
 import net.mehvahdjukaar.snowyspirit.reg.ClientRegistry;
 import net.mehvahdjukaar.snowyspirit.reg.ModRegistry;
+import net.mehvahdjukaar.snowyspirit.reg.ModTags;
 import net.minecraft.BlockUtil;
 import net.minecraft.CrashReport;
 import net.minecraft.CrashReportCategory;
@@ -54,10 +54,6 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.BooleanOp;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.entity.IEntityAdditionalSpawnData;
-import net.minecraftforge.network.NetworkHooks;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
@@ -111,7 +107,7 @@ public class SledEntity extends Entity implements IInputListener, IExtraClientSp
 
     @Override
     public Packet<?> getAddEntityPacket() {
-        return NetworkHooks.getEntitySpawningPacket(this);
+        return PlatformHelper.getEntitySpawnPacket(this);
     }
 
     @Override
@@ -161,11 +157,10 @@ public class SledEntity extends Entity implements IInputListener, IExtraClientSp
         if (additionalData.readBoolean()) {
             this.restoreWolfUUID = additionalData.readUUID();
         }
-        if(level.isClientSide) {
+        if (level.isClientSide) {
             ClientRegistry.playSledSounds(this);
         }
     }
-
 
 
     @Override
@@ -573,7 +568,7 @@ public class SledEntity extends Entity implements IInputListener, IExtraClientSp
                     //updates same synced data also on client cause u never know
                     this.setSyncedMovement(movement);
                     //send cient movement to other clients
-                    NetworkHandler.INSTANCE.sendToServer(new ServerBoundUpdateSledState(movement));
+                    NetworkHandler.CHANNEL.sendToServer(new ServerBoundUpdateSledState(movement));
                     this.spawnTrailParticles(movement, horizontalSpeed);
                 }
             } else {
@@ -602,12 +597,12 @@ public class SledEntity extends Entity implements IInputListener, IExtraClientSp
         if (this.level.hasChunksAt(blockpos, blockpos1)) {
             BlockPos.MutableBlockPos blockPos = new BlockPos.MutableBlockPos();
 
-            for(int i = blockpos.getX(); i <= blockpos1.getX(); ++i) {
-                for(int j = blockpos.getY(); j <= blockpos1.getY(); ++j) {
-                    for(int k = blockpos.getZ(); k <= blockpos1.getZ(); ++k) {
+            for (int i = blockpos.getX(); i <= blockpos1.getX(); ++i) {
+                for (int j = blockpos.getY(); j <= blockpos1.getY(); ++j) {
+                    for (int k = blockpos.getZ(); k <= blockpos1.getZ(); ++k) {
                         blockPos.set(i, j, k);
                         BlockState blockstate = this.level.getBlockState(blockPos);
-                        if(!(blockstate.getBlock() instanceof PowderSnowBlock)) {
+                        if (!(blockstate.getBlock() instanceof PowderSnowBlock)) {
                             try {
                                 blockstate.entityInside(this.level, blockPos, this);
                                 this.onInsideBlock(blockstate);
@@ -641,12 +636,12 @@ public class SledEntity extends Entity implements IInputListener, IExtraClientSp
 
                 this.spawnSnowFlakeParticle(level, left,
                         Mth.randomBetween(random, -1.0F, 1.0F) * 0.083,
-                        0.015 + random.nextFloat()*0.1f + up,
+                        0.015 + random.nextFloat() * 0.1f + up,
                         Mth.randomBetween(random, -1.0F, 1.0F) * 0.083);
 
                 this.spawnSnowFlakeParticle(level, right,
                         Mth.randomBetween(random, -1.0F, 1.0F) * 0.083,
-                        0.015 + random.nextFloat()*0.1f + up,
+                        0.015 + random.nextFloat() * 0.1f + up,
                         Mth.randomBetween(random, -1.0F, 1.0F) * 0.083);
 
             }
@@ -664,7 +659,7 @@ public class SledEntity extends Entity implements IInputListener, IExtraClientSp
                             if (left == null) {
                                 Vec3 a = this.calculateViewVector(xRot, yRot + 24);
                                 left = a.scale(-1f).add(this.position());
-                                Vec3 p = left.add(forward.scale(random.nextFloat()*1.85f));
+                                Vec3 p = left.add(forward.scale(random.nextFloat() * 1.85f));
                                 this.spawnSnowFlakeParticle(level, p,
                                         movement.x * 0.75 + forward.x * 0.25,
                                         movement.y + 0.017 + up,
@@ -674,7 +669,7 @@ public class SledEntity extends Entity implements IInputListener, IExtraClientSp
                             if (right == null) {
                                 Vec3 b = this.calculateViewVector(xRot, yRot - 24);
                                 right = b.scale(-1f).add(this.position());
-                                Vec3 p = right.add(forward.scale(random.nextFloat()*1.85f));
+                                Vec3 p = right.add(forward.scale(random.nextFloat() * 1.85f));
                                 this.spawnSnowFlakeParticle(level, p,
                                         movement.x * 0.75 + forward.x * 0.25,
                                         movement.y + 0.017 + up,
@@ -803,7 +798,7 @@ public class SledEntity extends Entity implements IInputListener, IExtraClientSp
         }
     }
 
-    public Status getCurrentStatus(){
+    public Status getCurrentStatus() {
         return this.status;
     }
 
@@ -839,18 +834,18 @@ public class SledEntity extends Entity implements IInputListener, IExtraClientSp
                                 final float snowFriction = 0.985f;
                                 BlockState above = this.level.getBlockState(mutable.above());
                                 if (above.getBlock() instanceof SnowLayerBlock ||
-                                        (above.hasProperty(SnowLayerBlock.LAYERS) && above.is(ModRegistry.SLED_SNOW))) {
+                                        (above.hasProperty(SnowLayerBlock.LAYERS) && above.is(ModTags.SLED_SNOW))) {
                                     onSnowLayer = true;
                                     f += snowFriction;
                                     ++k1;
                                     continue;
                                 }
                                 BlockState blockstate = this.level.getBlockState(mutable);
-                                if (blockstate.is(ModRegistry.SLED_SNOW)) {
+                                if (blockstate.is(ModTags.SLED_SNOW)) {
                                     onSnow = true;
                                     f += snowFriction;
                                     ++k1;
-                                } else if (blockstate.is(ModRegistry.SLED_SAND)) {
+                                } else if (blockstate.is(ModTags.SLED_SAND)) {
                                     //sand friction
                                     f += 0.83;
                                     ++k1;
@@ -1013,7 +1008,7 @@ public class SledEntity extends Entity implements IInputListener, IExtraClientSp
                             front.y + 0.2 + Mth.randomBetween(random, -0.1F, 0.2F),
                             front.z + Mth.randomBetween(random, -0.6F, 0.6F),
                             mov.x + Mth.randomBetween(random, -1.0F, 1.0F) * 0.083333336F,
-                            0.1 + random.nextFloat()*ySpeed,
+                            0.1 + random.nextFloat() * ySpeed,
                             mov.z + Mth.randomBetween(random, -1.0F, 1.0F) * 0.083333336F);
                 }
             }
@@ -1505,16 +1500,10 @@ public class SledEntity extends Entity implements IInputListener, IExtraClientSp
         return this.hasWolf() ? 3 : 2;
     }
 
-
-    @Override
-    public boolean shouldRiderSit() {
-        return super.shouldRiderSit();
-    }
-
     //precaution so it's always immune to powder snow if the mixin fails to apply
     @Override
     public void makeStuckInBlock(BlockState pState, Vec3 pMotionMultiplier) {
-        if (pState.is(ModRegistry.SLED_SNOW) || pState.getBlock() instanceof SnowLayerBlock) return;
+        if (pState.is(ModTags.SLED_SNOW) || pState.getBlock() instanceof SnowLayerBlock) return;
         super.makeStuckInBlock(pState, pMotionMultiplier);
     }
 }

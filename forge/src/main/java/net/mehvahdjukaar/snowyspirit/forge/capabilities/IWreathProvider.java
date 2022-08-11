@@ -1,4 +1,4 @@
-package net.mehvahdjukaar.snowyspirit.common.capabilities.wreath_cap;
+package net.mehvahdjukaar.snowyspirit.forge.capabilities;
 
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.core.BlockPos;
@@ -23,7 +23,7 @@ public interface IWreathProvider {
 
     void updateAllBlocks(ServerLevel level);
 
-    class WreathData{
+    public class WreathData{
         public Direction face = Direction.NORTH;
         public boolean open = true;
         public boolean hinge = true;

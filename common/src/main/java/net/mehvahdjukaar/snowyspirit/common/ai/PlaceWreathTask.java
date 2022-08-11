@@ -4,7 +4,8 @@ package net.mehvahdjukaar.snowyspirit.common.ai;
 import com.google.common.collect.ImmutableMap;
 import net.mehvahdjukaar.snowyspirit.SnowySpirit;
 import net.mehvahdjukaar.snowyspirit.common.block.WreathBlock;
-import net.mehvahdjukaar.snowyspirit.common.capabilities.CapabilityHandler;
+import net.mehvahdjukaar.snowyspirit.forge.capabilities.CapabilityHandler;
+import net.mehvahdjukaar.snowyspirit.reg.ModMemoryModules;
 import net.mehvahdjukaar.snowyspirit.reg.ModRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
@@ -35,7 +36,7 @@ public class PlaceWreathTask extends Behavior<Villager> {
     public PlaceWreathTask(float speed) {
         super(ImmutableMap.of(
                         // MemoryModuleType.INTERACTION_TARGET, MemoryStatus.VALUE_ABSENT,
-                        ModRegistry.WREATH_POS.get(), MemoryStatus.VALUE_ABSENT,
+                        ModMemoryModules.WREATH_POS.get(), MemoryStatus.VALUE_ABSENT,
                         MemoryModuleType.WALK_TARGET, MemoryStatus.VALUE_ABSENT),
                 190, 270);
         this.speedModifier = speed;
@@ -65,7 +66,7 @@ public class PlaceWreathTask extends Behavior<Villager> {
         if (targetPos != null) {
             pEntity.getBrain().eraseMemory(MemoryModuleType.INTERACTION_TARGET);
             pEntity.getBrain().setMemory(MemoryModuleType.WALK_TARGET, new WalkTarget(targetPos, this.speedModifier, 1));
-            displayAsHeldItem(pEntity, ModRegistry.WREATH_ITEM.get().getDefaultInstance());
+            displayAsHeldItem(pEntity, ModRegistry.WREATH.get().asItem().getDefaultInstance());
         }
     }
 
@@ -95,7 +96,7 @@ public class PlaceWreathTask extends Behavior<Villager> {
 
 
                     if (WreathBlock.placeWreathOnDoor(targetPos, pLevel)) {
-                        pOwner.getBrain().setMemory(ModRegistry.WREATH_POS.get(), GlobalPos.of(pLevel.dimension(), targetPos));
+                        pOwner.getBrain().setMemory(ModMemoryModules.WREATH_POS.get(), GlobalPos.of(pLevel.dimension(), targetPos));
                     }
                     //so taks ends
                     targetPos = null;

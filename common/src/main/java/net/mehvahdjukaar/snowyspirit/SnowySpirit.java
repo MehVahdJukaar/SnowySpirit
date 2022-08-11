@@ -5,21 +5,13 @@ import net.mehvahdjukaar.moonlight.api.platform.PlatformHelper;
 import net.mehvahdjukaar.snowyspirit.configs.RegistryConfigs;
 import net.mehvahdjukaar.snowyspirit.dynamicpack.ClientDynamicResourcesHandler;
 import net.mehvahdjukaar.snowyspirit.dynamicpack.ServerDynamicResourcesHandler;
+import net.mehvahdjukaar.snowyspirit.integration.SereneSeasonsCompat;
+import net.mehvahdjukaar.snowyspirit.reg.ModMemoryModules;
 import net.mehvahdjukaar.snowyspirit.reg.ModRegistry;
 import net.mehvahdjukaar.snowyspirit.reg.ModSetup;
-import net.mehvahdjukaar.snowyspirit.integration.SereneSeasonsCompat;
+import net.mehvahdjukaar.snowyspirit.reg.ModSounds;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.fml.ModList;
-import net.minecraftforge.fml.ModLoadingContext;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.fml.event.config.ModConfigEvent;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -29,7 +21,6 @@ import java.util.Date;
 /**
  * Author: MehVahdJukaar
  */
-@Mod(SnowySpirit.MOD_ID)
 public class SnowySpirit {
     public static final String MOD_ID = "snowyspirit";
 
@@ -43,29 +34,25 @@ public class SnowySpirit {
     public static boolean SERENE_SEASONS_INSTALLED = PlatformHelper.isModLoaded("sereneseasons");
 
     public SnowySpirit() {
-        
-        IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
-
         bus.addListener(ModSetup::init);
         bus.addListener(SnowySpirit::reloadConfigsEvent);
 
-        MinecraftForge.EVENT_BUS.register(this);
 
-        ModRegistry.init(bus);
+        RegistryConfigs.earlyLoad();
 
-        var serverRes = new ServerDynamicResourcesHandler();
-        serverRes.register(bus);
+        ModSounds.init();
+        ModRegistry.init();
+        ModMemoryModules.init();
 
-        DistExecutor.runWhenOn(Dist.CLIENT, () -> () -> {
-            var clientRes = new ClientDynamicResourcesHandler();
-            clientRes.register(bus);
-        });
 
-        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Configs.buildConfig());
-        ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, Configs.buildClientConfig());
+        ServerDynamicResourcesHandler.INSTANCE.register();
+
+        if (PlatformHelper.getEnv().isClient()) {
+            ClientDynamicResourcesHandler.INSTANCE.register();
+        }
     }
     //Do this shit next christmas
-    //TODO: add glow light particles
+    //TODO: add glow light particles & emissive model
     //TODO: add advancements
     //TODO: sync xRot, chest weight, configs, tweak values
     //TODO: nerf sled acceleration without wolf to make wolf more relevant. can still be used for downhill descent

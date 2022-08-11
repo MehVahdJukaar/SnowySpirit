@@ -72,8 +72,6 @@ public class GumdropButton extends DirectionalBlock {
         Direction dir = pState.getValue(FACING).getOpposite();
         BlockPos blockpos = pPos.relative(dir);
         return canSupportCenter(pLevel, blockpos, dir);
-
-        //return ButtonBlock.canAttach(pLevel, pPos,);
     }
 
     @Nullable

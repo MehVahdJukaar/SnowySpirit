@@ -1,8 +1,6 @@
-package net.mehvahdjukaar.snowyspirit.common.capabilities;
+package net.mehvahdjukaar.snowyspirit.forge.capabilities;
 
 import net.mehvahdjukaar.snowyspirit.SnowySpirit;
-import net.mehvahdjukaar.snowyspirit.common.capabilities.wreath_cap.IWreathProvider;
-import net.mehvahdjukaar.snowyspirit.common.capabilities.wreath_cap.WreathProvider;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityManager;

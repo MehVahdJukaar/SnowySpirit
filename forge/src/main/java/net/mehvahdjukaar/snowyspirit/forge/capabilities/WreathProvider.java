@@ -1,7 +1,6 @@
-package net.mehvahdjukaar.snowyspirit.common.capabilities.wreath_cap;
+package net.mehvahdjukaar.snowyspirit.forge.capabilities;
 
 import com.mojang.datafixers.util.Pair;
-import net.mehvahdjukaar.snowyspirit.common.capabilities.CapabilityHandler;
 import net.mehvahdjukaar.snowyspirit.reg.ModRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -33,7 +32,7 @@ public class WreathProvider implements IWreathProvider, ICapabilitySerializable<
 
     private final LazyOptional<IWreathProvider> lazyOptional = LazyOptional.of(() -> this);
 
-    public Map<BlockPos, WreathData> wreathBlocks = new HashMap<>();
+    public Map<BlockPos, IWreathProvider.WreathData> wreathBlocks = new HashMap<>();
 
     public void invalidate() {
         lazyOptional.invalidate();
@@ -69,7 +68,7 @@ public class WreathProvider implements IWreathProvider, ICapabilitySerializable<
     }
 
     @Override
-    public WreathData addWreath(BlockPos pos) {
+    public WreathData add2Wreath(BlockPos pos) {
         return wreathBlocks.computeIfAbsent(pos, WreathData::new);
     }
 

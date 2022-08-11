@@ -1,8 +1,11 @@
 package net.mehvahdjukaar.snowyspirit.common.entity;
 
+import net.mehvahdjukaar.moonlight.api.entity.IExtraClientSpawnData;
+import net.mehvahdjukaar.moonlight.api.platform.PlatformHelper;
 import net.mehvahdjukaar.snowyspirit.SnowySpirit;
 import net.mehvahdjukaar.snowyspirit.reg.ModRegistry;
 import net.mehvahdjukaar.snowyspirit.integration.supplementaries.SackHelper;
+import net.mehvahdjukaar.snowyspirit.reg.ModTags;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
@@ -46,7 +49,7 @@ import net.minecraftforge.network.NetworkHooks;
 
 import javax.annotation.Nullable;
 
-public class ContainerHolderEntity extends Entity implements Container, MenuProvider, IEntityAdditionalSpawnData {
+public class ContainerHolderEntity extends Entity implements Container, MenuProvider, IExtraClientSpawnData {
     private static final EntityDataAccessor<Integer> DATA_ID_HURT = SynchedEntityData.defineId(ContainerHolderEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Float> DATA_ID_DAMAGE = SynchedEntityData.defineId(ContainerHolderEntity.class, EntityDataSerializers.FLOAT);
 
@@ -82,7 +85,7 @@ public class ContainerHolderEntity extends Entity implements Container, MenuProv
 
     @Override
     public Packet<?> getAddEntityPacket() {
-        return NetworkHooks.getEntitySpawningPacket(this);
+        return PlatformHelper.getEntitySpawnPacket(this);
     }
 
     @Override
@@ -200,7 +203,7 @@ public class ContainerHolderEntity extends Entity implements Container, MenuProv
         if (this.hasCustomName()) {
             stack.setHoverName(this.getCustomName());
         }
-        if (!this.containerStack.is(ModRegistry.VALID_CONTAINERS)) {
+        if (!this.containerStack.is(ModTags.VALID_CONTAINERS)) {
             CompoundTag tag = new CompoundTag();
             ContainerHelper.saveAllItems(tag, this.itemStacks, false);
             stack.addTagElement("BlockEntityTag", tag);
@@ -492,7 +495,7 @@ public class ContainerHolderEntity extends Entity implements Container, MenuProv
     public AbstractContainerMenu createMenu(int id, Inventory pPlayerInventory) {
         if (SnowySpirit.SUPP && SackHelper.isSack(containerStack.getItem())) {
             return SackHelper.createMenu(id, pPlayerInventory, this);
-        } else if (!containerStack.is(ModRegistry.VALID_CONTAINERS)) {
+        } else if (!containerStack.is(ModTags.VALID_CONTAINERS)) {
             return new ShulkerBoxMenu(id, pPlayerInventory, this);
         }
         return ChestMenu.threeRows(id, pPlayerInventory, this);

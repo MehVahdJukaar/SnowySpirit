@@ -11,6 +11,7 @@ import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.model.geom.builders.MeshDefinition;
 import net.minecraft.client.model.geom.builders.PartDefinition;
 
+@Deprecated
 public class SlimModel<T extends SledEntity> extends EntityModel<T> {
 
     private final ModelPart sled;

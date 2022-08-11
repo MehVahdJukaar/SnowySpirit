@@ -1,12 +1,13 @@
-package net.mehvahdjukaar.randomium.forge;
+package net.mehvahdjukaar.snowyspirit.forge;
 
 import net.mehvahdjukaar.randomium.items.RandomiumItem;
+import net.mehvahdjukaar.snowyspirit.SnowySpirit;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
-@Mod.EventBusSubscriber(modid = RandomiumForge.MOD_ID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.FORGE)
+@Mod.EventBusSubscriber(modid = SnowySpirit.MOD_ID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class SnowySpiritForgeClient {
 
     @SubscribeEvent

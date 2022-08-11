@@ -1,15 +1,15 @@
 package net.mehvahdjukaar.snowyspirit.common.network;
 
+import net.mehvahdjukaar.moonlight.api.platform.network.ChannelHandler;
+import net.mehvahdjukaar.moonlight.api.platform.network.Message;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraftforge.network.NetworkEvent;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.function.Supplier;
 
 
-public class ClientBoundSyncAllWreaths implements NetworkHandler.Message {
+public class ClientBoundSyncAllWreaths implements Message {
     public final Set<BlockPos> pos;
 
     public ClientBoundSyncAllWreaths(FriendlyByteBuf buffer) {
@@ -24,20 +24,15 @@ public class ClientBoundSyncAllWreaths implements NetworkHandler.Message {
         this.pos = pos;
     }
 
-    public static void buffer(ClientBoundSyncAllWreaths message, FriendlyByteBuf buffer) {
-        buffer.writeInt(message.pos.size());
-        for (BlockPos p : message.pos) {
+    public void writeToBuffer(FriendlyByteBuf buffer) {
+        buffer.writeInt(this.pos.size());
+        for (BlockPos p : this.pos) {
             buffer.writeBlockPos(p);
         }
     }
 
-    public static void handler(ClientBoundSyncAllWreaths message, Supplier<NetworkEvent.Context> ctx) {
-        NetworkEvent.Context context = ctx.get();
-        context.enqueueWork(() -> {
-            if (context.getDirection().getReceptionSide().isClient()) {
-                ClientReceivers.handleSyncAlWreathsPacket(message);
-            }
-        });
-        context.setPacketHandled(true);
+    @Override
+    public void handle(ChannelHandler.Context context) {
+        ClientReceivers.handleSyncAlWreathsPacket(this);
     }
 }

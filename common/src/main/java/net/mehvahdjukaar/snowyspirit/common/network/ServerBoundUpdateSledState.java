@@ -1,14 +1,13 @@
 package net.mehvahdjukaar.snowyspirit.common.network;
 
+import net.mehvahdjukaar.moonlight.api.platform.network.ChannelHandler;
+import net.mehvahdjukaar.moonlight.api.platform.network.Message;
 import net.mehvahdjukaar.snowyspirit.common.entity.SledEntity;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.network.NetworkEvent;
-
-import java.util.function.Supplier;
 
 
-public class ServerBoundUpdateSledState implements NetworkHandler.Message {
+public class ServerBoundUpdateSledState implements Message {
     public final float clientDx;
     public final float clientDy;
     public final float clientDz;
@@ -20,27 +19,23 @@ public class ServerBoundUpdateSledState implements NetworkHandler.Message {
     }
 
     public ServerBoundUpdateSledState(Vec3 movement) {
-        this.clientDx = (float)movement.x;
-        this.clientDy = (float)movement.y;
-        this.clientDz = (float)movement.z;
+        this.clientDx = (float) movement.x;
+        this.clientDy = (float) movement.y;
+        this.clientDz = (float) movement.z;
 
     }
 
-    public static void buffer(ServerBoundUpdateSledState message, FriendlyByteBuf buffer) {
-        buffer.writeFloat(message.clientDx);
-        buffer.writeFloat(message.clientDy);
-        buffer.writeFloat(message.clientDz);
+    public void writeToBuffer(FriendlyByteBuf buffer) {
+        buffer.writeFloat(this.clientDx);
+        buffer.writeFloat(this.clientDy);
+        buffer.writeFloat(this.clientDz);
     }
 
-    public static void handler(ServerBoundUpdateSledState message, Supplier<NetworkEvent.Context> ctx) {
-        NetworkEvent.Context context = ctx.get();
-        context.enqueueWork(() -> {
-            if (context.getDirection().getReceptionSide().isServer()) {
-                if(context.getSender().getVehicle() instanceof SledEntity sled){
-                    sled.setSyncedMovement(message.clientDx, message.clientDy, message.clientDx);
-                }
-            }
-        });
-        context.setPacketHandled(true);
+    @Override
+    public void handle(ChannelHandler.Context context) {
+        if (context.getSender().getVehicle() instanceof SledEntity sled) {
+            sled.setSyncedMovement(this.clientDx, this.clientDy, this.clientDx);
+        }
     }
+
 }

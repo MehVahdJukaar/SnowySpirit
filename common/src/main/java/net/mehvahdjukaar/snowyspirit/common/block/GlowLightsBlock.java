@@ -37,7 +37,7 @@ import javax.annotation.Nonnull;
 import java.util.Collections;
 import java.util.List;
 
-public class GlowLightsBlock extends Block implements IForgeBlock, EntityBlock, IForgeShearable {
+public class GlowLightsBlock extends Block implements EntityBlock, IForgeShearable {
 
     public final DyeColor color;
 
@@ -128,7 +128,7 @@ public class GlowLightsBlock extends Block implements IForgeBlock, EntityBlock, 
             world.playSound(player, pos, SoundEvents.SNOW_GOLEM_SHEAR, SoundSource.PLAYERS, 1.0F, 1.0F);
             if (!world.isClientSide()) {
                 world.setBlockAndUpdate(pos, tile.mimic);
-                return Collections.singletonList(ModRegistry.GLOW_LIGHTS_ITEMS.get(color).get().getDefaultInstance());
+                return Collections.singletonList(ModRegistry.GLOW_LIGHTS_BLOCKS.get(color).get().asItem().getDefaultInstance());
             }
         }
         return Collections.emptyList();
@@ -136,6 +136,6 @@ public class GlowLightsBlock extends Block implements IForgeBlock, EntityBlock, 
 
     @Override
     public ItemStack getCloneItemStack(BlockState state, HitResult target, BlockGetter world, BlockPos pos, Player player) {
-        return ModRegistry.GLOW_LIGHTS_ITEMS.get(this.color).get().getDefaultInstance();
+        return ModRegistry.GLOW_LIGHTS_BLOCKS.get(this.color).get().asItem().getDefaultInstance();
     }
 }

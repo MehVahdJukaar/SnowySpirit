@@ -1,12 +1,13 @@
 package net.mehvahdjukaar.snowyspirit.reg;
 
+import net.mehvahdjukaar.moonlight.api.client.model.NestedModelLoader;
 import net.mehvahdjukaar.moonlight.api.platform.ClientPlatformHelper;
 import net.mehvahdjukaar.snowyspirit.SnowySpirit;
 import net.mehvahdjukaar.snowyspirit.client.ContainerHolderEntityRenderer;
 import net.mehvahdjukaar.snowyspirit.client.QuiltModel;
 import net.mehvahdjukaar.snowyspirit.client.SledEntityRenderer;
 import net.mehvahdjukaar.snowyspirit.client.SledModel;
-import net.mehvahdjukaar.snowyspirit.client.block_model.GlowLightsModelLoader;
+import net.mehvahdjukaar.snowyspirit.client.GlowLightsBakedModel;
 import net.mehvahdjukaar.snowyspirit.common.block.GlowLightsBlockTile;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.color.block.BlockColor;
@@ -33,9 +34,10 @@ public class ClientRegistry {
     public static void init() {
         ClientPlatformHelper.addModelLayerRegistration(ClientRegistry::registerModelLayers);
         ClientPlatformHelper.addEntityRenderersRegistration(ClientRegistry::registerEntityRenderers);
-        ClientPlatformHelper.addSpecialModelRegistration(ClientRegistry::registerSpecialModels);
+        ClientPlatformHelper.addModelLoaderRegistration(ClientRegistry::registerModelLoaders);
         ClientPlatformHelper.addBlockColorsRegistration(ClientRegistry::registerBlockColors);
     }
+
 
 
     public static void setup() {
@@ -49,7 +51,7 @@ public class ClientRegistry {
         }
         for (var v : ModRegistry.GLOW_LIGHTS_BLOCKS.values()) {
             //TODO: use forge emissive layer
-            ClientPlatformHelper.registerRenderType(v.get(), r -> r == RenderType.translucent() || r == RenderType.cutout());
+            ClientPlatformHelper.registerRenderType(v.get(), RenderType.cutout());
         }
 
         ClientPlatformHelper.registerItemProperty(ModRegistry.GINGERBREAD_COOKIE.get(), new ResourceLocation("shape"),
@@ -66,9 +68,8 @@ public class ClientRegistry {
         event.register(SLED_MODEL, QuiltModel::createBodyLayer);
     }
 
-
-    private static void registerSpecialModels(ClientPlatformHelper.SpecialModelEvent event) {
-        event.register(SnowySpirit.res("glow_lights_loader"), new GlowLightsModelLoader());
+    private static void registerModelLoaders(ClientPlatformHelper.ModelLoaderEvent event) {
+        event.register(SnowySpirit.res("glow_lights"),  new NestedModelLoader("overlay", GlowLightsBakedModel::new));
     }
 
     public static void registerBlockColors(ClientPlatformHelper.BlockColorEvent event) {

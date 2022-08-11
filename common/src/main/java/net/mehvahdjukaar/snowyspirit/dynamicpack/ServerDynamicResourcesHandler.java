@@ -1,32 +1,26 @@
 package net.mehvahdjukaar.snowyspirit.dynamicpack;
 
-import com.google.common.base.Preconditions;
+import net.mehvahdjukaar.moonlight.api.platform.ForgeHelper;
 import net.mehvahdjukaar.moonlight.api.platform.PlatformHelper;
+import net.mehvahdjukaar.moonlight.api.resources.RPUtils;
+import net.mehvahdjukaar.moonlight.api.resources.ResType;
 import net.mehvahdjukaar.moonlight.api.resources.SimpleTagBuilder;
 import net.mehvahdjukaar.moonlight.api.resources.pack.DynServerResourcesProvider;
 import net.mehvahdjukaar.moonlight.api.resources.pack.DynamicDataPack;
-import net.mehvahdjukaar.moonlight.block_set.wood.WoodType;
-import net.mehvahdjukaar.moonlight.resources.SimpleTagBuilder;
-import net.mehvahdjukaar.moonlight.resources.pack.DynServerResourcesProvider;
-import net.mehvahdjukaar.moonlight.resources.pack.DynamicDataPack;
+import net.mehvahdjukaar.moonlight.api.resources.recipe.IRecipeTemplate;
+import net.mehvahdjukaar.moonlight.api.set.wood.WoodTypeRegistry;
 import net.mehvahdjukaar.snowyspirit.SnowySpirit;
-import net.mehvahdjukaar.snowyspirit.common.items.SledItem;
 import net.mehvahdjukaar.snowyspirit.configs.RegistryConfigs;
 import net.mehvahdjukaar.snowyspirit.reg.ModRegistry;
-import net.minecraft.advancements.critereon.InventoryChangeTrigger;
 import net.minecraft.core.Registry;
 import net.minecraft.data.recipes.FinishedRecipe;
-import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.Items;
-import net.minecraftforge.common.crafting.ConditionalRecipe;
-import net.minecraftforge.common.crafting.conditions.ModLoadedCondition;
 import org.apache.logging.log4j.Logger;
 
-import java.util.function.Consumer;
-
 public class ServerDynamicResourcesHandler extends DynServerResourcesProvider {
+
+    public static final ServerDynamicResourcesHandler INSTANCE = new ServerDynamicResourcesHandler();
 
     public ServerDynamicResourcesHandler() {
         super(new DynamicDataPack(SnowySpirit.res("generated_pack")));
@@ -45,45 +39,30 @@ public class ServerDynamicResourcesHandler extends DynServerResourcesProvider {
 
     @Override
     public void regenerateDynamicAssets(ResourceManager resourceManager) {
+
+        IRecipeTemplate<?> template = RPUtils.readRecipeAsTemplate(resourceManager,
+                ResType.RECIPES.getPath(SnowySpirit.res("sled_oak")));
+
+        ModRegistry.SLED_ITEMS.forEach((w, b) -> {
+            if (w != WoodTypeRegistry.OAK_TYPE) {
+                Item i = b.asItem();
+                //check for disabled ones. Will actually crash if its null since vanilla recipe builder expects a non-null one
+                if (i.getItemCategory() != null) {
+                    FinishedRecipe newR = template.createSimilar(WoodTypeRegistry.OAK_TYPE, w, w.mainChild().asItem());
+                    if (newR == null) return;
+                    newR = ForgeHelper.addRecipeConditions(newR, template.getConditions());
+                    this.dynamicPack.addRecipe(newR);
+                }
+            }
+        });
     }
 
     @Override
     public void generateStaticAssetsOnStartup(ResourceManager manager) {
         SimpleTagBuilder builder = SimpleTagBuilder.of(SnowySpirit.res("sleds"));
-        ModRegistry.SLED_ITEMS.forEach((wood,sled)->{
-            builder.addEntry(sled);
-            makeSledRecipe(sled, dynamicPack::addRecipe);
-        });
+        builder.addEntries(ModRegistry.SLED_ITEMS.values());
         dynamicPack.addTag(builder, Registry.ITEM_REGISTRY);
     }
 
-    public static void makeConditionalWoodRec(FinishedRecipe r, WoodType wood, Consumer<FinishedRecipe> consumer, String name) {
-        ConditionalRecipe.builder()
-                .addCondition(new ModLoadedCondition(wood.getNamespace()))
-                .addRecipe(r)
-                .generateAdvancement()
-                .build(consumer, SnowySpirit.MOD_ID, name + "_" + wood.getAppendableId());
-    }
-
-    private static void makeSledRecipe(SledItem sled, Consumer<FinishedRecipe> consumer) {
-        try {
-            WoodType wood = sled.getWoodType();
-            Item plank = wood.planks.asItem();
-            Preconditions.checkArgument(plank != Items.AIR);
-
-            ShapedRecipeBuilder.shaped(sled, 1)
-                    .pattern("221")
-                    .pattern("111")
-                    .define('1', Items.STICK)
-                    .define('2', plank)
-                    .group("sled")
-                    .unlockedBy("has_plank", InventoryChangeTrigger.TriggerInstance.hasItems(plank))
-                    //.build(consumer);
-                    .save((s) -> makeConditionalWoodRec(s, wood, consumer, "sled")); //
-
-        } catch (Exception ignored) {
-            SnowySpirit.LOGGER.error("Failed to generate recipe for item {}", sled);
-        }
-    }
 
 }

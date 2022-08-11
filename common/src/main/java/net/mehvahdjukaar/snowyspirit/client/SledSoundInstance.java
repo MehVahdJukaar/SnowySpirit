@@ -2,6 +2,7 @@ package net.mehvahdjukaar.snowyspirit.client;
 
 import net.mehvahdjukaar.snowyspirit.common.entity.SledEntity;
 import net.mehvahdjukaar.snowyspirit.reg.ModRegistry;
+import net.mehvahdjukaar.snowyspirit.reg.ModSounds;
 import net.minecraft.client.resources.sounds.AbstractTickableSoundInstance;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
@@ -17,7 +18,7 @@ public class SledSoundInstance extends AbstractTickableSoundInstance {
     private int ticksOnSnow = 0;
 
     public SledSoundInstance(SledEntity sledEntity, boolean isSnow) {
-        super(isSnow ? ModRegistry.SLED_SOUND_SNOW.get() : ModRegistry.SLED_SOUND.get(), SoundSource.PLAYERS, sledEntity.level.getRandom());
+        super(isSnow ? ModSounds.SLED_SOUND_SNOW.get() : ModSounds.SLED_SOUND.get(), SoundSource.PLAYERS, sledEntity.level.getRandom());
         this.sled = sledEntity;
         this.looping = true;
         this.delay = 0;

@@ -1,8 +1,8 @@
 package net.mehvahdjukaar.snowyspirit.common.block;
 
 
-import net.mehvahdjukaar.snowyspirit.common.capabilities.CapabilityHandler;
-import net.mehvahdjukaar.snowyspirit.common.network.ClientBoundSyncWreath;
+import net.mehvahdjukaar.snowyspirit.forge.capabilities.CapabilityHandler;
+import net.mehvahdjukaar.snowyspirit.common.network.ClientBoundSyncWreathMessage;
 import net.mehvahdjukaar.snowyspirit.common.network.NetworkHandler;
 import net.mehvahdjukaar.snowyspirit.reg.ModRegistry;
 import net.minecraft.core.BlockPos;
@@ -101,7 +101,7 @@ public class WreathBlock extends HorizontalDirectionalBlock {
                         SoundType soundtype = state.getSoundType(level, p, null);
                         level.playSound(null, p, soundtype.getPlaceSound(), SoundSource.BLOCKS, (soundtype.getVolume() + 1.0F) / 2.0F, soundtype.getPitch() * 0.8F);
                         //send packet to clients
-                        NetworkHandler.sendToAllInRangeClients(p, serverLevel, Integer.MAX_VALUE, new ClientBoundSyncWreath(p, true));
+                        NetworkHandler.sendToAllInRangeClients(p, serverLevel, Integer.MAX_VALUE, new ClientBoundSyncWreathMessage(p, true));
 
                     }
                     return true;
