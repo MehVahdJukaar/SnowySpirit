@@ -13,5 +13,11 @@
   "result": {
     "item": "snowyspirit:gingerbread_trapdoor",
     "count": 2
-  }
+  },
+  "conditions": [
+    {
+      "type": "snowyspirit:flag",
+      "flag": "ginger"
+    }
+  ]
 }

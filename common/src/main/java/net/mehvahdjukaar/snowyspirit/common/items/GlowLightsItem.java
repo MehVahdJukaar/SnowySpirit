@@ -1,6 +1,7 @@
 package net.mehvahdjukaar.snowyspirit.common.items;
 
 import net.mehvahdjukaar.snowyspirit.common.block.GlowLightsBlockTile;
+import net.mehvahdjukaar.snowyspirit.reg.ModRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
@@ -20,7 +21,7 @@ public class GlowLightsItem extends Item {
     private final Block block;
 
     public GlowLightsItem(Block pBlock) {
-        super(new Item.Properties().tab(CreativeModeTab.TAB_DECORATIONS));
+        super(new Item.Properties().tab(ModRegistry.getTab(CreativeModeTab.TAB_DECORATIONS,"glow_lights")));
         this.block = pBlock;
     }
 

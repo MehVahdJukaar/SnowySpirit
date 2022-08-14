@@ -52,6 +52,6 @@ Winter themed mod that adds working sleds and winter related items with related 
 [[dependencies.snowyspirit]]
     modId="moonlight"
     mandatory=true
-    versionRange="[1.19-2.0.12,)"
+    versionRange="[1.19-2.0.13,)"
     ordering="NONE"
     side="BOTH"

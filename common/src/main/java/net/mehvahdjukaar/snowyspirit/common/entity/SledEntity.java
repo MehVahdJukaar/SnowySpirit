@@ -2,6 +2,7 @@ package net.mehvahdjukaar.snowyspirit.common.entity;
 
 import com.google.common.collect.Lists;
 import net.mehvahdjukaar.moonlight.api.entity.IExtraClientSpawnData;
+import net.mehvahdjukaar.moonlight.api.platform.ForgeHelper;
 import net.mehvahdjukaar.moonlight.api.platform.PlatformHelper;
 import net.mehvahdjukaar.moonlight.api.set.wood.WoodType;
 import net.mehvahdjukaar.moonlight.api.set.wood.WoodTypeRegistry;
@@ -10,6 +11,7 @@ import net.mehvahdjukaar.snowyspirit.common.network.NetworkHandler;
 import net.mehvahdjukaar.snowyspirit.common.network.ServerBoundUpdateSledState;
 import net.mehvahdjukaar.snowyspirit.reg.ClientRegistry;
 import net.mehvahdjukaar.snowyspirit.reg.ModRegistry;
+import net.mehvahdjukaar.snowyspirit.reg.ModSounds;
 import net.mehvahdjukaar.snowyspirit.reg.ModTags;
 import net.minecraft.BlockUtil;
 import net.minecraft.CrashReport;
@@ -158,7 +160,7 @@ public class SledEntity extends Entity implements IInputListener, IExtraClientSp
             this.restoreWolfUUID = additionalData.readUUID();
         }
         if (level.isClientSide) {
-            ClientRegistry.playSledSounds(this);
+            ModSounds.playSledSounds(this);
         }
     }
 
@@ -851,7 +853,7 @@ public class SledEntity extends Entity implements IInputListener, IExtraClientSp
                                     ++k1;
                                 } else if (Shapes.joinIsNotEmpty(blockstate.getCollisionShape(this.level, mutable).move(l1, k2, i2), voxelshape, BooleanOp.AND)) {
                                     //decreases friction for blocks and ice in particular
-                                    float fr = blockstate.getFriction(this.level, mutable, this);
+                                    float fr = ForgeHelper.getFriction(blockstate,this.level, mutable, this);
                                     if (fr > 0.9) fr *= 0.97;
                                     f += fr;
                                     ++k1;
@@ -1132,7 +1134,7 @@ public class SledEntity extends Entity implements IInputListener, IExtraClientSp
                         }
                         if (owned) {
                             //better be sure
-                            //hack so it actually allows it to ride
+                            //hack, so it actually allows it to ride
                             //now here server is updated and has its wolf set. clients that are watching (except this one) however are not
                             this.wolf = (Animal) found;
 
@@ -1413,7 +1415,7 @@ public class SledEntity extends Entity implements IInputListener, IExtraClientSp
     }
 
     public boolean isValidWolf(Entity entity) {
-        return entity.getType().is(ModRegistry.WOLVES) && entity instanceof Animal && entity.getBbWidth() < 1.1;
+        return entity.getType().is(ModTags.WOLVES) && entity instanceof Animal && entity.getBbWidth() < 1.1;
     }
 
     private float wolfAnimationSpeed = 0;

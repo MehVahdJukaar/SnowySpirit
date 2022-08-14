@@ -1,20 +1,20 @@
 package net.mehvahdjukaar.snowyspirit.common.ai;
 
 import com.mojang.datafixers.util.Pair;
+import dev.architectury.injectables.annotations.ExpectPlatform;
 import net.mehvahdjukaar.moonlight.api.events.IVillagerBrainEvent;
 import net.mehvahdjukaar.moonlight.api.events.MoonlightEventsHelper;
 import net.mehvahdjukaar.moonlight.api.util.VillagerAIManager;
 import net.mehvahdjukaar.snowyspirit.SnowySpirit;
-import net.mehvahdjukaar.snowyspirit.integration.supplementaries.PlacePresentTask;
+import net.mehvahdjukaar.snowyspirit.integration.supp.PlacePresentTask;
 import net.mehvahdjukaar.snowyspirit.reg.ModMemoryModules;
-import net.mehvahdjukaar.supplementaries.configs.RegistryConfigs;
 import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.entity.npc.VillagerType;
 import net.minecraft.world.entity.schedule.Activity;
 
 public class WinterVillagerAI {
 
-    public static boolean PRESENTS_ENABLED = RegistryConfigs.PRESENT_ENABLED.get();
+    public static boolean PRESENTS_ENABLED = SnowySpirit.SUPPLEMENTARIES_INSTALLED && PlacePresentTask.isPresentOn();
 
     public static void setup() {
 
@@ -37,12 +37,21 @@ public class WinterVillagerAI {
                 if (PRESENTS_ENABLED) {
                     event.addTaskToActivity(Activity.MEET, Pair.of(3, new PlacePresentTask(0.5f)));
                 }
-                event.addTaskToActivity(Activity.IDLE, Pair.of(3, new PlaceWreathTask(0.5f)));
+                addPlaceWreath(event);
+
             }
         } else {
             if (!villager.isBaby()) {
-                event.addTaskToActivity(Activity.IDLE, Pair.of(4, new RemoveWreathTask(0.5f)));
+                addRemoveWreath(event);
+
             }
         }
+    }
+
+    @ExpectPlatform
+    private static void addRemoveWreath(IVillagerBrainEvent event) {
+    }
+    @ExpectPlatform
+    private static void addPlaceWreath(IVillagerBrainEvent event) {
     }
 }

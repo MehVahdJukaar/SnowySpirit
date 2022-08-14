@@ -86,18 +86,19 @@ public class ModRegistry {
             CreativeModeTab.TAB_BUILDING_BLOCKS);
 
     public static final Supplier<Item> CANDY_CANE = regItem("candy_cane",
-            () -> new Item(new Item.Properties().tab(CreativeModeTab.TAB_FOOD).food(new FoodProperties
-                    .Builder().nutrition(2).saturationMod(0.4f).build())));
+            () -> new Item(new Item.Properties().tab(getTab(CreativeModeTab.TAB_FOOD, "candy_cane"))
+                    .food(new FoodProperties.Builder().nutrition(2).saturationMod(0.4f).build())));
 
     public static final Supplier<Item> GINGERBREAD_COOKIE = regItem("gingerbread_cookie",
-            () -> new Item(new Item.Properties().tab(CreativeModeTab.TAB_FOOD).food(new FoodProperties
-                    .Builder().nutrition(1).fast().saturationMod(0.4f).build())));
+            () -> new Item(new Item.Properties().tab(getTab(CreativeModeTab.TAB_FOOD, "gingerbread_cookie"))
+                    .food(new FoodProperties.Builder().nutrition(1).fast().saturationMod(0.4f).build())));
 
     public static final Supplier<Item> EGGNOG = regItem("eggnog", EggnogItem::new);
 
     public static final Supplier<Item> WINTER_DISC = regItem("winter_disc",
-            () -> new RecordItem(14, ModSounds.WINTER_MUSIC, new Item.Properties()
-                    .tab(CreativeModeTab.TAB_MISC).rarity(Rarity.RARE).stacksTo(1)));
+            () -> PlatformHelper.newMusicDisc(14, ModSounds.WINTER_MUSIC, new Item.Properties()
+                    .tab(getTab(CreativeModeTab.TAB_MISC,"winter_disc"))
+                    .rarity(Rarity.RARE).stacksTo(1),350));
 
     public static final Supplier<Block> GINGERBREAD_BLOCK = regWithItem("gingerbread", () ->
             new Block(BlockBehaviour.Properties.of(Material.STONE, MaterialColor.TERRACOTTA_ORANGE)
@@ -126,7 +127,7 @@ public class ModRegistry {
             () -> new Item(new Item.Properties().tab(CreativeModeTab.TAB_FOOD)));
 
     //pot
-    public static final Supplier<Block> GINGER_POT = regBlock("potted_ginger", () -> new FlowerPotBlock(
+    public static final Supplier<Block> GINGER_POT = regBlock("potted_ginger", () -> PlatformHelper.newFlowerPot(
             () -> (FlowerPotBlock) Blocks.FLOWER_POT, GINGER_CROP, BlockBehaviour.Properties.copy(Blocks.FLOWER_POT)));
 
 
@@ -149,8 +150,8 @@ public class ModRegistry {
     }
 
     public static final Supplier<BlockEntityType<GlowLightsBlockTile>> GLOW_LIGHTS_BLOCK_TILE = regTile(
-            "glow_lights", () -> BlockEntityType.Builder.of(GlowLightsBlockTile::new,
-                    ModRegistry.GLOW_LIGHTS_BLOCKS.values().stream().map(Supplier::get).toArray(Block[]::new)).build(null));
+            "glow_lights", () -> PlatformHelper.newBlockEntityType(GlowLightsBlockTile::new,
+                    ModRegistry.GLOW_LIGHTS_BLOCKS.values().stream().map(Supplier::get).toArray(Block[]::new)));
 
 
     public static final Supplier<Block> WREATH = regWithItem("wreath", () ->

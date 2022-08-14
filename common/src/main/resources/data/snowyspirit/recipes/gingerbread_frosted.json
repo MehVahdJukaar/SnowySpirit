@@ -6,5 +6,11 @@
   ],
   "result": {
     "item": "snowyspirit:gingerbread_frosted"
-  }
+  },
+  "conditions": [
+    {
+      "type": "snowyspirit:flag",
+      "flag": "ginger"
+    }
+  ]
 }

@@ -1,6 +1,7 @@
 package net.mehvahdjukaar.snowyspirit.common.items;
 
 
+import net.mehvahdjukaar.snowyspirit.reg.ModRegistry;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
@@ -17,7 +18,7 @@ import net.minecraft.world.level.Level;
 
 public class EggnogItem extends Item {
     public EggnogItem() {
-        super(new Item.Properties().tab(CreativeModeTab.TAB_FOOD).food(new FoodProperties
+        super(new Item.Properties().tab(ModRegistry.getTab(CreativeModeTab.TAB_FOOD,"eggnog") ).food(new FoodProperties
                 .Builder().nutrition(4).saturationMod(2f).build()));
     }
 

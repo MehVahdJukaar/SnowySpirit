@@ -65,7 +65,7 @@ public class ClientRegistry {
 
     private static void registerModelLayers(ClientPlatformHelper.ModelLayerEvent event) {
         event.register(SLED_MODEL, SledModel::createBodyLayer);
-        event.register(SLED_MODEL, QuiltModel::createBodyLayer);
+        event.register(QUILT_MODEL, QuiltModel::createBodyLayer);
     }
 
     private static void registerModelLoaders(ClientPlatformHelper.ModelLoaderEvent event) {

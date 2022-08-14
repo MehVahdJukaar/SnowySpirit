@@ -1,10 +1,11 @@
 package net.mehvahdjukaar.snowyspirit.common.entity;
 
+import dev.architectury.injectables.annotations.PlatformOnly;
 import net.mehvahdjukaar.moonlight.api.entity.IExtraClientSpawnData;
 import net.mehvahdjukaar.moonlight.api.platform.PlatformHelper;
 import net.mehvahdjukaar.snowyspirit.SnowySpirit;
 import net.mehvahdjukaar.snowyspirit.reg.ModRegistry;
-import net.mehvahdjukaar.snowyspirit.integration.supplementaries.SackHelper;
+import net.mehvahdjukaar.snowyspirit.integration.supp.SackHelper;
 import net.mehvahdjukaar.snowyspirit.reg.ModTags;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.NonNullList;
@@ -41,11 +42,6 @@ import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.HitResult;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.entity.IEntityAdditionalSpawnData;
-import net.minecraftforge.items.CapabilityItemHandler;
-import net.minecraftforge.items.wrapper.InvWrapper;
-import net.minecraftforge.network.NetworkHooks;
 
 import javax.annotation.Nullable;
 
@@ -299,7 +295,8 @@ public class ContainerHolderEntity extends Entity implements Container, MenuProv
         return this.entityData.get(DATA_ID_HURT);
     }
 
-    @Override
+    //@Override
+    @PlatformOnly(PlatformOnly.FORGE)
     public ItemStack getPickedResult(HitResult target) {
         return this.containerStack.copy();
     }
@@ -493,7 +490,7 @@ public class ContainerHolderEntity extends Entity implements Container, MenuProv
     }
 
     public AbstractContainerMenu createMenu(int id, Inventory pPlayerInventory) {
-        if (SnowySpirit.SUPP && SackHelper.isSack(containerStack.getItem())) {
+        if (SnowySpirit.SUPPLEMENTARIES_INSTALLED && SackHelper.isSack(containerStack.getItem())) {
             return SackHelper.createMenu(id, pPlayerInventory, this);
         } else if (!containerStack.is(ModTags.VALID_CONTAINERS)) {
             return new ShulkerBoxMenu(id, pPlayerInventory, this);
@@ -501,33 +498,11 @@ public class ContainerHolderEntity extends Entity implements Container, MenuProv
         return ChestMenu.threeRows(id, pPlayerInventory, this);
     }
 
-    // Forge Start
-    private LazyOptional<?> itemHandler = LazyOptional.of(() -> new InvWrapper(this));
-
-    @Override
-    public <T> net.minecraftforge.common.util.LazyOptional<T> getCapability(net.minecraftforge.common.capabilities.Capability<T> capability, @Nullable net.minecraft.core.Direction facing) {
-        if (this.isAlive() && capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
-            return itemHandler.cast();
-        return super.getCapability(capability, facing);
-    }
-
-    @Override
-    public void invalidateCaps() {
-        super.invalidateCaps();
-        this.itemHandler.invalidate();
-    }
-
-    @Override
-    public void reviveCaps() {
-        super.reviveCaps();
-        this.itemHandler = LazyOptional.of(() -> new InvWrapper(this));
-    }
-
 
     public static boolean isChestItem(ItemStack stack) {
         Item i = stack.getItem();
-        if (SnowySpirit.SUPP && SackHelper.isSack(i)) return true;
-        return stack.is(ModRegistry.VALID_CONTAINERS) ||
+        if (SnowySpirit.SUPPLEMENTARIES_INSTALLED && SackHelper.isSack(i)) return true;
+        return stack.is(ModTags.VALID_CONTAINERS) ||
                 (i instanceof BlockItem bi && (bi.getBlock() instanceof ShulkerBoxBlock));
     }
 

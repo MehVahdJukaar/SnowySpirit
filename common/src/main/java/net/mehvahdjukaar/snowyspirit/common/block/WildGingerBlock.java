@@ -1,6 +1,7 @@
 package net.mehvahdjukaar.snowyspirit.common.block;
 
 
+import dev.architectury.injectables.annotations.PlatformOnly;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -41,12 +42,14 @@ public class WildGingerBlock extends BushBlock implements BonemealableBlock {
         return false;
     }
 
-    @Override
+   // @Override
+   @PlatformOnly(PlatformOnly.FORGE)
     public int getFireSpreadSpeed(BlockState state, BlockGetter world, BlockPos pos, Direction face) {
         return 60;
     }
 
-    @Override
+   // @Override
+    @PlatformOnly(PlatformOnly.FORGE)
     public int getFlammability(BlockState state, BlockGetter world, BlockPos pos, Direction face) {
         return 100;
     }

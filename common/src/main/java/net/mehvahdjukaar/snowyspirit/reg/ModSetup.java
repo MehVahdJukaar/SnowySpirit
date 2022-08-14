@@ -1,7 +1,6 @@
 package net.mehvahdjukaar.snowyspirit.reg;
 
 import net.mehvahdjukaar.moonlight.api.set.wood.WoodType;
-import net.mehvahdjukaar.moonlight.util.Utils;
 import net.mehvahdjukaar.snowyspirit.common.ai.WinterVillagerAI;
 import net.mehvahdjukaar.snowyspirit.common.entity.SledEntity;
 import net.mehvahdjukaar.snowyspirit.common.network.NetworkHandler;
@@ -11,10 +10,8 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.dispenser.DefaultDispenseItemBehavior;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.ComposterBlock;
 import net.minecraft.world.level.block.DispenserBlock;
-import net.minecraft.world.level.block.FlowerPotBlock;
 
 public class ModSetup {
 
@@ -22,14 +19,11 @@ public class ModSetup {
 
         NetworkHandler.registerMessages();
 
-        ((FlowerPotBlock) Blocks.FLOWER_POT).addPlant(Utils.getID(ModRegistry.GINGER.get()), ModRegistry.GINGER_POT);
-
         ComposterBlock.COMPOSTABLES.put(ModRegistry.GINGER_FLOWER.get(), 0.3F);
         ComposterBlock.COMPOSTABLES.put(ModRegistry.GINGER.get(), 0.65F);
         ComposterBlock.COMPOSTABLES.put(ModRegistry.GINGER_WILD.get(), 0.65F);
 
 
-        ModWorldgenRegistry.registerFeatures();
         WinterVillagerAI.setup();
 
         ModRegistry.SLED_ITEMS.forEach((key, value) ->

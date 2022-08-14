@@ -1,0 +1,6 @@
+{
+  "type": "forge:add_features",
+  "biomes": "#snowyspirit:has_wild_ginger",
+  "features": "snowy_spirit:wild_ginger",
+  "step": "vegetal_decoration"
+}

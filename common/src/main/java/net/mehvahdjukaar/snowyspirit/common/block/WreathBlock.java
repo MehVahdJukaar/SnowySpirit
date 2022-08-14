@@ -1,23 +1,17 @@
 package net.mehvahdjukaar.snowyspirit.common.block;
 
 
-import net.mehvahdjukaar.snowyspirit.forge.capabilities.CapabilityHandler;
-import net.mehvahdjukaar.snowyspirit.common.network.ClientBoundSyncWreathMessage;
-import net.mehvahdjukaar.snowyspirit.common.network.NetworkHandler;
-import net.mehvahdjukaar.snowyspirit.reg.ModRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
-import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.HorizontalDirectionalBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
-import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
@@ -37,7 +31,7 @@ public class WreathBlock extends HorizontalDirectionalBlock {
 
     @Override
     public VoxelShape getShape(BlockState pState, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext) {
-        return switch (pState.getValue(FACING)){
+        return switch (pState.getValue(FACING)) {
             default -> NORTH_AABB;
             case SOUTH -> SOUTH_AABB;
             case EAST -> EAST_AABB;
@@ -55,14 +49,14 @@ public class WreathBlock extends HorizontalDirectionalBlock {
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext pContext) {
         Direction direction = pContext.getClickedFace();
-        if(direction.getAxis().isVertical()) {
-            for(Direction d : Direction.Plane.HORIZONTAL) {
+        if (direction.getAxis().isVertical()) {
+            for (Direction d : Direction.Plane.HORIZONTAL) {
                 BlockState blockstate = this.defaultBlockState().setValue(FACING, d);
                 if (blockstate.canSurvive(pContext.getLevel(), pContext.getClickedPos())) {
                     return blockstate;
                 }
             }
-        }else{
+        } else {
             BlockState blockstate = this.defaultBlockState().setValue(FACING, direction);
             if (blockstate.canSurvive(pContext.getLevel(), pContext.getClickedPos())) {
                 return blockstate;
@@ -74,7 +68,7 @@ public class WreathBlock extends HorizontalDirectionalBlock {
     @Override
     public boolean canSurvive(BlockState pState, LevelReader pLevel, BlockPos pPos) {
         BlockPos blockpos = pPos.relative(pState.getValue(FACING).getOpposite());
-        return pLevel.getBlockState(blockpos).isRedstoneConductor(pLevel,pPos);
+        return pLevel.getBlockState(blockpos).isRedstoneConductor(pLevel, pPos);
     }
 
     @Override
@@ -83,31 +77,4 @@ public class WreathBlock extends HorizontalDirectionalBlock {
     }
 
 
-    public static boolean placeWreathOnDoor(BlockPos pos, Level level){
-        var c = level.getCapability(CapabilityHandler.WREATH_CAPABILITY).orElse(null);
-        if (c != null) {
-            BlockState door = level.getBlockState(pos);
-
-            if (door.getBlock() instanceof DoorBlock) {
-                boolean lower = door.getValue(DoorBlock.HALF) == DoubleBlockHalf.LOWER;
-                BlockPos p = lower ? pos.above() : pos;
-                if (!c.hasWreath(p)) {
-
-                    if (level instanceof ServerLevel serverLevel) {
-                        BlockState state = ModRegistry.WREATH.get().defaultBlockState();
-
-                        c.refreshWreathVisual(p, level);
-                        //pLevel.setBlockAndUpdate(targetPos, state);
-                        SoundType soundtype = state.getSoundType(level, p, null);
-                        level.playSound(null, p, soundtype.getPlaceSound(), SoundSource.BLOCKS, (soundtype.getVolume() + 1.0F) / 2.0F, soundtype.getPitch() * 0.8F);
-                        //send packet to clients
-                        NetworkHandler.sendToAllInRangeClients(p, serverLevel, Integer.MAX_VALUE, new ClientBoundSyncWreathMessage(p, true));
-
-                    }
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
 }

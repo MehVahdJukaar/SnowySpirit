@@ -7,5 +7,11 @@
   ],
   "result": {
     "item": "snowyspirit:gumdrop_green"
-  }
+  },
+  "conditions": [
+    {
+      "type": "snowyspirit:flag",
+      "flag": "gumdrops"
+    }
+  ]
 }

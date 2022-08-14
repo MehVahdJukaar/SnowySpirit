@@ -1,6 +1,0 @@
-{
-  "type": "forge:add_features",
-  "biomes": "#minecraft:is_jungle",
-  "features": "snowy_spirit:wild_ginger",
-  "step": "vegetal_decoration"
-}

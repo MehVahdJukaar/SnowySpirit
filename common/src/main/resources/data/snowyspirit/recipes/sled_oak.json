@@ -14,5 +14,11 @@
   },
   "result": {
     "item": "snowyspirit:sled_oak"
-  }
+  },
+  "conditions": [
+    {
+      "type": "snowyspirit:flag",
+      "flag": "sleds"
+    }
+  ]
 }

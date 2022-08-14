@@ -9,5 +9,11 @@
   "result": {
     "item": "snowyspirit:gingerbread",
     "count": 2
-  }
+  },
+  "conditions": [
+    {
+      "type": "snowyspirit:flag",
+      "flag": "ginger"
+    }
+  ]
 }

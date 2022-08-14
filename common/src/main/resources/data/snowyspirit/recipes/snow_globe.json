@@ -14,5 +14,11 @@
   },
   "result": {
     "item": "snowyspirit:snow_globe"
-  }
+  },
+  "conditions": [
+    {
+      "type": "snowyspirit:flag",
+      "flag": "snow_globe"
+    }
+  ]
 }

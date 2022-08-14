@@ -10,5 +10,11 @@
   "result": {
     "item": "snowyspirit:eggnog",
     "count": 1
-  }
+  },
+  "conditions": [
+    {
+      "type": "snowyspirit:flag",
+      "flag": "eggnog"
+    }
+  ]
 }

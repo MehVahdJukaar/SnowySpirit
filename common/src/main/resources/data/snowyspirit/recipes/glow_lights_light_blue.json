@@ -8,5 +8,11 @@
   ],
   "result": {
     "item": "snowyspirit:glow_lights_light_blue"
-  }
+  },
+  "conditions": [
+    {
+      "type": "snowyspirit:flag",
+      "flag": "glow_lights"
+    }
+  ]
 }

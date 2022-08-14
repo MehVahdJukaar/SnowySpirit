@@ -13,5 +13,11 @@
   "result": {
     "item": "snowyspirit:wreath",
     "count": 1
-  }
+  },
+  "conditions": [
+    {
+      "type": "snowyspirit:flag",
+      "flag": "wreath"
+    }
+  ]
 }

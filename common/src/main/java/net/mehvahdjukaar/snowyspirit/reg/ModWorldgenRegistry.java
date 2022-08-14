@@ -27,10 +27,6 @@ public class ModWorldgenRegistry {
                 BlockPredicateFilter.forPredicate(placementRule)));
     }
 
-    private static final BlockPredicate GINGER_PLACEMENT = BlockPredicate.allOf(
-            BlockPredicate.ONLY_IN_AIR_PREDICATE,
-            BlockPredicate.wouldSurvive(ModRegistry.GINGER_WILD.get().defaultBlockState(), BlockPos.ZERO)
-    );
 
     public static RegSupplier<ConfiguredFeature<RandomPatchConfiguration, Feature<RandomPatchConfiguration>>> CONFIGURED_WILD_GINGER =
             RegHelper.registerConfiguredFeature(SnowySpirit.res("wild_ginger"),
@@ -38,7 +34,10 @@ public class ModWorldgenRegistry {
                     () -> makeRandomPatch(40, 4, 1,
                             new ConfiguredFeature<>(Feature.SIMPLE_BLOCK,
                                     new SimpleBlockConfiguration(BlockStateProvider.simple(ModRegistry.GINGER_WILD.get()))),
-                            GINGER_PLACEMENT));
+                            BlockPredicate.allOf(
+                                    BlockPredicate.ONLY_IN_AIR_PREDICATE,
+                                    BlockPredicate.wouldSurvive(ModRegistry.GINGER_WILD.get().defaultBlockState(), BlockPos.ZERO)
+                            )));
 
 
     public static RegSupplier<PlacedFeature> WILD_GINGER =

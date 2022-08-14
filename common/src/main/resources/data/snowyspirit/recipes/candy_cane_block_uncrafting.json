@@ -6,5 +6,11 @@
   "result": {
     "item": "snowyspirit:candy_cane",
     "count": 4
-  }
+  },
+  "conditions": [
+    {
+      "type": "snowyspirit:flag",
+      "flag": "candy_cane"
+    }
+  ]
 }

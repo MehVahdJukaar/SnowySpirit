@@ -9,7 +9,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.client.model.ModelDataManager;
 
 public class GlowLightsBlockTile extends MimicBlockTile {
 
@@ -31,7 +30,8 @@ public class GlowLightsBlockTile extends MimicBlockTile {
     public void acceptBlock(BlockState state) {
         this.mimic = state;
         if (level.isClientSide) {
-            ModelDataManager.requestModelDataRefresh(this);
+            this.requestModelReload();
+         //   ModelDataManager.requestModelDataRefresh(this);
         } else {
             this.setChanged();
         }

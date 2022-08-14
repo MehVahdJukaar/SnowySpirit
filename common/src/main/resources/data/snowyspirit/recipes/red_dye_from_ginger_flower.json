@@ -5,5 +5,11 @@
   ],
   "result": {
     "item": "minecraft:red_dye"
-  }
+  },
+  "conditions": [
+    {
+      "type": "snowyspirit:flag",
+      "flag": "ginger"
+    }
+  ]
 }
