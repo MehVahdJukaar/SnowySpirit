@@ -3,6 +3,7 @@ package net.mehvahdjukaar.snowyspirit.fabric;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
 import net.fabricmc.fabric.api.biome.v1.BiomeSelectors;
+import net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents;
 import net.mehvahdjukaar.moonlight.api.platform.PlatformHelper;
 import net.mehvahdjukaar.moonlight.fabric.FabricSetupCallbacks;
 import net.mehvahdjukaar.snowyspirit.SnowySpirit;
@@ -33,6 +34,7 @@ public class SnowySpiritFabric implements ModInitializer {
     private static void initClient() {
         ClientRegistry.init();
         ClientRegistry.setup();
+
     }
 
     private static void commonSetup() {

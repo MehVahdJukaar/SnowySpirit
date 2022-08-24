@@ -49,7 +49,7 @@ public class PlaceWreathTask extends Behavior<Villager> {
         if (cooldown-- > 0) return false;
         if (pOwner.isBaby()) return false;
         if(!SnowySpirit.isChristmasSeason(pOwner.level)) return false;
-        //doesnt always start and gets put on cooldown
+        //doesn't always start and gets put on cooldown
         if (!ForgeEventFactory.getMobGriefingEvent(pLevel, pOwner)) {
             cooldown = 20 * 60;
             return false;
@@ -60,7 +60,7 @@ public class PlaceWreathTask extends Behavior<Villager> {
 
     @Override
     protected void start(ServerLevel pLevel, Villager pEntity, long pGameTime) {
-        this.cooldown = 10 * (10 + pLevel.random.nextInt(10)) + pLevel.random.nextInt(20);
+        this.cooldown = 8 * (10 + pLevel.random.nextInt(10)) + pLevel.random.nextInt(20);
         this.ticksSinceReached = 0;
         targetPos = getValidPlacementPos(pLevel, pEntity);
 
@@ -111,12 +111,12 @@ public class PlaceWreathTask extends Behavior<Villager> {
     private static BlockPos getValidPlacementPos(ServerLevel pLevel, LivingEntity pWalker) {
         RandomSource random = pWalker.getRandom();
 
-        BlockPos meeting = pWalker.blockPosition();
+        BlockPos targetPos = pWalker.blockPosition();
 
 
         //10 tries
         for (int i = 0; i < 6; ++i) {
-            BlockPos pos = meeting.offset(random.nextInt(20) - 10, random.nextInt(6) - 3, random.nextInt(20) - 10);
+            BlockPos pos = targetPos.offset(random.nextInt(20) - 10, random.nextInt(6) - 3, random.nextInt(20) - 10);
             if (isValidPlacementSpot(pLevel, pos)) {
                 return pos;
             }

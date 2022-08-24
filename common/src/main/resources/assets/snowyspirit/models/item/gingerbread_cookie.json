@@ -7,19 +7,19 @@
   "overrides": [
     {
       "predicate": {
-        "shape": 1
+        "shape": 0.3
       },
       "model": "snowyspirit:item/gingerbread_cookie_1"
     },
     {
       "predicate": {
-        "shape": 2
+        "shape": 0.6
       },
       "model": "snowyspirit:item/gingerbread_cookie_2"
     },
     {
       "predicate": {
-        "shape": 3
+        "shape": 1
       },
       "model": "snowyspirit:item/gingerbread_cookie_3"
     }

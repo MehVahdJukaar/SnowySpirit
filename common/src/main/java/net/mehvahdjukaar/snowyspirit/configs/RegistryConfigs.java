@@ -71,6 +71,7 @@ public class RegistryConfigs {
 
     private static void init(ConfigBuilder builder) {
 
+        builder.push("snowy_season");
         builder.push("snow_season_start");
         START_MONTH = builder.comment("Day from which villagers will start placing wreaths, presents and throwing snowballs")
                 .define("month", 12, 1, 12);
@@ -90,6 +91,7 @@ public class RegistryConfigs {
                 .define("enabled", SnowySpirit.SEASON_MOD_INSTALLED);
         if (SnowySpirit.SEASON_MOD_INSTALLED) SeasonModCompat.addConfig(builder);
         builder.pop();
+        builder.pop();
 
         builder.push("misc");
         PACK_DEPENDANT_ASSETS = builder.comment("Allows generated assets to depend on installed resource and data packs. " +
@@ -102,7 +104,7 @@ public class RegistryConfigs {
         MOD_TAB = builder.define("mod_creative_tab", false);
         builder.pop();
 
-        builder.push("blocks_and_items").comment("here you can turn on and off individual features and blocks");
+        builder.push("blocks_and_items");
         SLEDS = regConfig(builder, "sleds", true);
         GUMDROPS = regConfig(builder, "gumdrops", true);
         GLOW_LIGHTS = regConfig(builder, "glow_lights", true);

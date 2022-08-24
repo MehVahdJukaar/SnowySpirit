@@ -6,6 +6,7 @@ import com.mojang.math.Vector3f;
 import net.mehvahdjukaar.moonlight.api.client.util.RenderUtil;
 import net.mehvahdjukaar.snowyspirit.SnowySpirit;
 import net.mehvahdjukaar.snowyspirit.common.IInputListener;
+import net.mehvahdjukaar.snowyspirit.integration.configured.ModConfigSelectScreen;
 import net.mehvahdjukaar.snowyspirit.wreath_stuff.capabilities.CapabilityHandler;
 import net.mehvahdjukaar.snowyspirit.wreath_stuff.capabilities.WreathCapability;
 import net.mehvahdjukaar.snowyspirit.reg.ModRegistry;
@@ -36,6 +37,7 @@ public class ClientEvents {
     public static void tickEvent(TickEvent.ClientTickEvent event) {
         if (event.phase == TickEvent.Phase.END) {
             ClientLevel level = Minecraft.getInstance().level;
+            //Minecraft.getInstance().setScreen(new ModConfigSelectScreen(Minecraft.getInstance().screen));
             if (level != null) {
                 level.getCapability(CapabilityHandler.WREATH_CAPABILITY).ifPresent(c -> c.refreshClientBlocksVisuals(level));
             }

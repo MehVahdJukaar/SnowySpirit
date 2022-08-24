@@ -7,7 +7,10 @@ import net.mehvahdjukaar.snowyspirit.configs.RegistryConfigs;
 import net.mehvahdjukaar.snowyspirit.dynamicpack.ClientDynamicResourcesHandler;
 import net.mehvahdjukaar.snowyspirit.dynamicpack.ServerDynamicResourcesHandler;
 import net.mehvahdjukaar.snowyspirit.integration.SeasonModCompat;
-import net.mehvahdjukaar.snowyspirit.reg.*;
+import net.mehvahdjukaar.snowyspirit.reg.ModMemoryModules;
+import net.mehvahdjukaar.snowyspirit.reg.ModRegistry;
+import net.mehvahdjukaar.snowyspirit.reg.ModSounds;
+import net.mehvahdjukaar.snowyspirit.reg.ModWorldgenRegistry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 import org.apache.logging.log4j.LogManager;
@@ -51,6 +54,7 @@ public class SnowySpirit {
             ClientDynamicResourcesHandler.INSTANCE.register();
         }
     }
+    //snow globe item texture
     //Do this shit next christmas
     //sleds loose their chest
     //TODO: add glow light particles & emissive model
@@ -79,7 +83,8 @@ public class SnowySpirit {
         Date end = new Date((inv ? 1 : 0), endM, endD);
 
         Date today = new Date(0, Calendar.getInstance().get(Calendar.MONTH), Calendar.getInstance().get(Calendar.DATE));
-
+        if (today.before(start) && inv) today = new Date(1, today.getMonth(), today.getDate());
+//TODO: rewrite properly
         //if seasonal use pumpkin placement time window
         IS_CHRISTMAS_REAL_TIME = today.after(start) && today.before(end);
 

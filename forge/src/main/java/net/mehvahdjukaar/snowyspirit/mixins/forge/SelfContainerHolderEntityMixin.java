@@ -1,7 +1,5 @@
 package net.mehvahdjukaar.snowyspirit.mixins.forge;
 
-import dev.architectury.patchedmixin.staticmixin.spongepowered.asm.mixin.Mixin;
-import dev.architectury.patchedmixin.staticmixin.spongepowered.asm.mixin.Unique;
 import net.mehvahdjukaar.snowyspirit.common.entity.ContainerHolderEntity;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.Entity;
@@ -10,6 +8,8 @@ import net.minecraft.world.level.Level;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.wrapper.InvWrapper;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 
 import javax.annotation.Nullable;
 

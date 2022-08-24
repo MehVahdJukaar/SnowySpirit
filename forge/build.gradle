@@ -152,11 +152,9 @@ dependencies {
 
     implementation 'org.jetbrains:annotations:22.0.0'
 
-    modImplementation("curse.maven:serene-seasons-291874:3926300")
+    modCompileOnly("curse.maven:serene-seasons-291874:3926300")
     modImplementation("net.mehvahdjukaar:moonlight-forge:${project.moonlight_version}")
-    modImplementation("net.mehvahdjukaar:supplementaries-forge:${project.supplementaries_version}"){
-        exclude group: 'vazkii'
-    }
-    modImplementation ("curse.maven:jei-238222:3884337")
-    //modImplementation("curse.maven:configured-457570:3822820")
+    modCompileOnly("net.mehvahdjukaar:supplementaries-forge:${project.supplementaries_version}")
+    modCompileOnly ("curse.maven:jei-238222:3884337")
+    modImplementation ("curse.maven:configured-457570:3872190")
 }

@@ -55,7 +55,7 @@ public class ClientRegistry {
         }
 
         ClientPlatformHelper.registerItemProperty(ModRegistry.GINGERBREAD_COOKIE.get(), new ResourceLocation("shape"),
-                (stack, world, entity, s) -> entity == null ? 0 : System.identityHashCode(stack) % 4);
+                (stack, world, entity, s) -> entity == null ? 0 : (System.identityHashCode(stack) % 4)/3f);
     }
 
     private static void registerEntityRenderers(ClientPlatformHelper.EntityRendererEvent event) {

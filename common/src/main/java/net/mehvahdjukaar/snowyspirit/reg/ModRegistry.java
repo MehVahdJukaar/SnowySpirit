@@ -56,7 +56,7 @@ public class ModRegistry {
             if (wood.canBurn()) {
                 String name = wood.getVariantId("sled");
                 SledItem item = new SledItem(wood);
-                event.register(name, item);
+                event.register(SnowySpirit.res(name), item);
                 SLED_ITEMS.put(wood, item);
                 wood.addChild("sled", item);
             }

@@ -3,7 +3,6 @@
   "minVersion": "0.8",
   "required": true,
   "compatibilityLevel": "JAVA_16",
-  "refmap": "snowyspirit.refmap.json",
   "package": "net.mehvahdjukaar.snowyspirit.mixins",
   "mixins": [
     "EntityMixin",
