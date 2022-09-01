@@ -13,6 +13,10 @@
     {
       "id" :"snowrealmagic:stairs",
       "required": false
+    },
+    {
+      "id" :"immersive_weathering:permafrost",
+      "required": false
     }
   ]
 }

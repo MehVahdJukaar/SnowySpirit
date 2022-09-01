@@ -19,7 +19,7 @@
       "net.mehvahdjukaar.snowyspirit.fabric.SnowySpiritFabric"
     ],
     "modmenu": [
-      "net.mehvahdjukaar.snowyspirit.integration.modMenu.ModMenuCompat"
+      "net.mehvahdjukaar.snowyspirit.integration.fabric.modMenu.ModMenuCompat"
     ]
   },
   "mixins": [
@@ -29,6 +29,6 @@
   "depends": {
     "fabric": "*",
     "minecraft": ">=1.19",
-    "moonlight": ">=1.19-2.0.12"
+    "moonlight": ">=1.19-2.0.20"
   }
 }

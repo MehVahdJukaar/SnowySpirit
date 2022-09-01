@@ -6,6 +6,7 @@ import net.mehvahdjukaar.moonlight.api.platform.ForgeHelper;
 import net.mehvahdjukaar.moonlight.api.platform.PlatformHelper;
 import net.mehvahdjukaar.moonlight.api.set.wood.WoodType;
 import net.mehvahdjukaar.moonlight.api.set.wood.WoodTypeRegistry;
+import net.mehvahdjukaar.snowyspirit.client.SledEntityRenderer;
 import net.mehvahdjukaar.snowyspirit.common.IInputListener;
 import net.mehvahdjukaar.snowyspirit.common.network.NetworkHandler;
 import net.mehvahdjukaar.snowyspirit.common.network.ServerBoundUpdateSledState;
@@ -20,6 +21,7 @@ import net.minecraft.ReportedException;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.data.tags.BlockTagsProvider;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.Packet;
@@ -27,6 +29,7 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.util.Mth;
@@ -95,7 +98,6 @@ public class SledEntity extends Entity implements IInputListener, IExtraClientSp
         super(entityType, level);
         this.blocksBuilding = true;
         this.maxUpStep = 1;
-
     }
 
     public SledEntity(Level level, double x, double y, double z) {
@@ -104,7 +106,6 @@ public class SledEntity extends Entity implements IInputListener, IExtraClientSp
         this.xo = x;
         this.yo = y;
         this.zo = z;
-
     }
 
     @Override
@@ -462,6 +463,18 @@ public class SledEntity extends Entity implements IInputListener, IExtraClientSp
 
         if (this.chest != null && chest.isRemoved()) this.chest = null;
         if (this.wolf != null && wolf.isRemoved()) this.wolf = null;
+
+        boolean hasWolf = false;
+        if(this.wolf != null && this.level.isClientSide) { //hackery to fix client side wold since we arent resetting it properly
+            //TODO: handle clientside wold properly, possibly not as a passenger
+            for (var passenger : this.getPassengers()) {
+                if (passenger == wolf){
+                    hasWolf = true;
+                    break;
+                }
+            }
+            if(!hasWolf) this.wolf = null;
+        }
 
         //on first and second tick cause of passengers fuckery needing 2 ticks to get added
         if (this.restoreWolfUUID != null) {
@@ -1449,9 +1462,11 @@ public class SledEntity extends Entity implements IInputListener, IExtraClientSp
                     fox.setSitting(false);
                 }
                 this.wolf.setInvulnerable(false);
-                this.wolf = null;
                 //this.spawnAtLocation(Items.LEAD);
+                this.wolf = null;
+                //this is bad... calling on server side only
             }
+
         }
     }
 

@@ -46,8 +46,7 @@ public class SnowySpirit {
         ModMemoryModules.init();
 
         ModWorldgenRegistry.init();
-
-
+        
         ServerDynamicResourcesHandler.INSTANCE.register();
 
         if (PlatformHelper.getEnv().isClient()) {

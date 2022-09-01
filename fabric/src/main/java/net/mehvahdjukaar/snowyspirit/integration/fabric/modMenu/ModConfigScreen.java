@@ -1,4 +1,4 @@
-package net.mehvahdjukaar.snowyspirit.integration.modMenu;
+package net.mehvahdjukaar.snowyspirit.integration.fabric.modMenu;
 
 import net.mehvahdjukaar.moonlight.api.client.gui.LinkButton;
 import net.mehvahdjukaar.moonlight.api.integration.cloth_config.ClothConfigListScreen;

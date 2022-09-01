@@ -1,4 +1,6 @@
-
 {
-  "parent": "snowyspirit:block/snow_globe"
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "snowyspirit:items/snow_globe"
+  }
 }

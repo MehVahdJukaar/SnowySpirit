@@ -154,7 +154,7 @@ dependencies {
 
     modCompileOnly("curse.maven:serene-seasons-291874:3926300")
     modImplementation("net.mehvahdjukaar:moonlight-forge:${project.moonlight_version}")
-    modCompileOnly("net.mehvahdjukaar:supplementaries-forge:${project.supplementaries_version}")
+    modImplementation("net.mehvahdjukaar:supplementaries-forge:${project.supplementaries_version}")
     modCompileOnly ("curse.maven:jei-238222:3884337")
     modImplementation ("curse.maven:configured-457570:3872190")
 }

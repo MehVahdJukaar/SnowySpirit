@@ -1,7 +1,15 @@
 {
   "replace": false,
   "values": [
-    "#forge:chests/trapped",
-    "#forge:chests/wooden"
+    "minecraft:chest",
+    "minecraft:trapped_chest",
+    {
+      "id" :"#forge:chests/trapped",
+      "required": false
+    },
+    {
+      "id" : "#forge:chests/wooden",
+      "required": false
+    }
   ]
 }
