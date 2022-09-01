@@ -24,9 +24,6 @@ public class ModSounds {
         return RegHelper.registerSound(SnowySpirit.res(name), () -> new SoundEvent(SnowySpirit.res(name)));
     }
 
-    public static void playSledSounds(SledEntity sledEntity) {
-        Minecraft.getInstance().getSoundManager().play(new SledSoundInstance(sledEntity, false));
-        Minecraft.getInstance().getSoundManager().play(new SledSoundInstance(sledEntity,true));
-    }
+
 
 }

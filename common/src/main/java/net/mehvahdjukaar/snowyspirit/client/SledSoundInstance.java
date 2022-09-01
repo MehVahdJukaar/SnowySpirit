@@ -3,6 +3,7 @@ package net.mehvahdjukaar.snowyspirit.client;
 import net.mehvahdjukaar.snowyspirit.common.entity.SledEntity;
 import net.mehvahdjukaar.snowyspirit.reg.ModRegistry;
 import net.mehvahdjukaar.snowyspirit.reg.ModSounds;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.sounds.AbstractTickableSoundInstance;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
@@ -83,5 +84,10 @@ public class SledSoundInstance extends AbstractTickableSoundInstance {
         } else {
             this.stop();
         }
+    }
+
+    public static void playAt(SledEntity sledEntity) {
+        Minecraft.getInstance().getSoundManager().play(new SledSoundInstance(sledEntity, false));
+        Minecraft.getInstance().getSoundManager().play(new SledSoundInstance(sledEntity,true));
     }
 }

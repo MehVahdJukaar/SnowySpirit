@@ -7,6 +7,7 @@ import net.mehvahdjukaar.moonlight.api.platform.PlatformHelper;
 import net.mehvahdjukaar.moonlight.api.set.wood.WoodType;
 import net.mehvahdjukaar.moonlight.api.set.wood.WoodTypeRegistry;
 import net.mehvahdjukaar.snowyspirit.client.SledEntityRenderer;
+import net.mehvahdjukaar.snowyspirit.client.SledSoundInstance;
 import net.mehvahdjukaar.snowyspirit.common.IInputListener;
 import net.mehvahdjukaar.snowyspirit.common.network.NetworkHandler;
 import net.mehvahdjukaar.snowyspirit.common.network.ServerBoundUpdateSledState;
@@ -161,7 +162,7 @@ public class SledEntity extends Entity implements IInputListener, IExtraClientSp
             this.restoreWolfUUID = additionalData.readUUID();
         }
         if (level.isClientSide) {
-            ModSounds.playSledSounds(this);
+            SledSoundInstance.playAt(this);
         }
     }
 
