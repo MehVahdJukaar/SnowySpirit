@@ -1,16 +1,19 @@
 package net.mehvahdjukaar.snowyspirit.integration.fabric.modMenu;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.mehvahdjukaar.moonlight.api.client.gui.LinkButton;
 import net.mehvahdjukaar.moonlight.api.integration.cloth_config.ClothConfigListScreen;
 import net.mehvahdjukaar.snowyspirit.SnowySpirit;
 import net.mehvahdjukaar.snowyspirit.configs.RegistryConfigs;
 import net.mehvahdjukaar.snowyspirit.reg.ModRegistry;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Items;
 
 public class ModConfigScreen extends ClothConfigListScreen {
 
@@ -65,6 +68,17 @@ public class ModConfigScreen extends ClothConfigListScreen {
         this.addRenderableWidget(youtube);
         this.addRenderableWidget(github);
         this.addRenderableWidget(twitter);
+    }
+
+    @Override
+    public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTicks) {
+        super.render(poseStack, mouseX, mouseY, partialTicks);
+
+        var level = Minecraft.getInstance().level;
+        if(level != null && SnowySpirit.isChristmasSeason(level)) {
+            int x = (int) (this.width * 0.93f);
+            this.itemRenderer.renderAndDecorateFakeItem(Items.SNOWBALL.getDefaultInstance(), x, 16);
+        }
     }
 
 }

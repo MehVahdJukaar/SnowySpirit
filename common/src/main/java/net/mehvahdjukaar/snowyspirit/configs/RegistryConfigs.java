@@ -40,7 +40,7 @@ public class RegistryConfigs {
     public static Supplier<Integer> END_DAY;
     public static Supplier<Integer> END_MONTH;
 
-    public static Supplier<Boolean> SERENE_SEASONS_COMPAT;
+    public static Supplier<Boolean> SEASONS_MOD_COMPAT;
 
     public static Supplier<Boolean> MOD_TAB;
 
@@ -72,6 +72,7 @@ public class RegistryConfigs {
     private static void init(ConfigBuilder builder) {
 
         builder.push("snowy_season");
+
         builder.push("snow_season_start");
         START_MONTH = builder.comment("Day from which villagers will start placing wreaths, presents and throwing snowballs")
                 .define("month", 12, 1, 12);
@@ -87,7 +88,7 @@ public class RegistryConfigs {
 
         builder.push("season_mod_compat");
 
-        SERENE_SEASONS_COMPAT = builder.comment("Enables compatibility with Serene Seasons (Forge) or Fabric Seasons (Fabric). Only takes effect if the mod is installed. Will make snowy season only active during certain seasons. Note that this will override previous time window settings")
+        SEASONS_MOD_COMPAT = builder.comment("Enables compatibility with Serene Seasons (Forge) or Fabric Seasons (Fabric). Only takes effect if the mod is installed. Will make snowy season only active during certain seasons. Note that this will override previous time window settings")
                 .define("enabled", SnowySpirit.SEASON_MOD_INSTALLED);
         if (SnowySpirit.SEASON_MOD_INSTALLED) SeasonModCompat.addConfig(builder);
         builder.pop();

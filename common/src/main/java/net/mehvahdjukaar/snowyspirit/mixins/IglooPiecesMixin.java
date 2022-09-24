@@ -7,6 +7,7 @@ import net.mehvahdjukaar.snowyspirit.configs.RegistryConfigs;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ChunkPos;
@@ -68,6 +69,8 @@ public abstract class IglooPiecesMixin extends TemplateStructurePiece {
                 BlockPos blockPos = new BlockPos(p.getX(), y, p.getZ());
                 if (pBox.isInside(blockPos)) {
                     Level level = worldGenLevel.getLevel();
+
+
                     SledEntity sledEntity = new SledEntity(level, blockPos.getX() + 0.5, blockPos.getY() + 0.5, blockPos.getZ());
                     ContainerHolderEntity c = sledEntity.tryAddingChest(Items.CHEST.getDefaultInstance());
                     if (c != null)
