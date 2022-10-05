@@ -87,7 +87,7 @@ public class SnowySpirit {
         //if seasonal use pumpkin placement time window
         IS_CHRISTMAS_REAL_TIME = today.after(start) && today.before(end);
 
-        USES_SEASON_MOD = SEASON_MOD_INSTALLED && RegistryConfigs.SERENE_SEASONS_COMPAT.get();
+        USES_SEASON_MOD = SEASON_MOD_INSTALLED && RegistryConfigs.SEASONS_MOD_COMPAT.get();
 
         if (USES_SEASON_MOD) {
             SeasonModCompat.refresh();

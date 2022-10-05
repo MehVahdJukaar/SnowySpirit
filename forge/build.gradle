@@ -165,5 +165,5 @@ dependencies {
     modImplementation("net.mehvahdjukaar:moonlight-forge:${project.moonlight_version}")
     modImplementation("net.mehvahdjukaar:supplementaries-forge:${project.supplementaries_version}")
     modCompileOnly ("curse.maven:jei-238222:3884337")
-    modImplementation ("curse.maven:configured-457570:3872190")
+    modImplementation ("curse.maven:configured-457570:4011355")
 }
