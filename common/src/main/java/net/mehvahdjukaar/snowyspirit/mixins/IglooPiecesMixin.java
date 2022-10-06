@@ -30,18 +30,14 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.util.Random;
 import java.util.function.Function;
 
 @Mixin(IglooPieces.IglooPiece.class)
 public abstract class IglooPiecesMixin extends TemplateStructurePiece {
 
-
-    public IglooPiecesMixin(StructurePieceType p_226886_, int p_226887_, StructureTemplateManager p_226888_, ResourceLocation p_226889_, String p_226890_, StructurePlaceSettings p_226891_, BlockPos p_226892_) {
-        super(p_226886_, p_226887_, p_226888_, p_226889_, p_226890_, p_226891_, p_226892_);
-    }
-
-    public IglooPiecesMixin(StructurePieceType p_226894_, CompoundTag p_226895_, StructureTemplateManager p_226896_, Function<ResourceLocation, StructurePlaceSettings> p_226897_) {
-        super(p_226894_, p_226895_, p_226896_, p_226897_);
+    public IglooPiecesMixin(StructurePieceType structurePieceType, int i, StructureTemplateManager structureTemplateManager, ResourceLocation resourceLocation, String string, StructurePlaceSettings structurePlaceSettings, BlockPos blockPos) {
+        super(structurePieceType, i, structureTemplateManager, resourceLocation, string, structurePlaceSettings, blockPos);
     }
 
     @Shadow
@@ -50,11 +46,10 @@ public abstract class IglooPiecesMixin extends TemplateStructurePiece {
     }
 
 
-
     @Inject(method = "postProcess", at = @At("RETURN"))
-    private void getCollisionShape(WorldGenLevel worldGenLevel, StructureManager p_227569_,
-                                   ChunkGenerator p_227570_, RandomSource pRandom, BoundingBox pBox,
-                                   ChunkPos p_227573_, BlockPos p_227574_, CallbackInfo ci){
+    private void addSleds(WorldGenLevel worldGenLevel, StructureManager structureManager,
+                                   ChunkGenerator chunkGenerator, RandomSource pRandom, BoundingBox pBox,
+                                   ChunkPos chunkPos, BlockPos pos, CallbackInfo ci){
 
         if (pRandom.nextFloat() > 0.3 && RegistryConfigs.SLEDS.get()) {
 
@@ -73,8 +68,9 @@ public abstract class IglooPiecesMixin extends TemplateStructurePiece {
 
                     SledEntity sledEntity = new SledEntity(level, blockPos.getX() + 0.5, blockPos.getY() + 0.5, blockPos.getZ());
                     ContainerHolderEntity c = sledEntity.tryAddingChest(Items.CHEST.getDefaultInstance());
-                    if (c != null)
-                        c.setLootTable(SnowySpirit.res("chests/igloo_sled"), level.getRandom().nextLong());
+                    if (c != null) {
+                        c.setLootTable(SnowySpirit.res("chests/igloo_sled"), pRandom.nextLong());
+                    }
                     level.addFreshEntity(sledEntity);
                 }
             }
