@@ -46,7 +46,7 @@ public class SnowySpiritFabric implements ModInitializer {
 
         BiomeModifications.addFeature(BiomeSelectors.tag(ModTags.HAS_GINGER_DENSE),
                 GenerationStep.Decoration.VEGETAL_DECORATION,
-                ModWorldgenRegistry.WILD_GINGER.getHolder().unwrapKey().get());
+                ModWorldgenRegistry.WILD_GINGER_DENSE.getHolder().unwrapKey().get());
     }
 
 
