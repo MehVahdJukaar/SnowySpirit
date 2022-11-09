@@ -51,8 +51,8 @@ public class SledSoundInstance extends AbstractTickableSoundInstance {
                 this.volume = 0;
                 return;
             }
-            if ((double) f >= 1.0E-7D) {
-                this.volume = Mth.clamp(f / SPEED_DIVIDER, 0.0F, 1.0F);
+            if ( f >= 1.0E-7D) {
+                this.volume = Mth.clamp(f / SPEED_DIVIDER, 0.0F, 1.1F);
             } else {
                 this.volume = 0.0F;
             }

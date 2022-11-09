@@ -4,6 +4,10 @@
     "snowyspirit:gingerbread",
     "snowyspirit:gingerbread_frosted",
     "snowyspirit:gingerbread_door",
-    "snowyspirit:gingerbread_trapdoor"
+    "snowyspirit:gingerbread_trapdoor",
+    {
+      "id": "snowyspirit:ginger_crate",
+      "required": false
+    }
   ]
 }

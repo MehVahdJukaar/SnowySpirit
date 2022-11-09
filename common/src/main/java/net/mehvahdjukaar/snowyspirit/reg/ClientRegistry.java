@@ -24,8 +24,8 @@ import java.util.function.Supplier;
 
 public class ClientRegistry {
 
-    public static ModelLayerLocation SLED_MODEL = loc("sled");
-    public static ModelLayerLocation QUILT_MODEL = loc("quilt");
+    public static final ModelLayerLocation SLED_MODEL = loc("sled");
+    public static final ModelLayerLocation QUILT_MODEL = loc("quilt");
 
     private static ModelLayerLocation loc(String name) {
         return new ModelLayerLocation(SnowySpirit.res(name), name);
@@ -55,7 +55,7 @@ public class ClientRegistry {
         }
 
         ClientPlatformHelper.registerItemProperty(ModRegistry.GINGERBREAD_COOKIE.get(), new ResourceLocation("shape"),
-                (stack, world, entity, s) -> entity == null ? 0 : (System.identityHashCode(stack) % 4)/3f);
+                (stack, world, entity, s) -> (System.identityHashCode(stack) % 4)/3f);
     }
 
     private static void registerEntityRenderers(ClientPlatformHelper.EntityRendererEvent event) {
@@ -72,14 +72,14 @@ public class ClientRegistry {
         event.register(SnowySpirit.res("glow_lights"),  new NestedModelLoader("overlay", GlowLightsBakedModel::new));
     }
 
-    public static void registerBlockColors(ClientPlatformHelper.BlockColorEvent event) {
+    private static void registerBlockColors(ClientPlatformHelper.BlockColorEvent event) {
         event.register(new MimicBlockColor(), ModRegistry.GLOW_LIGHTS_BLOCKS.values().stream()
                 .map(Supplier::get).toArray(Block[]::new));
 
     }
 
 
-    public static class MimicBlockColor implements BlockColor {
+    private static class MimicBlockColor implements BlockColor {
 
         @Override
         public int getColor(BlockState state, @Nullable BlockAndTintGetter world, @Nullable BlockPos pos, int tint) {
@@ -98,7 +98,7 @@ public class ClientRegistry {
             return -1;
         }
 
-        public static class noParticle implements BlockColor {
+        public static class NoParticle implements BlockColor {
             @Override
             public int getColor(BlockState state, @Nullable BlockAndTintGetter world, @Nullable BlockPos pos, int tint) {
                 if (tint == 0) return -1;

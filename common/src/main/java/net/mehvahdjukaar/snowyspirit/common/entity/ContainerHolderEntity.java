@@ -49,11 +49,12 @@ public class ContainerHolderEntity extends Entity implements Container, MenuProv
     private static final EntityDataAccessor<Integer> DATA_ID_HURT = SynchedEntityData.defineId(ContainerHolderEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Float> DATA_ID_DAMAGE = SynchedEntityData.defineId(ContainerHolderEntity.class, EntityDataSerializers.FLOAT);
 
+    private static final int CONTAINER_SIZE = 27;
+
     private ItemStack containerStack = ItemStack.EMPTY;
-    private final int containerSize = 27;
 
     //for client
-    public BlockState displayState = Blocks.AIR.defaultBlockState();
+    private BlockState displayState = Blocks.AIR.defaultBlockState();
 
     public ContainerHolderEntity(EntityType<?> type, Level level) {
         super(type, level);
@@ -71,11 +72,18 @@ public class ContainerHolderEntity extends Entity implements Container, MenuProv
 
     }
 
+    public BlockState getDisplayState() {
+        return displayState;
+    }
 
     public void setContainerItem(ItemStack stack) {
         this.containerStack = stack;
         if (this.containerStack.getItem() instanceof BlockItem blockItem) {
             this.displayState = blockItem.getBlock().defaultBlockState();
+        }
+        if(isContainerWithNBT(stack) && stack.hasTag()){
+            CompoundTag tag = stack.getTagElement("BlockEntityTag");
+            if(tag != null) ContainerHelper.loadAllItems(tag, itemStacks);
         }
     }
 
@@ -199,7 +207,8 @@ public class ContainerHolderEntity extends Entity implements Container, MenuProv
         if (this.hasCustomName()) {
             stack.setHoverName(this.getCustomName());
         }
-        if (!this.containerStack.is(ModTags.VALID_CONTAINERS)) {
+        //sacks and shulker. kind of ugly here
+        if (isContainerWithNBT(this.containerStack)) {
             CompoundTag tag = new CompoundTag();
             ContainerHelper.saveAllItems(tag, this.itemStacks, false);
             stack.addTagElement("BlockEntityTag", tag);
@@ -224,14 +233,6 @@ public class ContainerHolderEntity extends Entity implements Container, MenuProv
     @Override
     public boolean isPickable() {
         return !this.isRemoved();
-    }
-
-    @Override
-    public void setYRot(float pYRot) {
-        if (yRotO < 0) {
-            int a = 1;
-        }
-        super.setYRot(pYRot);
     }
 
     /**
@@ -372,8 +373,8 @@ public class ContainerHolderEntity extends Entity implements Container, MenuProv
             }
 
             @Override
-            public boolean set(ItemStack p_150265_) {
-                ContainerHolderEntity.this.setItem(pSlot, p_150265_);
+            public boolean set(ItemStack carried) {
+                ContainerHolderEntity.this.setItem(pSlot, carried);
                 return true;
             }
         } : super.getSlot(pSlot);
@@ -401,7 +402,7 @@ public class ContainerHolderEntity extends Entity implements Container, MenuProv
         if (this.isRemoved()) {
             return false;
         } else {
-            return !(pPlayer.distanceToSqr(this) > 64.0D);
+            return pPlayer.distanceToSqr(this) <= 64.0D;
         }
     }
 
@@ -447,8 +448,8 @@ public class ContainerHolderEntity extends Entity implements Container, MenuProv
     public void unpackLootTable(@Nullable Player pPlayer) {
         if (this.lootTable != null && this.level.getServer() != null) {
             LootTable loottable = this.level.getServer().getLootTables().get(this.lootTable);
-            if (pPlayer instanceof ServerPlayer) {
-                CriteriaTriggers.GENERATE_LOOT.trigger((ServerPlayer) pPlayer, this.lootTable);
+            if (pPlayer instanceof ServerPlayer serverPlayer) {
+                CriteriaTriggers.GENERATE_LOOT.trigger( serverPlayer, this.lootTable);
             }
 
             this.lootTable = null;
@@ -486,24 +487,38 @@ public class ContainerHolderEntity extends Entity implements Container, MenuProv
 
     @Override
     public int getContainerSize() {
-        return containerSize;
+        return CONTAINER_SIZE;
     }
 
     public AbstractContainerMenu createMenu(int id, Inventory pPlayerInventory) {
-        if (SnowySpirit.SUPPLEMENTARIES_INSTALLED && SackHelper.isSack(containerStack.getItem())) {
+        if (isSack(containerStack.getItem())) {
             return SackHelper.createMenu(id, pPlayerInventory, this);
-        } else if (!containerStack.is(ModTags.VALID_CONTAINERS)) {
+        } else if (!isNormalContainer(containerStack)) {
             return new ShulkerBoxMenu(id, pPlayerInventory, this);
         }
         return ChestMenu.threeRows(id, pPlayerInventory, this);
     }
 
 
-    public static boolean isChestItem(ItemStack stack) {
+    public static boolean isValidContainer(ItemStack stack) {
+        return isNormalContainer(stack) || isContainerWithNBT(stack);
+    }
+
+    private static boolean isNormalContainer(ItemStack stack) {
+        return stack.is(ModTags.VALID_CONTAINERS);
+    }
+
+    private static boolean isContainerWithNBT(ItemStack stack) {
         Item i = stack.getItem();
-        if (SnowySpirit.SUPPLEMENTARIES_INSTALLED && SackHelper.isSack(i)) return true;
-        return stack.is(ModTags.VALID_CONTAINERS) ||
-                (i instanceof BlockItem bi && (bi.getBlock() instanceof ShulkerBoxBlock));
+        return isShulkerBox(i) || isSack(i);
+    }
+
+    private static boolean isShulkerBox(Item i) {
+        return i instanceof BlockItem bi && (bi.getBlock() instanceof ShulkerBoxBlock);
+    }
+
+    private static boolean isSack(Item i) {
+        return SnowySpirit.SUPPLEMENTARIES_INSTALLED && SackHelper.isSack(i);
     }
 
 }

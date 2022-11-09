@@ -6,6 +6,7 @@ import net.mehvahdjukaar.moonlight.api.platform.RegHelper;
 import net.mehvahdjukaar.snowyspirit.configs.RegistryConfigs;
 import net.mehvahdjukaar.snowyspirit.dynamicpack.ClientDynamicResourcesHandler;
 import net.mehvahdjukaar.snowyspirit.dynamicpack.ServerDynamicResourcesHandler;
+import net.mehvahdjukaar.snowyspirit.integration.FDCompat;
 import net.mehvahdjukaar.snowyspirit.integration.SeasonModCompat;
 import net.mehvahdjukaar.snowyspirit.reg.ModMemoryModules;
 import net.mehvahdjukaar.snowyspirit.reg.ModRegistry;
@@ -32,6 +33,7 @@ public class SnowySpirit {
     public static final Logger LOGGER = LogManager.getLogger();
 
     public static boolean SUPPLEMENTARIES_INSTALLED = PlatformHelper.isModLoaded("supplementaries");
+    public static boolean FARMERSDELIGHT_INSTALLED = PlatformHelper.isModLoaded("farmersdelight");
     public static boolean SEASON_MOD_INSTALLED = PlatformHelper.isModLoaded(PlatformHelper.getPlatform().isForge() ? "sereneseasons" : "seasons");
 
 
@@ -43,10 +45,11 @@ public class SnowySpirit {
 
         ModSounds.init();
         ModRegistry.init();
+        if (FARMERSDELIGHT_INSTALLED) FDCompat.init();
         ModMemoryModules.init();
 
         ModWorldgenRegistry.init();
-        
+
         ServerDynamicResourcesHandler.INSTANCE.register();
 
         if (PlatformHelper.getEnv().isClient()) {
@@ -83,7 +86,7 @@ public class SnowySpirit {
 
         Date today = new Date(0, Calendar.getInstance().get(Calendar.MONTH), Calendar.getInstance().get(Calendar.DATE));
         if (today.before(start) && inv) today = new Date(1, today.getMonth(), today.getDate());
-//TODO: rewrite properly
+        //TODO: rewrite properly
         //if seasonal use pumpkin placement time window
         IS_CHRISTMAS_REAL_TIME = today.after(start) && today.before(end);
 

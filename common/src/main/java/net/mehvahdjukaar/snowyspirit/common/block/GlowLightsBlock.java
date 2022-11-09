@@ -91,9 +91,9 @@ public class GlowLightsBlock extends Block implements EntityBlock {
                 BlockPos blockpos = pPos.below();
                 BlockState blockstate = pLevel.getBlockState(blockpos);
                 if (!blockstate.canOcclude() || !blockstate.isFaceSturdy(pLevel, blockpos, Direction.UP)) {
-                    double d0 = (double) pPos.getX() + pRandom.nextDouble();
-                    double d1 = (double) pPos.getY() - 0.05D;
-                    double d2 = (double) pPos.getZ() + pRandom.nextDouble();
+                    double d0 = pPos.getX() + pRandom.nextDouble();
+                    double d1 = pPos.getY() - 0.05D;
+                    double d2 = pPos.getZ() + pRandom.nextDouble();
                     pLevel.addParticle(ParticleTypes.DRIPPING_WATER, d0, d1, d2, 0.0D, 0.0D, 0.0D);
                 }
             }
@@ -124,7 +124,7 @@ public class GlowLightsBlock extends Block implements EntityBlock {
             // world.playSound(player, pos, SoundEvents.SNOW_GOLEM_SHEAR, SoundSource.PLAYERS, 1.0F, 1.0F);
             if (!world.isClientSide()) {
                 world.setBlockAndUpdate(pos, tile.mimic);
-                return Collections.singletonList(ModRegistry.GLOW_LIGHTS_BLOCKS.get(color).get().asItem().getDefaultInstance());
+                return Collections.singletonList(ModRegistry.GLOW_LIGHTS_ITEMS.get(color).get().getDefaultInstance());
             }
         }
         return Collections.emptyList();
@@ -132,6 +132,6 @@ public class GlowLightsBlock extends Block implements EntityBlock {
 
     @Override
     public ItemStack getCloneItemStack(BlockGetter level, BlockPos pos, BlockState state) {
-        return ModRegistry.GLOW_LIGHTS_BLOCKS.get(this.color).get().asItem().getDefaultInstance();
+        return ModRegistry.GLOW_LIGHTS_ITEMS.get(this.color).get().getDefaultInstance();
     }
 }

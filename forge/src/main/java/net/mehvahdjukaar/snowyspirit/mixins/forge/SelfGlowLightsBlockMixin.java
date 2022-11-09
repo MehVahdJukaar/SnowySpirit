@@ -18,14 +18,14 @@ import java.util.List;
 @Mixin(GlowLightsBlock.class)
 public abstract class SelfGlowLightsBlockMixin extends Block implements IForgeShearable {
 
-    public SelfGlowLightsBlockMixin(Properties arg) {
+    protected SelfGlowLightsBlockMixin(Properties arg) {
         super(arg);
     }
 
     @Shadow
     public abstract List<ItemStack> shearAction(@Nullable Player player, @Nonnull ItemStack item, Level world, BlockPos pos, int fortune);
 
-        @Override
+    @Override
     public boolean isShearable(@NotNull ItemStack item, Level level, BlockPos pos) {
         return true;
     }

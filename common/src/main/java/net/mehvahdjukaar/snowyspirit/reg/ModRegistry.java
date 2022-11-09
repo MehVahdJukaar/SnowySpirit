@@ -33,6 +33,7 @@ import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.material.MaterialColor;
 
 import java.util.Collection;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -41,9 +42,10 @@ import java.util.function.Supplier;
 public class ModRegistry {
 
     //vanilla carpets
-    public static BiMap<DyeColor, Item> CARPETS = Util.make(HashBiMap.create(), m -> {
+    public static final BiMap<DyeColor, Item> CARPETS = Util.make(HashBiMap.create(), m -> {
         for (DyeColor c : DyeColor.values()) {
-            m.put(c, Registry.ITEM.get(new ResourceLocation(c.getName() + "_carpet")));
+            m.put(c, Registry.ITEM.getOptional(new ResourceLocation(c.getName() + "_carpet")).orElse(
+                    Registry.ITEM.get(new ResourceLocation("tinted", c.getName() + "_carpet"))));
         }
     });
 
@@ -58,7 +60,7 @@ public class ModRegistry {
                 SledItem item = new SledItem(wood);
                 event.register(SnowySpirit.res(name), item);
                 SLED_ITEMS.put(wood, item);
-                wood.addChild("sled", item);
+                wood.addChild("sled", (Object) item);
             }
         }
     }
@@ -97,8 +99,8 @@ public class ModRegistry {
 
     public static final Supplier<Item> WINTER_DISC = regItem("winter_disc",
             () -> PlatformHelper.newMusicDisc(14, ModSounds.WINTER_MUSIC, new Item.Properties()
-                    .tab(getTab(CreativeModeTab.TAB_MISC,"winter_disc"))
-                    .rarity(Rarity.RARE).stacksTo(1),350));
+                    .tab(getTab(CreativeModeTab.TAB_MISC, "winter_disc"))
+                    .rarity(Rarity.RARE).stacksTo(1), 350));
 
     public static final Supplier<Block> GINGERBREAD_BLOCK = regWithItem("gingerbread", () ->
             new Block(BlockBehaviour.Properties.of(Material.STONE, MaterialColor.TERRACOTTA_ORANGE)
@@ -131,9 +133,10 @@ public class ModRegistry {
             () -> (FlowerPotBlock) Blocks.FLOWER_POT, GINGER_CROP, BlockBehaviour.Properties.copy(Blocks.FLOWER_POT)));
 
 
-    public static final Map<DyeColor, Supplier<Block>> GUMDROPS_BUTTONS = new HashMap<>();
+    public static final Map<DyeColor, Supplier<Block>> GUMDROPS_BUTTONS = new EnumMap<>(DyeColor.class);
 
     public static final Map<DyeColor, Supplier<Block>> GLOW_LIGHTS_BLOCKS = new HashMap<>();
+    public static final Map<DyeColor, Supplier<Item>> GLOW_LIGHTS_ITEMS = new HashMap<>();
 
     static {
         for (DyeColor c : DyeColor.values()) {
@@ -143,10 +146,10 @@ public class ModRegistry {
         }
         for (DyeColor c : DyeColor.values()) {
             GLOW_LIGHTS_BLOCKS.put(c, regBlock("glow_lights_" + c.getName(), () -> new GlowLightsBlock(c)));
-            regItem("glow_lights_" + c.getName(), () -> new GlowLightsItem(GLOW_LIGHTS_BLOCKS.get(c).get()));
+            GLOW_LIGHTS_ITEMS.put(c, regItem("glow_lights_" + c.getName(), () -> new GlowLightsItem(GLOW_LIGHTS_BLOCKS.get(c).get())));
         }
         GLOW_LIGHTS_BLOCKS.put(null, regBlock("glow_lights_prismatic", () -> new GlowLightsBlock(null)));
-        regItem("glow_lights_prismatic", () -> new GlowLightsItem(GLOW_LIGHTS_BLOCKS.get(null).get()));
+        GLOW_LIGHTS_ITEMS.put(null, regItem("glow_lights_prismatic", () -> new GlowLightsItem(GLOW_LIGHTS_BLOCKS.get(null).get())));
     }
 
     public static final Supplier<BlockEntityType<GlowLightsBlockTile>> GLOW_LIGHTS_BLOCK_TILE = regTile(

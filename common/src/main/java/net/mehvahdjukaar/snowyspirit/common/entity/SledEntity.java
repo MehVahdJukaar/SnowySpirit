@@ -6,14 +6,11 @@ import net.mehvahdjukaar.moonlight.api.platform.ForgeHelper;
 import net.mehvahdjukaar.moonlight.api.platform.PlatformHelper;
 import net.mehvahdjukaar.moonlight.api.set.wood.WoodType;
 import net.mehvahdjukaar.moonlight.api.set.wood.WoodTypeRegistry;
-import net.mehvahdjukaar.snowyspirit.client.SledEntityRenderer;
 import net.mehvahdjukaar.snowyspirit.client.SledSoundInstance;
 import net.mehvahdjukaar.snowyspirit.common.IInputListener;
 import net.mehvahdjukaar.snowyspirit.common.network.NetworkHandler;
 import net.mehvahdjukaar.snowyspirit.common.network.ServerBoundUpdateSledState;
-import net.mehvahdjukaar.snowyspirit.reg.ClientRegistry;
 import net.mehvahdjukaar.snowyspirit.reg.ModRegistry;
-import net.mehvahdjukaar.snowyspirit.reg.ModSounds;
 import net.mehvahdjukaar.snowyspirit.reg.ModTags;
 import net.minecraft.BlockUtil;
 import net.minecraft.CrashReport;
@@ -22,7 +19,6 @@ import net.minecraft.ReportedException;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.data.tags.BlockTagsProvider;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.Packet;
@@ -30,7 +26,6 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.util.Mth;
@@ -1097,7 +1092,7 @@ public class SledEntity extends Entity implements IInputListener, IExtraClientSp
 
     @Nullable
     public ContainerHolderEntity tryAddingChest(ItemStack stack) {
-        if (ContainerHolderEntity.isChestItem(stack) && this.canAddChest()) {
+        if (ContainerHolderEntity.isValidContainer(stack) && this.canAddChest()) {
             ContainerHolderEntity container = new ContainerHolderEntity(level, this, stack.split(1));
             level.addFreshEntity(container);
             return container;

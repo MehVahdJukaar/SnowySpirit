@@ -31,7 +31,6 @@ public class GlowLightsBlockTile extends MimicBlockTile {
         this.mimic = state;
         if (level.isClientSide) {
             this.requestModelReload();
-         //   ModelDataManager.requestModelDataRefresh(this);
         } else {
             this.setChanged();
         }

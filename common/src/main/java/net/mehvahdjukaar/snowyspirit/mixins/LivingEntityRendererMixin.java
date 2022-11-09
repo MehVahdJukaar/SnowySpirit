@@ -18,8 +18,8 @@ public abstract class LivingEntityRendererMixin<T extends LivingEntity, M extend
     @Shadow
     protected M model;
 
-    protected LivingEntityRendererMixin(EntityRendererProvider.Context p_174008_) {
-        super(p_174008_);
+    protected LivingEntityRendererMixin(EntityRendererProvider.Context context) {
+        super(context);
     }
 
 

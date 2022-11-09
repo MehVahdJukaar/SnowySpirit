@@ -46,12 +46,6 @@ public class SnowGlobeBlock extends WaterBlock {
         builder.add(SNOWING);
     }
 
-
-    @Override
-    public void handlePrecipitation(BlockState pState, Level pLevel, BlockPos pPos, Biome.Precipitation pPrecipitation) {
-        super.handlePrecipitation(pState, pLevel, pPos, pPrecipitation);
-    }
-
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         boolean snowy = canBeSnowy(context.getClickedPos(), context.getLevel());

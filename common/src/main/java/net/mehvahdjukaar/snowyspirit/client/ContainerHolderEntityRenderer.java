@@ -53,7 +53,7 @@ public class ContainerHolderEntityRenderer<T extends ContainerHolderEntity> exte
         }
 
 
-        BlockState blockstate = entity.displayState;
+        BlockState blockstate = entity.getDisplayState();
         if (blockstate.getRenderShape() != RenderShape.INVISIBLE) {
             poseStack.pushPose();
             float scale = 0.75F;

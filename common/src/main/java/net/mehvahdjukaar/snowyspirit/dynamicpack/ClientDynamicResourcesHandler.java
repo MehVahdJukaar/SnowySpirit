@@ -46,7 +46,7 @@ public class ClientDynamicResourcesHandler extends DynClientResourcesProvider {
                 ResType.ITEM_MODELS.getPath(SnowySpirit.res("sled_oak")));
 
         ModRegistry.SLED_ITEMS.forEach((wood, sled) -> {
-            //if(wood.isVanilla())continue;
+
             try {
                 dynamicPack.addSimilarJsonResource(itemModel,
                         "sled_oak", wood.getVariantId("sled"));
@@ -64,7 +64,7 @@ public class ClientDynamicResourcesHandler extends DynClientResourcesProvider {
             Respriter respriter = Respriter.of(template);
 
             ModRegistry.SLED_ITEMS.forEach((wood, sled) -> {
-                //if (wood.isVanilla()) continue;
+
                 ResourceLocation textureRes = SnowySpirit.res("entity/sled/" + wood.getTexturePath());
                 if (this.alreadyHasTextureAtLocation(manager, textureRes)) return;
 

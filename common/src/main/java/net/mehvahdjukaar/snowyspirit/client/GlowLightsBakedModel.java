@@ -3,6 +3,7 @@ package net.mehvahdjukaar.snowyspirit.client;
 import net.mehvahdjukaar.moonlight.api.client.model.CustomBakedModel;
 import net.mehvahdjukaar.moonlight.api.client.model.ExtraModelData;
 import net.mehvahdjukaar.snowyspirit.common.block.GlowLightsBlockTile;
+import net.mehvahdjukaar.supplementaries.common.block.tiles.SignPostBlockTile;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.BlockModelShaper;
@@ -15,6 +16,7 @@ import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.ArrayList;
@@ -53,17 +55,9 @@ public class GlowLightsBakedModel implements CustomBakedModel {
         return quads;
     }
 
-    private static final ResourceLocation emptyRes = new ResourceLocation("oak_leaves");
-
-    @Override
-    public TextureAtlasSprite getParticleIcon() {
-        return Minecraft.getInstance().getTextureAtlas(TextureAtlas.LOCATION_BLOCKS)
-                .apply(emptyRes);
-    }
-
     @Override
     public TextureAtlasSprite getBlockParticle(ExtraModelData data) {
-        BlockState mimic = data.get(GlowLightsBlockTile.MIMIC);
+        BlockState mimic = data.get(SignPostBlockTile.MIMIC);
         if (mimic != null && !mimic.isAir()) {
 
             BakedModel model = blockModelShaper.getBlockModel(mimic);
@@ -72,7 +66,7 @@ public class GlowLightsBakedModel implements CustomBakedModel {
             } catch (Exception ignored) {
             }
         }
-        return getParticleIcon();
+        return blockModelShaper.getBlockModel(Blocks.OAK_LEAVES.defaultBlockState()).getParticleIcon();
     }
 
     @Override

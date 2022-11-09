@@ -28,7 +28,7 @@ public class ModWorldgenRegistry {
     }
 
 
-    public static RegSupplier<ConfiguredFeature<RandomPatchConfiguration, Feature<RandomPatchConfiguration>>> CONFIGURED_WILD_GINGER =
+    public static final RegSupplier<ConfiguredFeature<RandomPatchConfiguration, Feature<RandomPatchConfiguration>>> CONFIGURED_WILD_GINGER =
             RegHelper.registerConfiguredFeature(SnowySpirit.res("wild_ginger"),
                     () -> Feature.RANDOM_PATCH,
                     () -> makeRandomPatch(40, 4, 1,
@@ -40,7 +40,7 @@ public class ModWorldgenRegistry {
                             )));
 
 
-    public static RegSupplier<PlacedFeature> WILD_GINGER =
+    public static final RegSupplier<PlacedFeature> WILD_GINGER =
             RegHelper.registerPlacedFeature(SnowySpirit.res("wild_ginger"),
                     CONFIGURED_WILD_GINGER,
                     () -> List.of(
@@ -49,12 +49,12 @@ public class ModWorldgenRegistry {
                             InSquarePlacement.spread(),
                             BiomeFilter.biome()));
 
-    public static RegSupplier<PlacedFeature> WILD_GINGER_DENSE =
+    public static final RegSupplier<PlacedFeature> WILD_GINGER_DENSE =
             RegHelper.registerPlacedFeature(SnowySpirit.res("wild_ginger_dense"),
                     CONFIGURED_WILD_GINGER,
                     () -> List.of(
                             PlacementUtils.HEIGHTMAP_WORLD_SURFACE,
-                            RarityFilter.onAverageOnceEvery(10),
+                            RarityFilter.onAverageOnceEvery(11),
                             InSquarePlacement.spread(),
                             BiomeFilter.biome()));
 

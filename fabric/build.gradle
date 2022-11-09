@@ -39,15 +39,14 @@ dependencies {
     //modImplementation(fileTree(dir: 'mods_fabric', include: '*.jar'))
     //modImplementation("curse.maven:selene-499980:3859239")
 
-    modImplementation ("curse.maven:fabric-seasons-413523:3841956")
-    modImplementation ("net.mehvahdjukaar:moonlight-fabric:${project.moonlight_version}")
-    modImplementation ("net.mehvahdjukaar:supplementaries-fabric:${project.supplementaries_version}"){
+    modImplementation("curse.maven:fabric-seasons-413523:3841956")
+    modImplementation("net.mehvahdjukaar:moonlight-fabric:${project.moonlight_version}")
+    modImplementation("net.mehvahdjukaar:supplementaries-fabric:${project.supplementaries_version}") {
         exclude group: 'com.nhoryzon'
     }
-
+    modImplementation("curse.maven:farmers-delight-fabric-482834:4061213")
 
 }
-
 
 
 processResources {

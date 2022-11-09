@@ -36,8 +36,6 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 
 import javax.annotation.Nullable;
 import java.util.List;
-import java.util.Random;
-import java.util.stream.Collectors;
 
 public class GumdropButton extends DirectionalBlock {
 
@@ -74,6 +72,7 @@ public class GumdropButton extends DirectionalBlock {
         return canSupportCenter(pLevel, blockpos, dir);
     }
 
+    @Override
     @Nullable
     public BlockState getStateForPlacement(BlockPlaceContext pContext) {
         Direction direction = pContext.getClickedFace();
@@ -175,7 +174,7 @@ public class GumdropButton extends DirectionalBlock {
 
     private void checkPressed(BlockState pState, Level pLevel, BlockPos pPos) {
         List<? extends Entity> list = pLevel.getEntitiesOfClass(Entity.class, pState.getShape(pLevel, pPos).bounds().move(pPos))
-                .stream().filter(e -> (e instanceof AbstractArrow || e instanceof LivingEntity)).collect(Collectors.toList());
+                .stream().filter(e -> (e instanceof AbstractArrow || e instanceof LivingEntity)).toList();
 
         boolean flag = !list.isEmpty();
         boolean flag1 = pState.getValue(POWERED);

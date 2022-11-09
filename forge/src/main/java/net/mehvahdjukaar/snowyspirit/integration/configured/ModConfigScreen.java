@@ -34,7 +34,7 @@ public class ModConfigScreen extends CustomConfigScreen {
     static {
         addIcon("sleds", ModRegistry.SLED_ITEMS.get(WoodTypeRegistry.OAK_TYPE));
         addIcon("gumdrops", ModRegistry.GUMDROPS_BUTTONS.get(DyeColor.GREEN).get().asItem());
-        addIcon("glow lights", ModRegistry.GLOW_LIGHTS_BLOCKS.get(null).get().asItem());
+        addIcon("glow lights", ModRegistry.GLOW_LIGHTS_ITEMS.get(null).get().asItem());
         addIcon("blocks and items", ModRegistry.CANDY_CANE_BLOCK.get());
         addIcon("snowy season", ModRegistry.SNOW_GLOBE.get());
         addIcon("misc", ModRegistry.GINGERBREAD_COOKIE.get());
