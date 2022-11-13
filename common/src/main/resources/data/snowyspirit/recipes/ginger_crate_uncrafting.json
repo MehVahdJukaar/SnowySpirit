@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {"item": "snowyspirit:ginger_crate"}
+  ],
+  "result": {
+    "item": "snowyspirit:ginger",
+    "count": 9
+  },
+  "conditions": [
+    {
+      "type": "snowyspirit:flag",
+      "flag": "candy_cane"
+    },
+    {
+      "type": "snowyspirit:flag",
+      "flag": "ginger"
+    }
+  ]
+}

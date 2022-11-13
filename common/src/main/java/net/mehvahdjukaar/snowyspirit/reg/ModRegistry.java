@@ -42,12 +42,7 @@ import java.util.function.Supplier;
 public class ModRegistry {
 
     //vanilla carpets
-    public static final BiMap<DyeColor, Item> CARPETS = Util.make(HashBiMap.create(), m -> {
-        for (DyeColor c : DyeColor.values()) {
-            m.put(c, Registry.ITEM.getOptional(new ResourceLocation(c.getName() + "_carpet")).orElse(
-                    Registry.ITEM.get(new ResourceLocation("tinted", c.getName() + "_carpet"))));
-        }
-    });
+    public static BiMap<DyeColor, Item> CARPETS;
 
     public static void init() {
         BlockSetAPI.addDynamicItemRegistration(ModRegistry::registerSledItems, WoodType.class);

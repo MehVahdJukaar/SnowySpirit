@@ -161,7 +161,6 @@ public class SledEntity extends Entity implements IInputListener, IExtraClientSp
         }
     }
 
-
     @Override
     protected void defineSynchedData() {
         this.entityData.define(DATA_ID_TYPE, WoodTypeRegistry.OAK_TYPE.toString());

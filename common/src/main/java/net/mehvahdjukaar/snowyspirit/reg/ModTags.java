@@ -18,5 +18,4 @@ public class ModTags {
     public static final TagKey<Biome> HAS_GINGER = TagKey.create(Registry.BIOME_REGISTRY, SnowySpirit.res("has_wild_ginger"));
     public static final TagKey<Biome> HAS_GINGER_DENSE = TagKey.create(Registry.BIOME_REGISTRY, SnowySpirit.res("has_wild_ginger_dense"));
 
-
 }

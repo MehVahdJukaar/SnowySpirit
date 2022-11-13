@@ -16,6 +16,7 @@ import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ShearsItem;
 import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -33,7 +34,10 @@ import org.jetbrains.annotations.Nullable;
 import javax.annotation.Nonnull;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Supplier;
 
+//TODO: add IColored
 public class GlowLightsBlock extends Block implements EntityBlock {
 
     public final DyeColor color;
@@ -134,4 +138,5 @@ public class GlowLightsBlock extends Block implements EntityBlock {
     public ItemStack getCloneItemStack(BlockGetter level, BlockPos pos, BlockState state) {
         return ModRegistry.GLOW_LIGHTS_ITEMS.get(this.color).get().getDefaultInstance();
     }
+
 }

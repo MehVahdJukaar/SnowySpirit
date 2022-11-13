@@ -18,6 +18,10 @@
     {
       "modid": "farmersdelight",
       "type": "forge:mod_loaded"
+    },
+    {
+      "type": "snowyspirit:flag",
+      "flag": "ginger"
     }
   ]
 }

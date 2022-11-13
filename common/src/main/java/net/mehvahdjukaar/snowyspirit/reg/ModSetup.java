@@ -1,13 +1,18 @@
 package net.mehvahdjukaar.snowyspirit.reg;
 
+import com.google.common.collect.HashBiMap;
 import net.mehvahdjukaar.moonlight.api.set.wood.WoodType;
 import net.mehvahdjukaar.snowyspirit.common.ai.WinterVillagerAI;
 import net.mehvahdjukaar.snowyspirit.common.entity.SledEntity;
 import net.mehvahdjukaar.snowyspirit.common.network.NetworkHandler;
+import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.BlockSource;
 import net.minecraft.core.Direction;
+import net.minecraft.core.Registry;
 import net.minecraft.core.dispenser.DefaultDispenseItemBehavior;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.ComposterBlock;
@@ -15,7 +20,15 @@ import net.minecraft.world.level.block.DispenserBlock;
 
 public class ModSetup {
 
+
     public static void setup() {
+
+        ModRegistry.CARPETS = Util.make(HashBiMap.create(), m -> {
+            for (DyeColor c : DyeColor.values()) {
+                m.put(c, Registry.ITEM.getOptional(new ResourceLocation(c.getName() + "_carpet")).orElse(
+                        Registry.ITEM.get(new ResourceLocation("tinted", c.getName() + "_carpet"))));
+            }
+        });
 
         NetworkHandler.registerMessages();
 

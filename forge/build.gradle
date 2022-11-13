@@ -160,6 +160,8 @@ dependencies {
 
 
     implementation 'org.jetbrains:annotations:22.0.0'
+
+    modImplementation("com.itayfeder.tinted:Tinted:1.19.2-1.1.0")
     modImplementation("curse.maven:farmers-delight-398521:3999157")
     modCompileOnly("curse.maven:serene-seasons-291874:3926300")
     modImplementation("net.mehvahdjukaar:moonlight-forge:${project.moonlight_version}")
