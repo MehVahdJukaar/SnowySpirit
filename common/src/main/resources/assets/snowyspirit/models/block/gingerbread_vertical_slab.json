@@ -1,0 +1,9 @@
+{
+    "parent": "supplementaries:block/vertical_slab",
+    "textures": {
+        "bottom": "snowyspirit:blocks/gingerbread",
+        "top": "snowyspirit:blocks/gingerbread",
+        "side": "snowyspirit:blocks/gingerbread",
+        "back": "snowyspirit:blocks/gingerbread"
+    }
+}

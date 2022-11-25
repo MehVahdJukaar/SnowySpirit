@@ -1,0 +1,27 @@
+{
+  "conditions": [
+    {
+      "flag": "ginger",
+      "type": "snowyspirit:flag"
+    },
+    {
+      "modid": "quark",
+      "type": "forge:mod_loaded"
+    }
+  ],
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " 1 ",
+    " 1 ",
+    " 1 "
+  ],
+  "key": {
+    "1": {
+      "item": "snowyspirit:gingerbread_slab"
+    }
+  },
+  "result": {
+    "item": "snowyspirit:gingerbread_vertical_slab",
+    "count": 3
+  }
+}

@@ -10,12 +10,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
 
-public class RegistryConfigs {
+public class ModConfigs {
 
     public static ConfigSpec SPEC;
 
     public static void earlyLoad() {
-        ConfigBuilder builder = ConfigBuilder.create(SnowySpirit.res("registry"), ConfigType.COMMON);
+        ConfigBuilder builder = ConfigBuilder.create(SnowySpirit.res("common"), ConfigType.COMMON);
         init(builder);
         builder.onChange(SnowySpirit::onConfigReload);
         SPEC = builder.build();

@@ -1,25 +1,27 @@
 package net.mehvahdjukaar.snowyspirit.reg;
 
+import com.google.common.base.Suppliers;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+import net.mehvahdjukaar.moonlight.api.block.ModStairBlock;
+import net.mehvahdjukaar.moonlight.api.block.VerticalSlabBlock;
 import net.mehvahdjukaar.moonlight.api.item.WoodBasedBlockItem;
 import net.mehvahdjukaar.moonlight.api.misc.Registrator;
 import net.mehvahdjukaar.moonlight.api.platform.PlatformHelper;
 import net.mehvahdjukaar.moonlight.api.platform.RegHelper;
 import net.mehvahdjukaar.moonlight.api.set.BlockSetAPI;
+import net.mehvahdjukaar.moonlight.api.set.BlocksColorAPI;
 import net.mehvahdjukaar.moonlight.api.set.wood.WoodType;
 import net.mehvahdjukaar.moonlight.api.set.wood.WoodTypeRegistry;
 import net.mehvahdjukaar.snowyspirit.SnowySpirit;
 import net.mehvahdjukaar.snowyspirit.common.block.*;
 import net.mehvahdjukaar.snowyspirit.common.entity.ContainerHolderEntity;
 import net.mehvahdjukaar.snowyspirit.common.entity.SledEntity;
+import net.mehvahdjukaar.snowyspirit.common.items.CandyCaneItem;
 import net.mehvahdjukaar.snowyspirit.common.items.EggnogItem;
 import net.mehvahdjukaar.snowyspirit.common.items.GlowLightsItem;
 import net.mehvahdjukaar.snowyspirit.common.items.SledItem;
-import net.mehvahdjukaar.snowyspirit.configs.RegistryConfigs;
-import net.minecraft.Util;
-import net.minecraft.core.Registry;
-import net.minecraft.resources.ResourceLocation;
+import net.mehvahdjukaar.snowyspirit.configs.ModConfigs;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
@@ -42,7 +44,13 @@ import java.util.function.Supplier;
 public class ModRegistry {
 
     //vanilla carpets
-    public static BiMap<DyeColor, Item> CARPETS;
+    public static final Supplier<BiMap<DyeColor, Item>> CARPETS = Suppliers.memoize(() -> {
+        var m = HashBiMap.<DyeColor, Item>create();
+        for (DyeColor c : DyeColor.values()) {
+            m.put(c, BlocksColorAPI.getColoredItem("carpet", c));
+        }
+        return m;
+    });
 
     public static void init() {
         BlockSetAPI.addDynamicItemRegistration(ModRegistry::registerSledItems, WoodType.class);
@@ -73,7 +81,7 @@ public class ModRegistry {
 
     public static final Map<WoodType, SledItem> SLED_ITEMS = new HashMap<>();
 
-    public static final CreativeModeTab MOD_TAB = !RegistryConfigs.MOD_TAB.get() ? null :
+    public static final CreativeModeTab MOD_TAB = !ModConfigs.MOD_TAB.get() ? null :
             PlatformHelper.createModTab(SnowySpirit.res(SnowySpirit.MOD_ID),
                     () -> SLED_ITEMS.get(WoodTypeRegistry.OAK_TYPE).getDefaultInstance(), false);
 
@@ -83,7 +91,7 @@ public class ModRegistry {
             CreativeModeTab.TAB_BUILDING_BLOCKS);
 
     public static final Supplier<Item> CANDY_CANE = regItem("candy_cane",
-            () -> new Item(new Item.Properties().tab(getTab(CreativeModeTab.TAB_FOOD, "candy_cane"))
+            () -> new CandyCaneItem(new Item.Properties().tab(getTab(CreativeModeTab.TAB_FOOD, "candy_cane"))
                     .food(new FoodProperties.Builder().nutrition(2).saturationMod(0.4f).build())));
 
     public static final Supplier<Item> GINGERBREAD_COOKIE = regItem("gingerbread_cookie",
@@ -100,6 +108,21 @@ public class ModRegistry {
     public static final Supplier<Block> GINGERBREAD_BLOCK = regWithItem("gingerbread", () ->
             new Block(BlockBehaviour.Properties.of(Material.STONE, MaterialColor.TERRACOTTA_ORANGE)
                     .sound(SoundType.WOOD).strength(1F)), CreativeModeTab.TAB_BUILDING_BLOCKS);
+
+    //slab
+    public static final Supplier<Block> GINGERBREAD_STAIRS = regWithItem("gingerbread_stairs", () -> new ModStairBlock(
+            GINGERBREAD_BLOCK, BlockBehaviour.Properties.copy(GINGERBREAD_BLOCK.get())
+    ), CreativeModeTab.TAB_BUILDING_BLOCKS);
+    //TODO: finish
+    //slab
+    public static final Supplier<Block> GINGERBREAD_SLAB = regWithItem("gingerbread_slab", () -> new SlabBlock(
+            BlockBehaviour.Properties.copy(GINGERBREAD_BLOCK.get())
+    ), CreativeModeTab.TAB_BUILDING_BLOCKS);
+
+    //vertical slab
+    public static final Supplier<Block> CHECKER_VERTICAL_SLAB = regWithItem("gingerbread_vertical_slab", () -> new VerticalSlabBlock(
+            BlockBehaviour.Properties.copy(GINGERBREAD_BLOCK.get())
+    ), PlatformHelper.isModLoaded("quark") ? CreativeModeTab.TAB_BUILDING_BLOCKS : null);
 
     public static final Supplier<Block> GINGERBREAD_FROSTED_BLOCK = regWithItem("gingerbread_frosted", () ->
             new Block(BlockBehaviour.Properties.copy(GINGERBREAD_BLOCK.get())), CreativeModeTab.TAB_BUILDING_BLOCKS);
@@ -163,7 +186,7 @@ public class ModRegistry {
 
     //gets the tab given or null if the item is disabled
     public static CreativeModeTab getTab(CreativeModeTab g, String regName) {
-        if (RegistryConfigs.isEnabled(regName)) {
+        if (ModConfigs.isEnabled(regName)) {
             return MOD_TAB == null ? g : MOD_TAB;
         }
         return null;

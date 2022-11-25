@@ -219,7 +219,7 @@ public class SledEntity extends Entity implements IInputListener, IExtraClientSp
                     this.spawnAtLocation(this.getSledItem());
                     DyeColor seat = this.getSeatType();
                     if (seat != null) {
-                        this.spawnAtLocation(ModRegistry.CARPETS.get(seat));
+                        this.spawnAtLocation(ModRegistry.CARPETS.get().get(seat));
                     }
                     if (this.hasWolf()) {
                         this.spawnAtLocation(Items.LEAD);
@@ -1110,7 +1110,7 @@ public class SledEntity extends Entity implements IInputListener, IExtraClientSp
                 this.playSound(SoundEvents.ARMOR_EQUIP_LEATHER, 0.5F, 1.0F);
 
                 //will crash with modded carpets. save actial item isntead. depends on implementation if we render carper or not
-                this.setSeatType(ModRegistry.CARPETS.inverse().get(stack.getItem()));
+                this.setSeatType(ModRegistry.CARPETS.get().inverse().get(stack.getItem()));
                 stack.shrink(1);
                 return InteractionResult.sidedSuccess(player.level.isClientSide);
             } else if (this.tryAddingChest(stack) != null) {

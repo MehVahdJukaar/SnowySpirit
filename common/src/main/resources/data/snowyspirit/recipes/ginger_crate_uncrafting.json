@@ -9,8 +9,8 @@
   },
   "conditions": [
     {
-      "type": "snowyspirit:flag",
-      "flag": "candy_cane"
+      "modid": "farmersdelight",
+      "type": "forge:mod_loaded"
     },
     {
       "type": "snowyspirit:flag",

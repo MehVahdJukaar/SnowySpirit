@@ -1,0 +1,14 @@
+
+{
+  "variants": {
+    "type=bottom": {
+      "model": "snowyspirit:block/gingerbread_slab"
+    },
+    "type=double": {
+      "model": "snowyspirit:block/gingerbread"
+    },
+    "type=top": {
+      "model": "snowyspirit:block/gingerbread_slab_top"
+    }
+  }
+}

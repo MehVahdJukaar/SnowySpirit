@@ -14,7 +14,7 @@ import net.mehvahdjukaar.moonlight.api.resources.textures.SpriteUtils;
 import net.mehvahdjukaar.moonlight.api.resources.textures.TextureImage;
 import net.mehvahdjukaar.moonlight.api.util.Utils;
 import net.mehvahdjukaar.snowyspirit.SnowySpirit;
-import net.mehvahdjukaar.snowyspirit.configs.RegistryConfigs;
+import net.mehvahdjukaar.snowyspirit.configs.ModConfigs;
 import net.mehvahdjukaar.snowyspirit.reg.ModRegistry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -27,7 +27,7 @@ public class ClientDynamicResourcesHandler extends DynClientResourcesProvider {
 
     public ClientDynamicResourcesHandler() {
         super(new DynamicTexturePack(SnowySpirit.res("generated_pack")));
-        this.dynamicPack.generateDebugResources = PlatformHelper.isDev() || RegistryConfigs.DEBUG_RESOURCES.get();
+        this.dynamicPack.generateDebugResources = PlatformHelper.isDev() || ModConfigs.DEBUG_RESOURCES.get();
     }
 
     @Override
@@ -37,7 +37,7 @@ public class ClientDynamicResourcesHandler extends DynClientResourcesProvider {
 
     @Override
     public boolean dependsOnLoadedPacks() {
-        return RegistryConfigs.PACK_DEPENDANT_ASSETS.get();
+        return ModConfigs.PACK_DEPENDANT_ASSETS.get();
     }
 
     @Override

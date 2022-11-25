@@ -5,7 +5,7 @@ import net.mehvahdjukaar.moonlight.api.entity.IExtraClientSpawnData;
 import net.mehvahdjukaar.moonlight.api.platform.PlatformHelper;
 import net.mehvahdjukaar.snowyspirit.SnowySpirit;
 import net.mehvahdjukaar.snowyspirit.reg.ModRegistry;
-import net.mehvahdjukaar.snowyspirit.integration.supp.SackHelper;
+import net.mehvahdjukaar.snowyspirit.integration.supp.SuppCompat;
 import net.mehvahdjukaar.snowyspirit.reg.ModTags;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.NonNullList;
@@ -492,7 +492,7 @@ public class ContainerHolderEntity extends Entity implements Container, MenuProv
 
     public AbstractContainerMenu createMenu(int id, Inventory pPlayerInventory) {
         if (isSack(containerStack.getItem())) {
-            return SackHelper.createMenu(id, pPlayerInventory, this);
+            return SuppCompat.createSackMenu(id, pPlayerInventory, this);
         } else if (!isNormalContainer(containerStack)) {
             return new ShulkerBoxMenu(id, pPlayerInventory, this);
         }
@@ -518,7 +518,7 @@ public class ContainerHolderEntity extends Entity implements Container, MenuProv
     }
 
     private static boolean isSack(Item i) {
-        return SnowySpirit.SUPPLEMENTARIES_INSTALLED && SackHelper.isSack(i);
+        return SnowySpirit.SUPPLEMENTARIES_INSTALLED && SuppCompat.isSack(i);
     }
 
 }

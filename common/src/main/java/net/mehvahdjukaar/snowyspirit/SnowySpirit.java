@@ -3,7 +3,7 @@ package net.mehvahdjukaar.snowyspirit;
 
 import net.mehvahdjukaar.moonlight.api.platform.PlatformHelper;
 import net.mehvahdjukaar.moonlight.api.platform.RegHelper;
-import net.mehvahdjukaar.snowyspirit.configs.RegistryConfigs;
+import net.mehvahdjukaar.snowyspirit.configs.ModConfigs;
 import net.mehvahdjukaar.snowyspirit.dynamicpack.ClientDynamicResourcesHandler;
 import net.mehvahdjukaar.snowyspirit.dynamicpack.ServerDynamicResourcesHandler;
 import net.mehvahdjukaar.snowyspirit.integration.FDCompat;
@@ -38,10 +38,10 @@ public class SnowySpirit {
 
 
     public static void commonInit() {
-        RegistryConfigs.earlyLoad();
+        ModConfigs.earlyLoad();
 
 
-        RegHelper.registerSimpleRecipeCondition(SnowySpirit.res("flag"), RegistryConfigs::isEnabled);
+        RegHelper.registerSimpleRecipeCondition(SnowySpirit.res("flag"), ModConfigs::isEnabled);
 
         ModSounds.init();
         ModRegistry.init();
@@ -72,11 +72,11 @@ public class SnowySpirit {
     public static void onConfigReload() {
 
         //refresh date after configs are loaded
-        int startM = RegistryConfigs.START_MONTH.get() - 1;
-        int startD = RegistryConfigs.START_DAY.get();
+        int startM = ModConfigs.START_MONTH.get() - 1;
+        int startD = ModConfigs.START_DAY.get();
 
-        int endM = RegistryConfigs.END_MONTH.get() - 1;
-        int endD = RegistryConfigs.END_DAY.get();
+        int endM = ModConfigs.END_MONTH.get() - 1;
+        int endD = ModConfigs.END_DAY.get();
 
         boolean inv = startM > endM;
 
@@ -90,7 +90,7 @@ public class SnowySpirit {
         //if seasonal use pumpkin placement time window
         IS_CHRISTMAS_REAL_TIME = today.after(start) && today.before(end);
 
-        USES_SEASON_MOD = SEASON_MOD_INSTALLED && RegistryConfigs.SEASONS_MOD_COMPAT.get();
+        USES_SEASON_MOD = SEASON_MOD_INSTALLED && ModConfigs.SEASONS_MOD_COMPAT.get();
 
         if (USES_SEASON_MOD) {
             SeasonModCompat.refresh();

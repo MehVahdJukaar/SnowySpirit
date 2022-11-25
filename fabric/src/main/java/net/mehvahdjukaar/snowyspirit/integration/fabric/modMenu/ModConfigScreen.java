@@ -4,7 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.mehvahdjukaar.moonlight.api.client.gui.LinkButton;
 import net.mehvahdjukaar.moonlight.api.integration.cloth_config.ClothConfigListScreen;
 import net.mehvahdjukaar.snowyspirit.SnowySpirit;
-import net.mehvahdjukaar.snowyspirit.configs.RegistryConfigs;
+import net.mehvahdjukaar.snowyspirit.configs.ModConfigs;
 import net.mehvahdjukaar.snowyspirit.reg.ModRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -21,7 +21,7 @@ public class ModConfigScreen extends ClothConfigListScreen {
         super(SnowySpirit.MOD_ID, ModRegistry.WREATH.get().asItem().getDefaultInstance(),
                 Component.literal(ChatFormatting.AQUA + "Snowy Spirit Configs"),
                 SnowySpirit.res("textures/blocks/gingerbread_frosted_block.png"),
-                parent, RegistryConfigs.SPEC);
+                parent, ModConfigs.SPEC);
     }
 
     @Override

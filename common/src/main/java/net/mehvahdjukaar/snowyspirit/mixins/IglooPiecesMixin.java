@@ -3,11 +3,9 @@ package net.mehvahdjukaar.snowyspirit.mixins;
 import net.mehvahdjukaar.snowyspirit.SnowySpirit;
 import net.mehvahdjukaar.snowyspirit.common.entity.ContainerHolderEntity;
 import net.mehvahdjukaar.snowyspirit.common.entity.SledEntity;
-import net.mehvahdjukaar.snowyspirit.configs.RegistryConfigs;
+import net.mehvahdjukaar.snowyspirit.configs.ModConfigs;
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ChunkPos;
@@ -30,9 +28,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.Random;
-import java.util.function.Function;
-
 @Mixin(IglooPieces.IglooPiece.class)
 public abstract class IglooPiecesMixin extends TemplateStructurePiece {
 
@@ -48,10 +43,10 @@ public abstract class IglooPiecesMixin extends TemplateStructurePiece {
 
     @Inject(method = "postProcess", at = @At("RETURN"))
     private void addSleds(WorldGenLevel worldGenLevel, StructureManager structureManager,
-                                   ChunkGenerator chunkGenerator, RandomSource pRandom, BoundingBox pBox,
-                                   ChunkPos chunkPos, BlockPos pos, CallbackInfo ci){
+                          ChunkGenerator chunkGenerator, RandomSource pRandom, BoundingBox pBox,
+                          ChunkPos chunkPos, BlockPos pos, CallbackInfo ci) {
 
-        if (pRandom.nextFloat() > 0.3 && RegistryConfigs.SLEDS.get()) {
+        if (pRandom.nextFloat() > 0.3 && ModConfigs.SLEDS.get()) {
 
             ResourceLocation resourcelocation = new ResourceLocation(this.templateName);
             if (resourcelocation.equals(new ResourceLocation("igloo/top"))) {
@@ -64,14 +59,17 @@ public abstract class IglooPiecesMixin extends TemplateStructurePiece {
                 BlockPos blockPos = new BlockPos(p.getX(), y, p.getZ());
                 if (pBox.isInside(blockPos)) {
                     Level level = worldGenLevel.getLevel();
-
-
-                    SledEntity sledEntity = new SledEntity(level, blockPos.getX() + 0.5, blockPos.getY() + 0.5, blockPos.getZ());
-                    ContainerHolderEntity c = sledEntity.tryAddingChest(Items.CHEST.getDefaultInstance());
-                    if (c != null) {
-                        c.setLootTable(SnowySpirit.res("chests/igloo_sled"), pRandom.nextLong());
-                    }
-                    level.addFreshEntity(sledEntity);
+                    //bukkit doesn't like spawn calls from another thread...
+                    var server = level.getServer();
+                    if (server == null) return;
+                    server.executeIfPossible(() -> {
+                        SledEntity sledEntity = new SledEntity(level, blockPos.getX() + 0.5, blockPos.getY() + 0.5, blockPos.getZ());
+                        ContainerHolderEntity c = sledEntity.tryAddingChest(Items.CHEST.getDefaultInstance());
+                        if (c != null) {
+                            c.setLootTable(SnowySpirit.res("chests/igloo_sled"), level.random.nextLong());
+                        }
+                        level.addFreshEntity(sledEntity);
+                    });
                 }
             }
         }
