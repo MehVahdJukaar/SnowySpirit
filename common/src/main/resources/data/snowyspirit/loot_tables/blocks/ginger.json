@@ -29,15 +29,6 @@
           ],
           "name": "snowyspirit:ginger_flower"
         }
-      ],
-      "conditions": [
-        {
-          "condition": "minecraft:block_state_property",
-          "block": "minecraft:wheat",
-          "properties": {
-            "age": "7"
-          }
-        }
       ]
     }
   ],
