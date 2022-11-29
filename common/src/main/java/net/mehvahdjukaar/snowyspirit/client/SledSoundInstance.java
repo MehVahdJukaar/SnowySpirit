@@ -81,6 +81,9 @@ public class SledSoundInstance extends AbstractTickableSoundInstance {
                 this.pitch = 1.0F;
             }
 
+            //amplify a bit since itwas too quiet
+            this.volume*=1.2f;
+
         } else {
             this.stop();
         }
