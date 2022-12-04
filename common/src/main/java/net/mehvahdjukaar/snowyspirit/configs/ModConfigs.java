@@ -64,7 +64,7 @@ public class ModConfigs {
         else if(key.contains("sled"))return SLEDS.get();
         else if(key.contains("gumdrop"))return GUMDROPS.get();
         else if(key.contains("glow_light"))return GLOW_LIGHTS.get();
-        else if(key.contains("ginger"))return GINGER.get();
+        else if(key.contains("ginger.json"))return GINGER.get();
         return CONFIGS_BY_NAME.getOrDefault(key, () -> true).get();
     }
 
@@ -110,7 +110,7 @@ public class ModConfigs {
         GUMDROPS = regConfig(builder, "gumdrops", true);
         GLOW_LIGHTS = regConfig(builder, "glow_lights", true);
         CANDY_CANE = regConfig(builder, "candy_cane", true);
-        GINGER = regConfig(builder, "ginger", true);
+        GINGER = regConfig(builder, "ginger.json", true);
         EGGNOG = regConfig(builder, "eggnog", true);
         WREATH = regConfig(builder, "wreath", true);
         SNOW_GLOBE = regConfig(builder, "snow_globe", true);

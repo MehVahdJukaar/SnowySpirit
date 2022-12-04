@@ -1,0 +1,9 @@
+{
+  "name": "ginger",
+  "color": "15127451",
+  "effectInstance": {
+    "effect": "minecraft:luck",
+    "duration": 200,
+    "amplifier": 0
+  }
+}

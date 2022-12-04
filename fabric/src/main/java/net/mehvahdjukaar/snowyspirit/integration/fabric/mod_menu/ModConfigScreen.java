@@ -1,8 +1,8 @@
-package net.mehvahdjukaar.snowyspirit.integration.fabric.modMenu;
+package net.mehvahdjukaar.snowyspirit.integration.fabric.mod_menu;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.mehvahdjukaar.moonlight.api.client.gui.LinkButton;
-import net.mehvahdjukaar.moonlight.api.integration.cloth_config.ClothConfigListScreen;
+import net.mehvahdjukaar.moonlight.api.platform.configs.fabric.FabricConfigListScreen;
 import net.mehvahdjukaar.snowyspirit.SnowySpirit;
 import net.mehvahdjukaar.snowyspirit.configs.ModConfigs;
 import net.mehvahdjukaar.snowyspirit.reg.ModRegistry;
@@ -15,14 +15,14 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Items;
 
-public class ModConfigScreen extends ClothConfigListScreen {
+public class ModConfigScreen extends FabricConfigListScreen {
 
     public ModConfigScreen(Screen parent) {
         super(SnowySpirit.MOD_ID, ModRegistry.WREATH.get().asItem().getDefaultInstance(),
                 Component.literal(ChatFormatting.AQUA + "Snowy Spirit Configs"),
                 SnowySpirit.res("textures/blocks/gingerbread_frosted_block.png"),
                 parent, ModConfigs.SPEC);
-    }
+    }MobEffects.
 
     @Override
     protected void addExtraButtons() {
@@ -75,7 +75,7 @@ public class ModConfigScreen extends ClothConfigListScreen {
         super.render(poseStack, mouseX, mouseY, partialTicks);
 
         var level = Minecraft.getInstance().level;
-        if(level != null && SnowySpirit.isChristmasSeason(level)) {
+        if (level != null && SnowySpirit.isChristmasSeason(level)) {
             int x = (int) (this.width * 0.93f);
             this.itemRenderer.renderAndDecorateFakeItem(Items.SNOWBALL.getDefaultInstance(), x, 16);
         }

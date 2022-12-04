@@ -139,11 +139,11 @@ public class ModRegistry {
     public static final Supplier<Block> GINGER_WILD = regWithItem("wild_ginger", () -> new WildGingerBlock(
             BlockBehaviour.Properties.copy(Blocks.TALL_GRASS)), CreativeModeTab.TAB_DECORATIONS);
 
-    public static final Supplier<Block> GINGER_CROP = regBlock("ginger", () ->
+    public static final Supplier<Block> GINGER_CROP = regBlock("ginger.json", () ->
             new GingerBlock(BlockBehaviour.Properties.of(Material.PLANT).noCollission().randomTicks().instabreak().sound(SoundType.CROP)));
     public static final Supplier<Item> GINGER_FLOWER = regItem("ginger_flower",
             () -> new ItemNameBlockItem(GINGER_CROP.get(), new Item.Properties().tab(CreativeModeTab.TAB_MISC)));
-    public static final Supplier<Item> GINGER = regItem("ginger",
+    public static final Supplier<Item> GINGER = regItem("ginger.json",
             () -> new Item(new Item.Properties().tab(CreativeModeTab.TAB_FOOD)));
 
     //pot
