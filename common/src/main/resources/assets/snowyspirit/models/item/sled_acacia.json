@@ -2,6 +2,6 @@
 {
   "parent": "item/generated",
   "textures": {
-    "layer0": "snowyspirit:items/sled_acacia"
+    "layer0": "snowyspirit:items/sleds/sled_acacia"
   }
 }
