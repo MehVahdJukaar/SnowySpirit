@@ -1,12 +1,11 @@
 package net.mehvahdjukaar.snowyspirit.wreath_stuff;
 
 import net.mehvahdjukaar.snowyspirit.SnowySpirit;
-import net.mehvahdjukaar.snowyspirit.common.block.WreathBlock;
-import net.mehvahdjukaar.snowyspirit.wreath_stuff.network.ClientBoundSyncAllWreaths;
 import net.mehvahdjukaar.snowyspirit.common.network.NetworkHandler;
-import net.mehvahdjukaar.snowyspirit.wreath_stuff.capabilities.CapabilityHandler;
-import net.mehvahdjukaar.snowyspirit.wreath_stuff.capabilities.WreathCapability;
 import net.mehvahdjukaar.snowyspirit.reg.ModRegistry;
+import net.mehvahdjukaar.snowyspirit.wreath_stuff.capabilities.ModCapabilities;
+import net.mehvahdjukaar.snowyspirit.wreath_stuff.capabilities.WreathCapability;
+import net.mehvahdjukaar.snowyspirit.wreath_stuff.network.ClientBoundSyncAllWreaths;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
@@ -27,12 +26,12 @@ public class ServerEvents {
 
     @SubscribeEvent
     public static void registerCapabilities(RegisterCapabilitiesEvent event) {
-        CapabilityHandler.register(event);
+        ModCapabilities.register(event);
     }
 
     @SubscribeEvent
     public static void attachCapabilities(AttachCapabilitiesEvent<Level> event) {
-        CapabilityHandler.attachCapabilities(event);
+        ModCapabilities.attachCapabilities(event);
     }
 
     @SubscribeEvent(priority = EventPriority.LOW)
@@ -55,7 +54,7 @@ public class ServerEvents {
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void tickEvent(TickEvent.LevelTickEvent event) {
         if (event.phase == TickEvent.Phase.END && event.level instanceof ServerLevel level) {
-            level.getCapability(CapabilityHandler.WREATH_CAPABILITY).ifPresent(c -> c.updateAllBlocks(level));
+            level.getCapability(ModCapabilities.WREATH_CAPABILITY).ifPresent(c -> c.updateAllBlocks(level));
         }
     }
 
@@ -63,7 +62,7 @@ public class ServerEvents {
     public static void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {
         ServerPlayer player = (ServerPlayer) event.getEntity();
         ServerLevel level = player.getLevel();
-        WreathCapability cap = level.getCapability(CapabilityHandler.WREATH_CAPABILITY).orElse(null);
+        WreathCapability cap = ModCapabilities.get(level, ModCapabilities.WREATH_CAPABILITY);
         if (cap != null)
             NetworkHandler.CHANNEL.sendToClientPlayer(player,
                     new ClientBoundSyncAllWreaths(cap.getWreathBlocks().keySet()));
@@ -73,7 +72,7 @@ public class ServerEvents {
     public static void onDimensionChanged(PlayerEvent.PlayerChangedDimensionEvent event) {
         ServerPlayer player = (ServerPlayer) event.getEntity();
         ServerLevel level = player.getLevel();
-        WreathCapability cap = level.getCapability(CapabilityHandler.WREATH_CAPABILITY).orElse(null);
+        WreathCapability cap = ModCapabilities.get(level, ModCapabilities.WREATH_CAPABILITY);
         if (cap != null)
             NetworkHandler.CHANNEL.sendToClientPlayer(player,
                     new ClientBoundSyncAllWreaths(cap.getWreathBlocks().keySet()));

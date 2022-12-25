@@ -3,9 +3,8 @@ package net.mehvahdjukaar.snowyspirit.wreath_stuff.ai;
 
 import com.google.common.collect.ImmutableMap;
 import net.mehvahdjukaar.snowyspirit.SnowySpirit;
-import net.mehvahdjukaar.snowyspirit.common.block.WreathBlock;
 import net.mehvahdjukaar.snowyspirit.wreath_stuff.WreathHelper;
-import net.mehvahdjukaar.snowyspirit.wreath_stuff.capabilities.CapabilityHandler;
+import net.mehvahdjukaar.snowyspirit.wreath_stuff.capabilities.ModCapabilities;
 import net.mehvahdjukaar.snowyspirit.reg.ModMemoryModules;
 import net.mehvahdjukaar.snowyspirit.reg.ModRegistry;
 import net.minecraft.core.BlockPos;
@@ -131,7 +130,7 @@ public class PlaceWreathTask extends Behavior<Villager> {
         if (state.getBlock() instanceof DoorBlock) {
             boolean lower = state.getValue(DoorBlock.HALF) == DoubleBlockHalf.LOWER;
 
-            var c = serverLevel.getCapability(CapabilityHandler.WREATH_CAPABILITY).orElse(null);
+            var c = ModCapabilities.get(serverLevel, ModCapabilities.WREATH_CAPABILITY);
             return c != null && (lower ? !c.hasWreath(pos.above()) : !c.hasWreath(pos));
         }
 

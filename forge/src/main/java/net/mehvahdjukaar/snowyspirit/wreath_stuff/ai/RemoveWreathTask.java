@@ -2,7 +2,7 @@ package net.mehvahdjukaar.snowyspirit.wreath_stuff.ai;
 
 import com.google.common.collect.ImmutableMap;
 import net.mehvahdjukaar.snowyspirit.SnowySpirit;
-import net.mehvahdjukaar.snowyspirit.wreath_stuff.capabilities.CapabilityHandler;
+import net.mehvahdjukaar.snowyspirit.wreath_stuff.capabilities.ModCapabilities;
 import net.mehvahdjukaar.snowyspirit.wreath_stuff.network.ClientBoundSyncWreathMessage;
 import net.mehvahdjukaar.snowyspirit.common.network.NetworkHandler;
 import net.mehvahdjukaar.snowyspirit.reg.ModMemoryModules;
@@ -74,7 +74,7 @@ public class RemoveWreathTask extends Behavior<Villager> {
     }
 
     @Override
-    protected void tick(ServerLevel pLevel, Villager pOwner, long pGameTime) {
+    protected void tick(ServerLevel level, Villager pOwner, long pGameTime) {
         BlockPos pos = pOwner.getBrain().getMemory(ModMemoryModules.WREATH_POS.get()).get().pos();
 
         //hax
@@ -85,23 +85,24 @@ public class RemoveWreathTask extends Behavior<Villager> {
         if (pos.closerToCenterThan(pOwner.position(), 2.3)) {
             this.ticksSinceReached++;
 
-            BlockState state = pLevel.getBlockState(pos);
+            BlockState state = level.getBlockState(pos);
             if (state.getBlock() instanceof DoorBlock) {
                 boolean lower = state.getValue(DoorBlock.HALF) == DoubleBlockHalf.LOWER;
-                var c = pLevel.getCapability(CapabilityHandler.WREATH_CAPABILITY).orElse(null);
+                var c = ModCapabilities.get(level, ModCapabilities.WREATH_CAPABILITY);
+
                 pos = lower ? pos.above() : pos;
                 if (c != null && c.hasWreath(pos)) {
                     //breaking animation. same as fodder lol. might have the same issues
                     int k = (int) ((float) this.ticksSinceReached / (float) 10 * 10.0F);
                     if (k != this.lastBreakProgress) {
-                        pLevel.destroyBlockProgress(pOwner.getId(), pos, k);
+                        level.destroyBlockProgress(pOwner.getId(), pos, k);
                         this.lastBreakProgress = k;
                     }
 
                     if (ticksSinceReached > 10) {
 
                         pOwner.getBrain().eraseMemory(ModMemoryModules.WREATH_POS.get());
-                        c.removeWreath(pos, pLevel, true);
+                        c.removeWreath(pos, level, true);
                         NetworkHandler.CHANNEL.sendToAllClientPlayers(new ClientBoundSyncWreathMessage(pos, false));
                     }
                     return;

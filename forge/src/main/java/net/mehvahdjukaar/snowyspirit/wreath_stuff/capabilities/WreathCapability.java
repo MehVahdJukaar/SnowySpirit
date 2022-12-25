@@ -32,7 +32,7 @@ public class WreathCapability implements ICapabilitySerializable<CompoundTag> {
 
     private final LazyOptional<WreathCapability> lazyOptional = LazyOptional.of(() -> this);
 
-    public Map<BlockPos, WreathData> wreathBlocks = new HashMap<>();
+    private final Map<BlockPos, WreathData> wreathBlocks = new HashMap<>();
 
     public void invalidate() {
         lazyOptional.invalidate();
@@ -41,7 +41,7 @@ public class WreathCapability implements ICapabilitySerializable<CompoundTag> {
     @Nonnull
     @Override
     public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
-        return cap == CapabilityHandler.WREATH_CAPABILITY ?
+        return cap == ModCapabilities.WREATH_CAPABILITY ?
                 lazyOptional.cast() : LazyOptional.empty();
     }
 
@@ -151,15 +151,33 @@ public class WreathCapability implements ICapabilitySerializable<CompoundTag> {
 
 
     public static class WreathData{
-        public Direction face = Direction.NORTH;
-        public boolean open = true;
-        public boolean hinge = true;
+        private Direction face = Direction.NORTH;
+        private boolean open = true;
+        private boolean hinge = true;
 
-        public boolean needsInitialization = true;
-        public Pair<Float, Float> openDimensions = null;
-        public Pair<Float, Float> closedDimensions = null;
+        private boolean needsInitialization = true;
+        private Pair<Float, Float> openDimensions = null;
+        private Pair<Float, Float> closedDimensions = null;
 
         public WreathData(BlockPos pos) {}
+
+        public Direction getDirection() {
+            if(this.open){
+                return this.hinge ? face.getCounterClockWise() : face.getClockWise();
+            }return this.face;
+        }
+
+        public boolean isOpen() {
+            return open;
+        }
+
+        public boolean isHinge() {
+            return hinge;
+        }
+
+        public Pair<Float, Float> getDimensions() {
+            return this.open ? openDimensions : closedDimensions;
+        }
     }
 
 }

@@ -22,7 +22,7 @@ public class ModConfigScreen extends FabricConfigListScreen {
                 Component.literal(ChatFormatting.AQUA + "Snowy Spirit Configs"),
                 SnowySpirit.res("textures/blocks/gingerbread_frosted_block.png"),
                 parent, ModConfigs.SPEC);
-    }MobEffects.
+    }
 
     @Override
     protected void addExtraButtons() {

@@ -32,7 +32,7 @@ dependencies {
     modImplementation("me.shedaniel.cloth:cloth-config-fabric:${project.cloth_version}") {
         exclude group: 'net.fabricmc.fabric-api'
     }
-    modImplementation "com.terraformersmc:modmenu:4.0.6", {
+    modCompileOnly "com.terraformersmc:modmenu:4.0.6", {
         exclude module: "fabric-api"
     }
 
@@ -41,7 +41,7 @@ dependencies {
 
     modImplementation("curse.maven:fabric-seasons-413523:3841956")
     modImplementation("net.mehvahdjukaar:moonlight-fabric:${project.moonlight_version}")
-    modImplementation("net.mehvahdjukaar:supplementaries-fabric:${project.supplementaries_version}") {
+    modCompileOnly("net.mehvahdjukaar:supplementaries-fabric:${project.supplementaries_version}") {
         exclude group: 'com.nhoryzon'
     }
     modImplementation("curse.maven:farmers-delight-fabric-482834:4061213")

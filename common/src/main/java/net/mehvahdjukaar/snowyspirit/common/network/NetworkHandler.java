@@ -6,11 +6,10 @@ import net.mehvahdjukaar.snowyspirit.SnowySpirit;
 
 public class NetworkHandler {
 
-    public static ChannelHandler CHANNEL;
+    public static final ChannelHandler CHANNEL = ChannelHandler.createChannel(SnowySpirit.res("network"));
+
 
     public static void registerMessages() {
-
-        CHANNEL = ChannelHandler.createChannel(SnowySpirit.res("network"));
 
         CHANNEL.register(NetworkDir.PLAY_TO_SERVER,
                 ServerBoundUpdateSledState.class,

@@ -6,10 +6,9 @@ import com.mojang.math.Vector3f;
 import net.mehvahdjukaar.moonlight.api.client.util.RenderUtil;
 import net.mehvahdjukaar.snowyspirit.SnowySpirit;
 import net.mehvahdjukaar.snowyspirit.common.IInputListener;
-import net.mehvahdjukaar.snowyspirit.integration.configured.ModConfigSelectScreen;
-import net.mehvahdjukaar.snowyspirit.wreath_stuff.capabilities.CapabilityHandler;
-import net.mehvahdjukaar.snowyspirit.wreath_stuff.capabilities.WreathCapability;
 import net.mehvahdjukaar.snowyspirit.reg.ModRegistry;
+import net.mehvahdjukaar.snowyspirit.wreath_stuff.capabilities.ModCapabilities;
+import net.mehvahdjukaar.snowyspirit.wreath_stuff.capabilities.WreathCapability;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.Input;
@@ -39,7 +38,7 @@ public class ClientEvents {
             ClientLevel level = Minecraft.getInstance().level;
             //Minecraft.getInstance().setScreen(new ModConfigSelectScreen(Minecraft.getInstance().screen));
             if (level != null) {
-                level.getCapability(CapabilityHandler.WREATH_CAPABILITY).ifPresent(c -> c.refreshClientBlocksVisuals(level));
+                level.getCapability(ModCapabilities.WREATH_CAPABILITY).ifPresent(c -> c.refreshClientBlocksVisuals(level));
             }
         }
     }
@@ -52,8 +51,7 @@ public class ClientEvents {
             Level level = mc.player.level;
             PoseStack poseStack = event.getPoseStack();
             Vec3 cameraPos = mc.gameRenderer.getMainCamera().getPosition();
-            WreathCapability capability = level.getCapability(CapabilityHandler.WREATH_CAPABILITY, null).orElse(null);
-
+            var capability = ModCapabilities.get(level, ModCapabilities.WREATH_CAPABILITY);
             if (capability != null) {
                 float dist = mc.gameRenderer.getRenderDistance();
                 dist *= dist;
@@ -71,18 +69,14 @@ public class ClientEvents {
                         poseStack.pushPose();
                         poseStack.translate(pos.getX() - cameraPos.x(), pos.getY() - cameraPos.y(), pos.getZ() - cameraPos.z());
 
-                        //int pPackedLight = getLight(pos, level);
                         WreathCapability.WreathData data = entry.getValue();
-                        Direction dir = data.face;
-                        boolean open = data.open;
-                        if (open) {
-                            dir = data.hinge ? dir.getCounterClockWise() : dir.getClockWise();
-                        }
+                        Direction dir = data.getDirection();
+
                         BlockState state = ModRegistry.WREATH.get().defaultBlockState();
                         BlockRenderDispatcher blockRenderer = mc.getBlockRenderer();
                         poseStack.translate(0.5, 0.5, 0.5);
 
-                        var dim = open ? data.openDimensions : data.closedDimensions;
+                        var dim = data.getDimensions();
 
                         if (dim != null) {
                             poseStack.pushPose();
@@ -109,7 +103,6 @@ public class ClientEvents {
         }
     }
 
-    //TODO: fabric
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void onInputUpdate(MovementInputUpdateEvent event) {
         Minecraft mc = Minecraft.getInstance();

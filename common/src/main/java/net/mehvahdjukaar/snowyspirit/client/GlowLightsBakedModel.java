@@ -2,6 +2,7 @@ package net.mehvahdjukaar.snowyspirit.client;
 
 import net.mehvahdjukaar.moonlight.api.client.model.CustomBakedModel;
 import net.mehvahdjukaar.moonlight.api.client.model.ExtraModelData;
+import net.mehvahdjukaar.snowyspirit.common.block.GlowLightsBlock;
 import net.mehvahdjukaar.snowyspirit.common.block.GlowLightsBlockTile;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderType;
@@ -39,18 +40,21 @@ public class GlowLightsBakedModel implements CustomBakedModel {
                 BlockState mimic = extraData.get(GlowLightsBlockTile.MIMIC);
                 if (mimic != null && !mimic.isAir()) {
                     BakedModel model = blockModelShaper.getBlockModel(mimic);
-
-                    quads.addAll(model.getQuads(mimic, side, rand));
+                    quads.addAll(model.getQuads(state, side, rand));
                 }
             } catch (Exception ignored) {
             }
 
             //need to be added later so they go ontop
 
-            quads.addAll(overlay.getQuads(state, side, rand));
+            var overlay = this.overlay.getQuads(state, side, rand);
+            if (GlowLightsBlock.hasSide(state, side)) {
+                quads.addAll(overlay);
+            }
         }
         return quads;
     }
+
 
     @Override
     public TextureAtlasSprite getBlockParticle(ExtraModelData data) {

@@ -2,14 +2,12 @@ package net.mehvahdjukaar.snowyspirit.wreath_stuff.capabilities;
 
 import net.mehvahdjukaar.snowyspirit.SnowySpirit;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.CapabilityManager;
-import net.minecraftforge.common.capabilities.CapabilityToken;
-import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
+import net.minecraftforge.common.capabilities.*;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 
-public class CapabilityHandler {
+import javax.annotation.Nullable;
 
+public class ModCapabilities {
 
     public static final Capability<WreathCapability> WREATH_CAPABILITY = CapabilityManager.get(new CapabilityToken<>() {
     });
@@ -24,5 +22,10 @@ public class CapabilityHandler {
         event.addListener(wreathProvider::invalidate);
     }
 
+    @SuppressWarnings("ConstantConditions")
+    @Nullable
+    public static <T> T get(ICapabilityProvider provider,Capability<T> cap){
+        return provider.getCapability(cap).orElse(null);
+    }
 
 }

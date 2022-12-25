@@ -29,23 +29,24 @@ public class GlowLightsItem extends Item {
     public InteractionResult useOn(UseOnContext context) {
         Player player = context.getPlayer();
         if (player != null && player.getAbilities().mayBuild) {
-            Level world = context.getLevel();
+            Level level = context.getLevel();
             BlockPos pos = context.getClickedPos();
-            BlockState clicked = world.getBlockState(pos);
-            if (GlowLightsBlockTile.isValidBlock(clicked, pos, world)) {
-                BlockState frame = this.block.getStateForPlacement(new BlockPlaceContext(context));
-                if(frame != null) {
-                    world.setBlockAndUpdate(pos, frame);
+            BlockState clicked = level.getBlockState(pos);
+            if (GlowLightsBlockTile.isValidBlock(clicked, pos, level)) {
+                level.removeBlock(pos, false);
+                BlockState glowLight = this.block.getStateForPlacement(new BlockPlaceContext(context));
+                if(glowLight != null) {
+                    level.setBlockAndUpdate(pos, glowLight);
 
-                    if (world.getBlockEntity(pos) instanceof GlowLightsBlockTile tile) {
+                    if (level.getBlockEntity(pos) instanceof GlowLightsBlockTile tile) {
 
                         SoundEvent sound = SoundEvents.AMETHYST_CLUSTER_HIT;
                         tile.acceptBlock(clicked);
-                        world.playSound(player, pos, sound, SoundSource.BLOCKS, (0.8f + 1.0F) / 2.0F,1 * 1.3F);
-                        if (!player.isCreative() && !world.isClientSide()) {
+                        level.playSound(player, pos, sound, SoundSource.BLOCKS, (0.8f + 1.0F) / 2.0F,1 * 1.3F);
+                        if (!player.isCreative() && !level.isClientSide()) {
                             context.getItemInHand().shrink(1);
                         }
-                        return InteractionResult.sidedSuccess(world.isClientSide);
+                        return InteractionResult.sidedSuccess(level.isClientSide);
                     }
                     return InteractionResult.FAIL;
                 }

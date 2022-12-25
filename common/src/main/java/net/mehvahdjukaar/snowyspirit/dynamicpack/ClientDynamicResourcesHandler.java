@@ -18,8 +18,12 @@ import net.mehvahdjukaar.snowyspirit.configs.ModConfigs;
 import net.mehvahdjukaar.snowyspirit.reg.ModRegistry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
 import org.apache.logging.log4j.Logger;
+
+import java.util.EnumMap;
+import java.util.Map;
 
 public class ClientDynamicResourcesHandler extends DynClientResourcesProvider {
 
@@ -28,6 +32,41 @@ public class ClientDynamicResourcesHandler extends DynClientResourcesProvider {
     public ClientDynamicResourcesHandler() {
         super(new DynamicTexturePack(SnowySpirit.res("generated_pack")));
         this.dynamicPack.generateDebugResources = PlatformHelper.isDev() || ModConfigs.DEBUG_RESOURCES.get();
+    }
+
+    private static final Map<DyeColor, float[]> COLORS = new EnumMap<>(DyeColor.class);
+
+    public static float[] getGlowLightColor(DyeColor color) {
+        return COLORS.get(color);
+    }
+
+    @Override
+    protected void onNormalReload(ResourceManager manager) {
+        super.onNormalReload(manager);
+
+        try {
+            var l = SpriteUtils.parsePaletteStrip(manager,
+                    ResType.PARTICLE_TEXTURES.getPath(SnowySpirit.res("glow_lights_colors")),
+                    DyeColor.values().length);
+            var i = l.iterator();
+            for (var d : DyeColor.values()) {
+                if (i.hasNext()) {
+                    addColor(d, i.next());
+                } else {
+                    //default for tinted
+                    addColor(d, d.getTextColor());
+                }
+            }
+        }catch (Exception e){
+            int aa = 1;
+        }
+    }
+
+    private static void addColor(DyeColor d, int c) {
+        int n = (c & 0xFF0000) >> 16;
+        int o = (c & 0xFF00) >> 8;
+        int p = (c & 0xFF);
+        COLORS.put(d, new float[]{n / 255.0F, o / 255.0F, p / 255.0F});
     }
 
     @Override
@@ -48,8 +87,7 @@ public class ClientDynamicResourcesHandler extends DynClientResourcesProvider {
         ModRegistry.SLED_ITEMS.forEach((wood, sled) -> {
 
             try {
-                dynamicPack.addSimilarJsonResource(itemModel,
-                        "sled_oak", wood.getVariantId("sled"));
+                this.addSimilarJsonResource(manager, itemModel, "sled_oak", wood.getVariantId("sled"));
             } catch (Exception ex) {
                 getLogger().error("Failed to generate Sled item model for {} : {}", sled, ex);
             }

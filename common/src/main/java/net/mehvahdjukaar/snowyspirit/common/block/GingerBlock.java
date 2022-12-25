@@ -22,8 +22,8 @@ public class GingerBlock extends CropBlock {
            Block.box(0.0D, 0.0D, 0.0D, 16.0D, 8.0D, 16.0D),
            Block.box(0.0D, 0.0D, 0.0D, 16.0D, 9.0D, 16.0D)};
 
-   public GingerBlock(BlockBehaviour.Properties p_51328_) {
-      super(p_51328_);
+   public GingerBlock(BlockBehaviour.Properties properties) {
+      super(properties);
    }
 
    @Override

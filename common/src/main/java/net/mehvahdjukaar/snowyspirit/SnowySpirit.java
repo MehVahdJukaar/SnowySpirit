@@ -32,9 +32,9 @@ public class SnowySpirit {
 
     public static final Logger LOGGER = LogManager.getLogger();
 
-    public static boolean SUPPLEMENTARIES_INSTALLED = PlatformHelper.isModLoaded("supplementaries");
-    public static boolean FARMERSDELIGHT_INSTALLED = PlatformHelper.isModLoaded("farmersdelight");
-    public static boolean SEASON_MOD_INSTALLED = PlatformHelper.isModLoaded(PlatformHelper.getPlatform().isForge() ? "sereneseasons" : "seasons");
+    public static final boolean SUPPLEMENTARIES_INSTALLED = PlatformHelper.isModLoaded("supplementaries");
+    public static final boolean FARMERSDELIGHT_INSTALLED = PlatformHelper.isModLoaded("farmersdelight");
+    public static final boolean SEASON_MOD_INSTALLED = PlatformHelper.isModLoaded(PlatformHelper.getPlatform().isForge() ? "sereneseasons" : "seasons");
 
 
     public static void commonInit() {

@@ -3,11 +3,7 @@ package net.mehvahdjukaar.snowyspirit.reg;
 import net.mehvahdjukaar.moonlight.api.client.model.NestedModelLoader;
 import net.mehvahdjukaar.moonlight.api.platform.ClientPlatformHelper;
 import net.mehvahdjukaar.snowyspirit.SnowySpirit;
-import net.mehvahdjukaar.snowyspirit.client.ContainerHolderEntityRenderer;
-import net.mehvahdjukaar.snowyspirit.client.QuiltModel;
-import net.mehvahdjukaar.snowyspirit.client.SledEntityRenderer;
-import net.mehvahdjukaar.snowyspirit.client.SledModel;
-import net.mehvahdjukaar.snowyspirit.client.GlowLightsBakedModel;
+import net.mehvahdjukaar.snowyspirit.client.*;
 import net.mehvahdjukaar.snowyspirit.common.block.GlowLightsBlockTile;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.color.block.BlockColor;
@@ -36,8 +32,14 @@ public class ClientRegistry {
         ClientPlatformHelper.addEntityRenderersRegistration(ClientRegistry::registerEntityRenderers);
         ClientPlatformHelper.addModelLoaderRegistration(ClientRegistry::registerModelLoaders);
         ClientPlatformHelper.addBlockColorsRegistration(ClientRegistry::registerBlockColors);
+        ClientPlatformHelper.addParticleRegistration(ClientRegistry::registerParticles);
+
+        SammysParticleHacks.init();
     }
 
+    private static void registerParticles(ClientPlatformHelper.ParticleEvent event) {
+        event.register(ModRegistry.GLOW_LIGHT_PARTICLE.get(), GlowLightParticle.Provider::new);
+    }
 
 
     public static void setup() {
