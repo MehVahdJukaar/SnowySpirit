@@ -66,7 +66,7 @@ public class ClientDynamicResourcesHandler extends DynClientResourcesProvider {
         int n = (c & 0xFF0000) >> 16;
         int o = (c & 0xFF00) >> 8;
         int p = (c & 0xFF);
-        COLORS.put(d, new float[]{n / 255.0F, o / 255.0F, p / 255.0F});
+        COLORS.put(d, new float[]{p / 255.0F, o / 255.0F, n / 255.0F});
     }
 
     @Override

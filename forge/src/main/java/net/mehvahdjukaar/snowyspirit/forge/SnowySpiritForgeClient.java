@@ -5,6 +5,8 @@ import net.mehvahdjukaar.snowyspirit.client.SammysParticleHacks;
 import net.mehvahdjukaar.snowyspirit.integration.configured.ModConfigSelectScreen;
 import net.mehvahdjukaar.snowyspirit.reg.ClientRegistry;
 import net.minecraft.world.entity.animal.Sheep;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.ShearsItem;
 import net.minecraftforge.api.distmarker.Dist;
@@ -37,9 +39,11 @@ public class SnowySpiritForgeClient {
         @SubscribeEvent
         public static void onRenderStage(RenderLevelStageEvent event) {
             if ((event.getStage() == RenderLevelStageEvent.Stage.AFTER_TRIPWIRE_BLOCKS)) {
-                SammysParticleHacks.renderLast(event.getPoseStack());
+
+           //     SammysParticleHacks.renderLast(event.getPoseStack());
             }
         }
+
         @SubscribeEvent
         public static void onRenderLast(RenderLevelLastEvent event) {
              //   SammysParticleHacks.renderLast(event.getPoseStack());

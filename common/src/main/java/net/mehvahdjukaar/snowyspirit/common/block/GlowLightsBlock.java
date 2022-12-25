@@ -71,7 +71,7 @@ public class GlowLightsBlock extends WaterBlock implements EntityBlock, IColored
 
     public GlowLightsBlock(DyeColor color) {
         super(Properties.copy(Blocks.OAK_LEAVES)
-                .lightLevel(s -> 10));
+                .lightLevel(s -> 6));
         this.color = color;
     }
 
@@ -95,7 +95,7 @@ public class GlowLightsBlock extends WaterBlock implements EntityBlock, IColored
     public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos currentPos, BlockPos neighborPos) {
         return super.updateShape(state, direction, neighborState, level, currentPos, neighborPos)
                 .setValue(DIR_MAP.get(direction),
-                        neighborState.isFaceSturdy(level, neighborPos, direction.getOpposite(), SupportType.FULL));
+                        !Block.isFaceFull(neighborState.getCollisionShape(level,neighborPos), direction.getOpposite()));
     }
 
     @Nullable
@@ -107,8 +107,7 @@ public class GlowLightsBlock extends WaterBlock implements EntityBlock, IColored
         for (var e : DIR_MAP.entrySet()) {
             Direction d = e.getKey();
             BlockPos p = pos.relative(d);
-            state = state.setValue(e.getValue(), level.getBlockState(p)
-                    .isFaceSturdy(level, p, d.getOpposite(), SupportType.FULL));
+            state = state.setValue(e.getValue(),  !Block.isFaceFull(level.getBlockState(p).getCollisionShape(level,p), d.getOpposite()));
         }
         return state;
     }
@@ -198,7 +197,7 @@ public class GlowLightsBlock extends WaterBlock implements EntityBlock, IColored
                                            RandomSource randomSource, DyeColor color) {
         Vec3 vec3 = Vec3.atCenterOf(pos);
         for (Direction direction : Direction.values()) {
-            if (randomSource.nextFloat() < 0.2f && hasSide(state,direction)) {
+            if (randomSource.nextFloat() < 0.1f && hasSide(state,direction)) {
                 int i = direction.getStepX();
                 int j = direction.getStepY();
                 int k = direction.getStepZ();
@@ -212,7 +211,6 @@ public class GlowLightsBlock extends WaterBlock implements EntityBlock, IColored
     }
 
     @Override
-    @PlatformOnly(PlatformOnly.FABRIC) //forge uses shearable interface
     public InteractionResult use(BlockState pState, Level level, BlockPos pos, Player pPlayer, InteractionHand pHand, BlockHitResult pHit) {
         ItemStack stack = pPlayer.getItemInHand(pHand);
         if (stack.getItem() instanceof ShearsItem) {
