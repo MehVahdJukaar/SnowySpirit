@@ -12,64 +12,16 @@ import java.util.function.Supplier;
 
 public class ModConfigs {
 
-    public static ConfigSpec SPEC;
-
-    public static void earlyLoad() {
-        ConfigBuilder builder = ConfigBuilder.create(SnowySpirit.res("common"), ConfigType.COMMON);
-        init(builder);
-        builder.onChange(SnowySpirit::onConfigReload);
-        SPEC = builder.build();
-        //load early
-        SPEC.loadFromFile();
-    }
-
-
-
-
-    private static Supplier<Boolean> regConfig(ConfigBuilder builder, String name, Boolean value) {
-        var config = builder.define(name, value);
-        CONFIGS_BY_NAME.put(name, config);
-        return config;
-    }
+    public static final ConfigSpec SPEC;
 
     private static final Map<String, Supplier<Boolean>> CONFIGS_BY_NAME = new HashMap<>();
 
-    public static Supplier<Integer> START_DAY;
-    public static Supplier<Integer> START_MONTH;
-
-    public static Supplier<Integer> END_DAY;
-    public static Supplier<Integer> END_MONTH;
-
-    public static Supplier<Boolean> SEASONS_MOD_COMPAT;
-
-    public static Supplier<Boolean> MOD_TAB;
-
-    public static Supplier<Boolean> CUSTOM_CONFIGURED_SCREEN;
-
-    public static Supplier<Boolean> PACK_DEPENDANT_ASSETS;
-    public static Supplier<Boolean> DEBUG_RESOURCES;
-
-    //registry stuff
-    public static Supplier<Boolean> SLEDS;
-    public static Supplier<Boolean> GUMDROPS;
-    public static Supplier<Boolean> GLOW_LIGHTS;
-    public static Supplier<Boolean> CANDY_CANE;
-    public static Supplier<Boolean> GINGER;
-    public static Supplier<Boolean> EGGNOG;
-    public static Supplier<Boolean> WREATH;
-    public static Supplier<Boolean> SNOW_GLOBE;
-
-    public static boolean isEnabled(String key) {
-        if(key.contains("candy_cane"))return CANDY_CANE.get();
-        else if(key.contains("sled"))return SLEDS.get();
-        else if(key.contains("gumdrop"))return GUMDROPS.get();
-        else if(key.contains("glow_light"))return GLOW_LIGHTS.get();
-        else if(key.contains("ginger"))return GINGER.get();
-        return CONFIGS_BY_NAME.getOrDefault(key, () -> true).get();
+    public static void init() {
     }
 
+    static{
+        ConfigBuilder builder = ConfigBuilder.create(SnowySpirit.res("common"), ConfigType.COMMON);
 
-    private static void init(ConfigBuilder builder) {
 
         builder.push("snowy_season");
 
@@ -116,5 +68,56 @@ public class ModConfigs {
         SNOW_GLOBE = regConfig(builder, "snow_globe", true);
 
         builder.pop();
+
+
+
+
+
+        builder.onChange(SnowySpirit::onConfigReload);
+        SPEC = builder.build();
+        //load early
+        SPEC.loadFromFile();
     }
+
+    public static final Supplier<Integer> START_DAY;
+    public static final Supplier<Integer> START_MONTH;
+
+    public static final Supplier<Integer> END_DAY;
+    public static final Supplier<Integer> END_MONTH;
+
+    public static final Supplier<Boolean> SEASONS_MOD_COMPAT;
+
+    public static final Supplier<Boolean> MOD_TAB;
+
+    public static final Supplier<Boolean> CUSTOM_CONFIGURED_SCREEN;
+
+    public static final Supplier<Boolean> PACK_DEPENDANT_ASSETS;
+    public static final Supplier<Boolean> DEBUG_RESOURCES;
+
+    //registry stuff
+    public static final Supplier<Boolean> SLEDS;
+    public static final Supplier<Boolean> GUMDROPS;
+    public static final Supplier<Boolean> GLOW_LIGHTS;
+    public static final Supplier<Boolean> CANDY_CANE;
+    public static final Supplier<Boolean> GINGER;
+    public static final Supplier<Boolean> EGGNOG;
+    public static final Supplier<Boolean> WREATH;
+    public static final Supplier<Boolean> SNOW_GLOBE;
+
+
+    private static Supplier<Boolean> regConfig(ConfigBuilder builder, String name, Boolean value) {
+        var config = builder.define(name, value);
+        CONFIGS_BY_NAME.put(name, config);
+        return config;
+    }
+
+    public static boolean isEnabled(String key) {
+        if(key.contains("candy_cane"))return CANDY_CANE.get();
+        else if(key.contains("sled"))return SLEDS.get();
+        else if(key.contains("gumdrop"))return GUMDROPS.get();
+        else if(key.contains("glow_light"))return GLOW_LIGHTS.get();
+        else if(key.contains("ginger"))return GINGER.get();
+        return CONFIGS_BY_NAME.getOrDefault(key, () -> true).get();
+    }
+
 }

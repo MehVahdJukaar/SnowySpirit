@@ -25,6 +25,8 @@ import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.monster.piglin.PiglinAi;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.vehicle.Minecart;
+import net.minecraft.world.entity.vehicle.MinecartChest;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ChestMenu;
 import net.minecraft.world.inventory.ShulkerBoxMenu;
@@ -453,9 +455,13 @@ public class ContainerHolderEntity extends Entity implements Container, MenuProv
             }
 
             this.lootTable = null;
-            LootContext.Builder builder = (new LootContext.Builder((ServerLevel) this.level)).withParameter(LootContextParams.ORIGIN, this.position()).withOptionalRandomSeed(this.lootTableSeed);
-            // Forge: add this entity to loot context, however, currently Vanilla uses 'this' for the player creating the chests. So we take over 'killer_entity' for this.
-            builder.withParameter(LootContextParams.KILLER_ENTITY, this);
+            LootContext.Builder builder = (new LootContext.Builder((ServerLevel) this.level))
+                    .withParameter(LootContextParams.ORIGIN, this.position()).withOptionalRandomSeed(this.lootTableSeed);
+
+            if(PlatformHelper.getPlatform().isForge()) {
+                // Forge: add this entity to loot context, however, currently Vanilla uses 'this' for the player creating the chests. So we take over 'killer_entity' for this.
+                builder.withParameter(LootContextParams.KILLER_ENTITY, this);
+            }
             if (pPlayer != null) {
                 builder.withLuck(pPlayer.getLuck()).withParameter(LootContextParams.THIS_ENTITY, pPlayer);
             }

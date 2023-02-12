@@ -34,19 +34,13 @@ public class SnowySpiritForgeClient {
         });
     }
 
-    @Mod.EventBusSubscriber(modid = SnowySpirit.MOD_ID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.FORGE)
-    public static class ClientEvents {
-        @SubscribeEvent
-        public static void onRenderStage(RenderLevelStageEvent event) {
-            if ((event.getStage() == RenderLevelStageEvent.Stage.AFTER_TRIPWIRE_BLOCKS)) {
-
-           //     SammysParticleHacks.renderLast(event.getPoseStack());
-            }
-        }
-
-        @SubscribeEvent
-        public static void onRenderLast(RenderLevelLastEvent event) {
-             //   SammysParticleHacks.renderLast(event.getPoseStack());
-        }
-    }
+//    @Mod.EventBusSubscriber(modid = SnowySpirit.MOD_ID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.FORGE)
+//    public static class ClientEvents {
+//        @SubscribeEvent
+//        public static void onRenderStage(RenderLevelStageEvent event) {
+//            if ((event.getStage() == RenderLevelStageEvent.Stage.AFTER_TRIPWIRE_BLOCKS)) {
+//           //     SammysParticleHacks.renderLast(event.getPoseStack());
+//            }
+//        }
+//    }
 }

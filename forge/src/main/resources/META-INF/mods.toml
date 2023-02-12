@@ -5,50 +5,46 @@ loaderVersion="[40,)"
 
 license="All rights reserved"
 
+issueTrackerURL = "https://github.com/MehVahdJukaar/christmas/issues"
+
 
 [[mods]] #mandatory
-# The modid of the mod
-modId="snowyspirit" #mandatory
+    modId="snowyspirit" #mandatory
 
-version="${version}" #mandatory
+    version="${version}" #mandatory
 
-displayName="Snowy Spirit" #mandatory
+    displayName="Snowy Spirit" #mandatory
 
+    displayURL = "https://www.curseforge.com/minecraft/mc-mods/snowy-spirit" #optional
 
-displayURL = "https://www.curseforge.com/minecraft/mc-mods/snowy-spirit" #optional
+    logoFile="icon.png" #optional
 
-logoFile="icon.png" #optional
+    credits="MehVahdJukaar, Plantkillable" #optional
 
-credits="MehVahdJukaar, Plantkillable" #optional
+    authors="MehVahdJukaar" #optional
 
-authors="MehVahdJukaar" #optional
+    description='''
+    Winter themed mod that adds working sleds and winter related items with related ai tweaks for villagers
+    '''
 
-itemIcon="snowyspirit:sled_oak" #catalogue icon
+[modproperties.snowyspirit]
+    catalogueItemIcon = "snowyspirit:sled_oak" #catalogue icon
+    configuredBackground = "snowyspirit:textures/blocks/gingerbread_frosted_block.png"
 
-configuredBackground= "snowyspirit:textures/blocks/gingerbread_frosted_block.png"
-
-description='''
-Winter themed mod that adds working sleds and winter related items with related ai tweaks for villagers
-'''
-# A dependency - use the . to indicate dependency for a specific modid. Dependencies are optional.
 [[dependencies.snowyspirit]] #optional
-    # the modid of the dependency
     modId="forge" #mandatory
-    # Does this dependency have to exist - if not, ordering below must be specified
     mandatory=true #mandatory
-    # The version range of the dependency
     versionRange="[40,)" #mandatory
-    # An ordering relationship for the dependency - BEFORE or AFTER required if the relationship is not mandatory
     ordering="NONE"
-    # Side this dependency is applied on - BOTH, CLIENT or SERVER
     side="BOTH"
-    # Here's another dependency
+
 [[dependencies.snowyspirit]]
     modId="minecraft"
     mandatory=true
     versionRange="[1.19,1.20)"
     ordering="NONE"
     side="BOTH"
+
 [[dependencies.snowyspirit]]
     modId="moonlight"
     mandatory=true

@@ -1,17 +1,26 @@
 package net.mehvahdjukaar.snowyspirit.client;
 
+import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.BufferBuilder;
+import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.math.Quaternion;
 import com.mojang.math.Vector3f;
 import net.mehvahdjukaar.moonlight.api.util.math.MthUtils;
 import net.minecraft.client.Camera;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.*;
+import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
+
+import static com.mojang.blaze3d.vertex.DefaultVertexFormat.PARTICLE;
 
 public class GlowLightParticle extends TextureSheetParticle {
 
@@ -24,47 +33,16 @@ public class GlowLightParticle extends TextureSheetParticle {
         super(arg, d, e, f);
         this.sprites = sprites;
         this.gravity = 0.0F;
-        this.lifetime = 18 + this.random.nextInt(12);
+        this.lifetime = 19 + this.random.nextInt(12);
         this.hasPhysics = false;
         this.alpha = 0;
         this.quadSize = 0;
         this.bbHeight = 0.2f;
         this.bbWidth = 0.2f;
-        this.deltaRot = MthUtils.nextWeighted(this.random, 0.03f, 300);
+        this.deltaRot = MthUtils.nextWeighted(this.random, 0.03f, 500);
         this.scale = 0.05f + MthUtils.nextWeighted(this.random, 0.15f, 1);
         this.roll = (float) (Math.PI * this.random.nextFloat());
     }
-
-
-    public void rend3er(VertexConsumer buffer, Camera camera, float partialTicks) {
-       // super.render(buffer, camera, partialTicks);
-
-        var magicBuffer = buffer;;SammysParticleHacks.getMagicBuffer();
-
-        float a = this.alpha;
-        float old = this.quadSize;
-        float oldO = this.oldQuadSize;
-
-        this.alpha = a * 0.4f;
-        super.render(magicBuffer, camera, partialTicks);
-
-        this.quadSize *= 0.5;
-        this.oldQuadSize *= 0.5;
-        this.alpha *= 0.65;
-        super.render(magicBuffer, camera, partialTicks);
-
-        this.quadSize *= 0.5;
-        this.oldQuadSize *= 0.5;
-        this.alpha *= 0.8;
-        super.render(magicBuffer, camera, partialTicks);
-        this.quadSize *= 0.5;
-        this.oldQuadSize *= 0.5;
-        this.alpha = a;
-        super.render(magicBuffer, camera, partialTicks);
-        this.quadSize = old;
-        this.oldQuadSize = oldO;
-    }
-
 
     @Override
     public void render(VertexConsumer buffer, Camera renderInfo, float partialTicks) {
@@ -99,12 +77,35 @@ public class GlowLightParticle extends TextureSheetParticle {
 
         float size = this.getQuadSize(partialTicks);
 
-        renderQuad(sprite,buffer,x,y,z,  lightColor, quadPos, size,
-                rCol,gCol,bCol,1);
+        int mode = 0;
 
-        this.setSprite(sprites.get(2,3));
-        renderQuad(sprite,buffer,x,y,z, lightColor, quadPos, size,
-                1,1,1,alpha*0.3f);
+        if(mode == 0){
+            renderQuad(sprite,buffer,x,y,z,  lightColor, quadPos, size,
+                    rCol,gCol,bCol, alpha*.4f);
+
+            this.setSprite(sprites.get(2,3));
+            renderQuad(sprite,buffer,x,y,z, lightColor, quadPos, size,
+                    0.5f+rCol/2f,0.5f+gCol/2f,0.5f+bCol/2f,alpha*0.6f);
+        }else if(mode == 1){
+            renderQuad(sprite, buffer, x, y, z, lightColor, quadPos, size * 1.5f,
+                    rCol, gCol, bCol, alpha * .3f);
+
+             renderQuad(sprite,buffer,x,y,z,  lightColor, quadPos, size,
+                      0.5f+rCol/2f,0.5f+gCol/2f,0.5f+bCol/2f, alpha*.4f);
+
+            this.setSprite(sprites.get(2,3));
+            renderQuad(sprite,buffer,x,y,z, lightColor, quadPos, size,
+                    1,1,1,alpha*0.3f);
+        }
+        else if(mode == 2){
+            renderQuad(sprite, buffer, x, y, z, lightColor, quadPos, size,
+                    rCol, gCol, bCol, alpha * .8f);
+
+            this.setSprite(sprites.get(2,3));
+            renderQuad(sprite,buffer,x,y,z, lightColor, quadPos, size,
+                    1,1,1,alpha*0.3f);
+        }
+
 
         this.setSprite(sprites.get(3,3));
         renderQuad(sprite, buffer,x,y,z, lightColor, quadPos, size,
@@ -148,7 +149,7 @@ public class GlowLightParticle extends TextureSheetParticle {
 
     @Override
     public ParticleRenderType getRenderType() {
-        return SammysParticleHacks.GLOW_LIGHT_PARTICLE_RENDER_TYPE;
+        return GLOW_LIGHT_PARTICLE_RENDER_TYPE;
     }
 
     @Override
@@ -193,4 +194,28 @@ public class GlowLightParticle extends TextureSheetParticle {
             return p;
         }
     }
+
+    public static final ParticleRenderType GLOW_LIGHT_PARTICLE_RENDER_TYPE = new ParticleRenderType() {
+        @Override
+        public void begin(BufferBuilder builder, TextureManager textureManager) {
+            RenderSystem.depthMask(false);
+            RenderSystem.setShaderTexture(0, TextureAtlas.LOCATION_PARTICLES);
+            RenderSystem.enableBlend();
+            RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE);
+            builder.begin(VertexFormat.Mode.QUADS, PARTICLE);
+            //SammysParticleHacks.PARTICLE_MATRIX =  RenderSystem.getModelViewMatrix();
+        }
+
+        @Override
+        public void end(Tesselator tesselator) {
+            tesselator.end();
+            RenderSystem.depthMask(true);
+            RenderSystem.disableBlend();
+            RenderSystem.defaultBlendFunc();
+        }
+
+        public String toString() {
+            return "PARTICLE_SHEET_ADDITIVE_TRANSLUCENT";
+        }
+    };
 }

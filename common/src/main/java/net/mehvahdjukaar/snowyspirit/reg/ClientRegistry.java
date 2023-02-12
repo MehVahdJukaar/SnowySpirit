@@ -91,7 +91,7 @@ public class ClientRegistry {
         public static int col(BlockState state, BlockAndTintGetter level, BlockPos pos, int tint) {
             if (level != null && pos != null) {
                 if (level.getBlockEntity(pos) instanceof GlowLightsBlockTile tile) {
-                    BlockState mimic = tile.mimic;
+                    BlockState mimic = tile.getHeldBlock();
                     if (mimic != null && !mimic.hasBlockEntity()) {
                         return Minecraft.getInstance().getBlockColors().getColor(mimic, level, pos, tint);
                     }

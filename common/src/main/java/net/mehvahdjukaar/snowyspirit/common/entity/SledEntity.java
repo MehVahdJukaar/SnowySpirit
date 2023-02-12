@@ -288,7 +288,6 @@ public class SledEntity extends Entity implements IInputListener, IExtraClientSp
 
     //all values are relative
 
-    @Nullable
     public float getAdditionalY() {
         return this.entityData.get(DATA_ADDITIONAL_Y);
     }
@@ -657,7 +656,7 @@ public class SledEntity extends Entity implements IInputListener, IExtraClientSp
             }
             if (Math.abs(xRot) < 0.01) {
                 Vec3 v = new Vec3(0, 0, 1);
-                v = v.yRot((float) ((-yRot / 180 * Math.PI)));
+                v = v.yRot((float) (-yRot / 180 * Math.PI));
 
                 double cross = v.cross(new Vec3(movement.x, 0, movement.z).normalize()).y;
                 //more particles!
@@ -734,7 +733,7 @@ public class SledEntity extends Entity implements IInputListener, IExtraClientSp
         if (this.maxUpStep > 0.0F && flag3 && (flag || flag2)) {
             Vec3 vec31 = collideBoundingBox(this, new Vec3(pVec.x, this.maxUpStep, pVec.z), aabb, this.level, list);
             Vec3 vec32 = collideBoundingBox(this, new Vec3(0.0D, this.maxUpStep, 0.0D), aabb.expandTowards(pVec.x, 0.0D, pVec.z), this.level, list);
-            if (vec32.y < (double) this.maxUpStep) {
+            if (vec32.y < this.maxUpStep) {
                 Vec3 vec33 = collideBoundingBox(this, new Vec3(pVec.x, 0.0D, pVec.z), aabb.move(vec32), this.level, list).add(vec32);
                 if (vec33.horizontalDistanceSqr() > vec31.horizontalDistanceSqr()) {
                     vec31 = vec33;
@@ -875,7 +874,7 @@ public class SledEntity extends Entity implements IInputListener, IExtraClientSp
                 return Status.IN_AIR;
             }
 
-            float friction = f / (float) k1;
+            float friction = f / k1;
             if (this.onGround) {
                 //alters friction when on slope
                 double slopeFriction = Mth.clamp(this.getXRot(), -45, 45) / 45f;

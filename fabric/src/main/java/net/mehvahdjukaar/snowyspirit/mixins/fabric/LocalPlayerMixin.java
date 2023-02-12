@@ -25,7 +25,7 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer {
 
     @Shadow @Final protected Minecraft minecraft;
 
-    public LocalPlayerMixin(ClientLevel clientLevel, GameProfile gameProfile, @Nullable ProfilePublicKey profilePublicKey) {
+    protected LocalPlayerMixin(ClientLevel clientLevel, GameProfile gameProfile, @Nullable ProfilePublicKey profilePublicKey) {
         super(clientLevel, gameProfile, profilePublicKey);
     }
 

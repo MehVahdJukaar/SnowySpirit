@@ -19,7 +19,9 @@ public class SeasonModCompatImpl {
 
     //if winder AI should be on
     public static boolean isWinter(Level level) {
-        return (VALID_WINTER_SEASONS.contains(SeasonHelper.getSeasonState(level).getSubSeason()));
+        var s = SeasonHelper.getSeasonState(level);
+        if (s == null) return false;
+        return (VALID_WINTER_SEASONS.contains(s.getSubSeason()));
     }
 
 

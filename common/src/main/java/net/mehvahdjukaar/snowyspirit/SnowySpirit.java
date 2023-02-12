@@ -38,7 +38,7 @@ public class SnowySpirit {
 
 
     public static void commonInit() {
-        ModConfigs.earlyLoad();
+        ModConfigs.init();
 
 
         RegHelper.registerSimpleRecipeCondition(SnowySpirit.res("flag"), ModConfigs::isEnabled);

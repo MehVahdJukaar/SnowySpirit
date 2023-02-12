@@ -1,8 +1,5 @@
 package net.mehvahdjukaar.snowyspirit.common.block;
 
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
-import dev.architectury.injectables.annotations.PlatformOnly;
 import net.mehvahdjukaar.moonlight.api.block.IColored;
 import net.mehvahdjukaar.moonlight.api.block.WaterBlock;
 import net.mehvahdjukaar.moonlight.api.platform.ForgeHelper;
@@ -31,7 +28,7 @@ import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.EntityBlock;
-import net.minecraft.world.level.block.SupportType;
+import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
@@ -47,7 +44,10 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
-import java.util.*;
+import java.util.Collections;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
 
 public class GlowLightsBlock extends WaterBlock implements EntityBlock, IColored {
     public final DyeColor color;
@@ -76,7 +76,7 @@ public class GlowLightsBlock extends WaterBlock implements EntityBlock, IColored
     }
 
     public static boolean hasSide(BlockState state, Direction direction) {
-        if(direction == null)return true;
+        if (direction == null) return true;
         return state.getValue(DIR_MAP.get(direction));
     }
 
@@ -95,7 +95,7 @@ public class GlowLightsBlock extends WaterBlock implements EntityBlock, IColored
     public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos currentPos, BlockPos neighborPos) {
         return super.updateShape(state, direction, neighborState, level, currentPos, neighborPos)
                 .setValue(DIR_MAP.get(direction),
-                        !Block.isFaceFull(neighborState.getCollisionShape(level,neighborPos), direction.getOpposite()));
+                        !Block.isFaceFull(neighborState.getCollisionShape(level, neighborPos), direction.getOpposite()));
     }
 
     @Nullable
@@ -107,7 +107,7 @@ public class GlowLightsBlock extends WaterBlock implements EntityBlock, IColored
         for (var e : DIR_MAP.entrySet()) {
             Direction d = e.getKey();
             BlockPos p = pos.relative(d);
-            state = state.setValue(e.getValue(),  !Block.isFaceFull(level.getBlockState(p).getCollisionShape(level,p), d.getOpposite()));
+            state = state.setValue(e.getValue(), !Block.isFaceFull(level.getBlockState(p).getCollisionShape(level, p), d.getOpposite()));
         }
         return state;
     }
@@ -134,7 +134,7 @@ public class GlowLightsBlock extends WaterBlock implements EntityBlock, IColored
         List<ItemStack> drops = super.getDrops(state, builder);
         if (builder.getParameter(LootContextParams.BLOCK_ENTITY) instanceof GlowLightsBlockTile tile) {
             //checks again if the content itself can be mined
-            BlockState heldState = tile.mimic;
+            BlockState heldState = tile.getHeldBlock();
             if (builder.getParameter(LootContextParams.THIS_ENTITY) instanceof ServerPlayer player) {
                 if (!ForgeHelper.canHarvestBlock(heldState, builder.getLevel(), new BlockPos(builder.getParameter(LootContextParams.ORIGIN)), player)) {
                     return drops;
@@ -168,9 +168,6 @@ public class GlowLightsBlock extends WaterBlock implements EntityBlock, IColored
         return 1;
     }
 
-    private static final List<DyeColor> COLORS = Arrays.stream(DyeColor.values()).filter(c ->
-            (c != DyeColor.BROWN && c != DyeColor.BLACK && c != DyeColor.GRAY && c != DyeColor.LIGHT_GRAY)).toList();
-
     @Override
     public void animateTick(BlockState pState, Level pLevel, BlockPos pPos, RandomSource pRandom) {
         if (pLevel.isRainingAt(pPos.above())) {
@@ -185,11 +182,7 @@ public class GlowLightsBlock extends WaterBlock implements EntityBlock, IColored
                 }
             }
         }
-        DyeColor c = this.color;
-        if (c == null) {
-            c = COLORS.get(pRandom.nextInt(COLORS.size()));
-        }
-        spawnParticlesOnBlockFaces(pLevel, pState, pPos, ModRegistry.GLOW_LIGHT_PARTICLE.get(), pRandom, c);
+        spawnParticlesOnBlockFaces(pLevel, pState, pPos, ModRegistry.GLOW_LIGHT_PARTICLE.get(), pRandom, this.color);
     }
 
 
@@ -197,14 +190,14 @@ public class GlowLightsBlock extends WaterBlock implements EntityBlock, IColored
                                            RandomSource randomSource, DyeColor color) {
         Vec3 vec3 = Vec3.atCenterOf(pos);
         for (Direction direction : Direction.values()) {
-            if (randomSource.nextFloat() < 0.1f && hasSide(state,direction)) {
+            if (randomSource.nextFloat() < 0.15f && hasSide(state, direction)) {
                 int i = direction.getStepX();
                 int j = direction.getStepY();
                 int k = direction.getStepZ();
                 double d0 = vec3.x + (i == 0 ? Mth.nextDouble(level.random, -0.5D, 0.5D) : i * 0.6D);
                 double d1 = vec3.y + (j == 0 ? Mth.nextDouble(level.random, -0.5D, 0.5D) : j * 0.6D);
                 double d2 = vec3.z + (k == 0 ? Mth.nextDouble(level.random, -0.5D, 0.5D) : k * 0.6D);
-                var c = ClientDynamicResourcesHandler.getGlowLightColor(color);
+                var c = ClientDynamicResourcesHandler.getGlowLightColor(color, randomSource);
                 level.addParticle(particleOptions, d0, d1, d2, c[0], c[1], c[2]);
             }
         }
@@ -231,7 +224,7 @@ public class GlowLightsBlock extends WaterBlock implements EntityBlock, IColored
     private List<ItemStack> shearAction(@Nullable Player player, @Nonnull ItemStack item, Level world, BlockPos pos, int fortune) {
         if (world.getBlockEntity(pos) instanceof GlowLightsBlockTile tile) {
             if (!world.isClientSide()) {
-                world.setBlockAndUpdate(pos, tile.mimic);
+                world.setBlockAndUpdate(pos, tile.getHeldBlock());
                 return Collections.singletonList(ModRegistry.GLOW_LIGHTS_ITEMS.get(color).get().getDefaultInstance());
             }
         }

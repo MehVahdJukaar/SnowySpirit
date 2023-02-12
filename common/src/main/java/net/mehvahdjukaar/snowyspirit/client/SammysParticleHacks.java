@@ -123,28 +123,4 @@ public class SammysParticleHacks {
         }
     }
 
-
-    public static final ParticleRenderType GLOW_LIGHT_PARTICLE_RENDER_TYPE = new ParticleRenderType() {
-        @Override
-        public void begin(BufferBuilder builder, TextureManager textureManager) {
-            RenderSystem.depthMask(false);
-            RenderSystem.setShaderTexture(0, TextureAtlas.LOCATION_PARTICLES);
-            RenderSystem.enableBlend();
-            RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE);
-            builder.begin(VertexFormat.Mode.QUADS, PARTICLE);
-            PARTICLE_MATRIX =  RenderSystem.getModelViewMatrix();
-        }
-
-        @Override
-        public void end(Tesselator tesselator) {
-            tesselator.end();
-            RenderSystem.depthMask(true);
-            RenderSystem.disableBlend();
-            RenderSystem.defaultBlendFunc();
-        }
-
-        public String toString() {
-            return "PARTICLE_SHEET_ADDITIVE_TRANSLUCENT";
-        }
-    };
 }
