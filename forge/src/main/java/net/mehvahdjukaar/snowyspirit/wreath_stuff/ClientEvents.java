@@ -5,7 +5,6 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Vector3f;
 import net.mehvahdjukaar.moonlight.api.client.util.RenderUtil;
 import net.mehvahdjukaar.snowyspirit.SnowySpirit;
-import net.mehvahdjukaar.snowyspirit.common.IInputListener;
 import net.mehvahdjukaar.snowyspirit.reg.ModRegistry;
 import net.mehvahdjukaar.snowyspirit.wreath_stuff.capabilities.ModCapabilities;
 import net.mehvahdjukaar.snowyspirit.wreath_stuff.capabilities.WreathCapability;
@@ -103,17 +102,5 @@ public class ClientEvents {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
-    public static void onInputUpdate(MovementInputUpdateEvent event) {
-        Minecraft mc = Minecraft.getInstance();
-        if (mc.player != null) {
-            Entity riddenEntity = mc.player.getVehicle();
-            Input movementInput = event.getInput();
-            if (riddenEntity instanceof IInputListener listener) {
-                listener.onInputUpdate(movementInput.left, movementInput.right,
-                        movementInput.up, movementInput.down,
-                        mc.options.keySprint.isDown(), movementInput.jumping);
-            }
-        }
-    }
+
 }

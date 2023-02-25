@@ -59,7 +59,9 @@ allprojects {
             url = "https://www.cursemaven.com"
             allowInsecureProtocol = true
         }
-
+        maven {
+            url "https://maven.firstdarkdev.xyz/snapshots"
+        }
     }
 
     tasks.withType(JavaCompile) {

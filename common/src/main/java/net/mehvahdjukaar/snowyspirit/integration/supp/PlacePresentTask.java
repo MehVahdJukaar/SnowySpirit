@@ -8,7 +8,6 @@ import net.mehvahdjukaar.snowyspirit.reg.ModMemoryModules;
 import net.mehvahdjukaar.supplementaries.common.block.blocks.PresentBlock;
 import net.mehvahdjukaar.supplementaries.common.block.tiles.PresentBlockTile;
 import net.mehvahdjukaar.supplementaries.configs.CommonConfigs;
-import net.mehvahdjukaar.supplementaries.configs.RegistryConfigs;
 import net.mehvahdjukaar.supplementaries.reg.ModRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -36,7 +35,7 @@ import javax.annotation.Nullable;
 public class PlacePresentTask extends Behavior<Villager> {
 
     public static boolean isPresentOn() {
-        return CommonConfigs.Utilities.PRESENT_ENABLED.get();
+        return CommonConfigs.Functional.PRESENT_ENABLED.get();
     }
 
 

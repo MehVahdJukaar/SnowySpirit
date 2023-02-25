@@ -5,6 +5,7 @@ import net.minecraft.world.Container;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.Level;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.wrapper.InvWrapper;
@@ -16,7 +17,7 @@ import javax.annotation.Nullable;
 @Mixin(ContainerHolderEntity.class)
 public abstract class SelfContainerHolderEntityMixin extends Entity implements Container {
 
-    public SelfContainerHolderEntityMixin(EntityType<?> arg, Level arg2) {
+    protected SelfContainerHolderEntityMixin(EntityType<?> arg, Level arg2) {
         super(arg, arg2);
     }
 
@@ -27,7 +28,7 @@ public abstract class SelfContainerHolderEntityMixin extends Entity implements C
 
     @Override
     public <T> net.minecraftforge.common.util.LazyOptional<T> getCapability(net.minecraftforge.common.capabilities.Capability<T> capability, @Nullable net.minecraft.core.Direction facing) {
-        if (this.isAlive() && capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
+        if (this.isAlive() && capability == ForgeCapabilities.ITEM_HANDLER)
             return itemHandler.cast();
 
         return super.getCapability(capability, facing);

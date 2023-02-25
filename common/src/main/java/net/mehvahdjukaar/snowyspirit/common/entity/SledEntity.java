@@ -1,13 +1,13 @@
 package net.mehvahdjukaar.snowyspirit.common.entity;
 
 import com.google.common.collect.Lists;
+import net.mehvahdjukaar.moonlight.api.entity.IControllableVehicle;
 import net.mehvahdjukaar.moonlight.api.entity.IExtraClientSpawnData;
 import net.mehvahdjukaar.moonlight.api.platform.ForgeHelper;
 import net.mehvahdjukaar.moonlight.api.platform.PlatformHelper;
 import net.mehvahdjukaar.moonlight.api.set.wood.WoodType;
 import net.mehvahdjukaar.moonlight.api.set.wood.WoodTypeRegistry;
 import net.mehvahdjukaar.snowyspirit.client.SledSoundInstance;
-import net.mehvahdjukaar.snowyspirit.common.IInputListener;
 import net.mehvahdjukaar.snowyspirit.common.network.NetworkHandler;
 import net.mehvahdjukaar.snowyspirit.common.network.ServerBoundUpdateSledState;
 import net.mehvahdjukaar.snowyspirit.reg.ModRegistry;
@@ -63,7 +63,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.function.Supplier;
 
-public class SledEntity extends Entity implements IInputListener, IExtraClientSpawnData {
+public class SledEntity extends Entity implements IControllableVehicle, IExtraClientSpawnData {
     private static final EntityDataAccessor<Integer> DATA_ID_HURT = SynchedEntityData.defineId(SledEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> DATA_ID_HURT_DIR = SynchedEntityData.defineId(SledEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Float> DATA_ID_DAMAGE = SynchedEntityData.defineId(SledEntity.class, EntityDataSerializers.FLOAT);

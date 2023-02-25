@@ -53,11 +53,6 @@ public class ModConfigScreen extends CustomConfigScreen {
     }
 
     @Override
-    public boolean hasFancyBooleans() {
-        return true;
-    }
-
-    @Override
     public void onSave() {
     }
 
