@@ -9,11 +9,13 @@ public class NetworkHandler {
     public static final ChannelHandler CHANNEL = ChannelHandler.createChannel(SnowySpirit.res("network"));
 
 
-    public static void registerMessages() {
+    static {
 
-        CHANNEL.register(NetworkDir.PLAY_TO_SERVER,
-                ServerBoundUpdateSledState.class,
-                ServerBoundUpdateSledState::new);
+        CHANNEL.register(NetworkDir.PLAY_TO_SERVER, ServerBoundUpdateSledState.class, ServerBoundUpdateSledState::new);
+    }
+
+    public static void init(){
+
     }
 
 }

@@ -1,16 +1,12 @@
 package net.mehvahdjukaar.snowyspirit.reg;
 
-import com.google.common.collect.HashBiMap;
 import net.mehvahdjukaar.moonlight.api.set.wood.WoodType;
 import net.mehvahdjukaar.snowyspirit.common.ai.WinterVillagerAI;
 import net.mehvahdjukaar.snowyspirit.common.entity.SledEntity;
-import net.mehvahdjukaar.snowyspirit.common.network.NetworkHandler;
-import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.BlockSource;
 import net.minecraft.core.Direction;
 import net.minecraft.core.dispenser.DefaultDispenseItemBehavior;
-import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.ComposterBlock;
@@ -18,11 +14,9 @@ import net.minecraft.world.level.block.DispenserBlock;
 
 public class ModSetup {
 
+    public static boolean done = false;
 
     public static void setup() {
-
-        NetworkHandler.registerMessages();
-
         ComposterBlock.COMPOSTABLES.put(ModRegistry.GINGER_FLOWER.get(), 0.3F);
         ComposterBlock.COMPOSTABLES.put(ModRegistry.GINGER.get(), 0.65F);
         ComposterBlock.COMPOSTABLES.put(ModRegistry.GINGER_WILD.get(), 0.65F);
@@ -32,7 +26,7 @@ public class ModSetup {
 
         ModRegistry.SLED_ITEMS.forEach((key, value) ->
                 DispenserBlock.registerBehavior(value, new SledDispenserBehavior(key)));
-
+        done = true;
     }
 
 

@@ -29,6 +29,63 @@ subprojects {
         // The following line declares the yarn mappings you may select this one as well.
         // mappings "net.fabricmc:yarn:1.19+build.4:v2"
     }
+    var env = System.getenv()
+    var modLoader = name
+
+    var changelogFile = rootProject.file("changelog.md")
+    var changelogText = changelogFile.exists() ? changelogFile.text : ""
+
+    if (env.MODRINTH_TOKEN) {
+        modrinth {
+            projectId = rootProject.mod_id
+            uploadFile = tasks.remapJar
+            gameVersions = [rootProject.minecraft_version]
+            loaders = [modLoader]
+            changelog = changelogText
+
+            if (modLoader == "fabric") {
+                dependencies {
+                    required.project "fabric-api"
+                    required.project "moonlight"
+                }
+            } else {
+                dependencies {
+                    required.project "moonlight"
+                }
+            }
+        }
+    }
+
+    if (env.CURSEFORGE_TOKEN) {
+        curseforge {
+            apiKey = env.CURSEFORGE_TOKEN
+            project {
+                id = rootProject.project_id
+                changelog = changelogText
+                releaseType = 'release'
+                addGameVersion rootProject.minecraft_version
+                addGameVersion modLoader.capitalize()
+
+                mainArtifact(tasks.remapJar)
+
+                if (modLoader == "fabric") {
+                    relations {
+                        requiredDependency "fabric-api"
+                        requiredDependency "selene"
+
+                        optionalDependency("fabric-seasons")
+                    }
+                } else {
+                    relations {
+                        requiredDependency("selene")
+
+                        optionalDependency("supplementaries")
+                        optionalDependency("serene-seasons")
+                    }
+                }
+            }
+        }
+    }
 }
 
 allprojects {
@@ -48,11 +105,6 @@ allprojects {
 
         mavenLocal()
 
-        // Add repositories to retrieve artifacts from in here.
-        // You should only use this when depending on other mods because
-        // Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
-        // See https://docs.gradle.org/current/userguide/declaring_repositories.html
-        // for more information about repositories.
         maven { url "https://maven.parchmentmc.org" }
 
         maven {

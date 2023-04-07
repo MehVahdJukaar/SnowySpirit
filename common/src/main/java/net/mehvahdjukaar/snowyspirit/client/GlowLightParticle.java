@@ -8,10 +8,12 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.math.Quaternion;
 import com.mojang.math.Vector3f;
+import net.mehvahdjukaar.moonlight.api.client.util.ParticleUtil;
 import net.mehvahdjukaar.moonlight.api.util.math.MthUtils;
 import net.minecraft.client.Camera;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.*;
+import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureManager;
@@ -149,7 +151,7 @@ public class GlowLightParticle extends TextureSheetParticle {
 
     @Override
     public ParticleRenderType getRenderType() {
-        return GLOW_LIGHT_PARTICLE_RENDER_TYPE;
+        return ParticleUtil.ADDITIVE_TRANSLUCENCY_RENDER_TYPE;
     }
 
     @Override
@@ -194,28 +196,4 @@ public class GlowLightParticle extends TextureSheetParticle {
             return p;
         }
     }
-
-    public static final ParticleRenderType GLOW_LIGHT_PARTICLE_RENDER_TYPE = new ParticleRenderType() {
-        @Override
-        public void begin(BufferBuilder builder, TextureManager textureManager) {
-            RenderSystem.depthMask(false);
-            RenderSystem.setShaderTexture(0, TextureAtlas.LOCATION_PARTICLES);
-            RenderSystem.enableBlend();
-            RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE);
-            builder.begin(VertexFormat.Mode.QUADS, PARTICLE);
-            //SammysParticleHacks.PARTICLE_MATRIX =  RenderSystem.getModelViewMatrix();
-        }
-
-        @Override
-        public void end(Tesselator tesselator) {
-            tesselator.end();
-            RenderSystem.depthMask(true);
-            RenderSystem.disableBlend();
-            RenderSystem.defaultBlendFunc();
-        }
-
-        public String toString() {
-            return "PARTICLE_SHEET_ADDITIVE_TRANSLUCENT";
-        }
-    };
 }

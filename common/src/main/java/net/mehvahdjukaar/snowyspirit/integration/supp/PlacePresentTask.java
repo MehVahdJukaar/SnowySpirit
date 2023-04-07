@@ -35,7 +35,7 @@ import javax.annotation.Nullable;
 public class PlacePresentTask extends Behavior<Villager> {
 
     public static boolean isPresentOn() {
-        return CommonConfigs.Functional.PRESENT_ENABLED.get();
+        return CommonConfigs.isEnabled("present");
     }
 
 

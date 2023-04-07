@@ -14,7 +14,7 @@ public class ModConfigs {
 
     public static final ConfigSpec SPEC;
 
-    private static final Map<String, Supplier<Boolean>> CONFIGS_BY_NAME = new HashMap<>();
+    private static final Map<String, Supplier<Boolean>> FEATURE_TOGGLES = new HashMap<>();
 
     public static void init() {
     }
@@ -58,14 +58,61 @@ public class ModConfigs {
         builder.pop();
 
         builder.push("blocks_and_items");
-        SLEDS = regConfig(builder, "sleds", true);
-        GUMDROPS = regConfig(builder, "gumdrops", true);
-        GLOW_LIGHTS = regConfig(builder, "glow_lights", true);
-        CANDY_CANE = regConfig(builder, "candy_cane", true);
-        GINGER = regConfig(builder, "ginger", true);
-        EGGNOG = regConfig(builder, "eggnog", true);
-        WREATH = regConfig(builder, "wreath", true);
-        SNOW_GLOBE = regConfig(builder, "snow_globe", true);
+        GUMDROPS = feature(builder, "gumdrops");
+        GLOW_LIGHTS = feature(builder, "glow_lights");
+        CANDY_CANE = feature(builder, "candy_cane");
+        GINGER = feature(builder, "ginger");
+        EGGNOG = feature(builder, "eggnog");
+        WREATH = feature(builder, "wreath");
+        SNOW_GLOBE = feature(builder, "snow_globe");
+
+        builder.push("sleds");
+        SLEDS = feature(builder);
+
+        builder.push("physics").comment("Advanced settings. Use to alter sled physics");
+
+
+        builder.push("slipperiness").comment("Controls how sleds slide along other blocks." +
+                "In other words its the inverse of friction"+
+                "This number affect how the sled speed is multiplied each tick. A value of 1 will make it keep its velocity forever"+
+                "Increasing these values will effectively increase the sled top speed when on these blocks");
+        SAND_FRICTION = builder.define("sand_slipperiness", 0.83d, 0, 1);
+        SNOW_FRICTION = builder.define("snow_slipperiness",0.985d, 0,1);
+        ICE_FRICTION_MULTIPLIER = builder.comment("Used to decrease ice friction (for sleds)")
+                .define("ice_slipperiness_mult", 0.97, 0, 1);
+        SLOPE_FRICTION_INCREASE = builder.comment("Factor that will be added to a block slipperiness when the sled is considered on a slope (angled down)" +
+                "This is also scaled by the slope angle, applying the full number at 45 degrees." +
+                        "This config alters how fast sleds go down slopes")
+                        .define("slope_slipperiness_increment", 0.06,0,1);
+
+        ROTATION_FRICTION = builder.comment("Multiply angular velocity by this number each tick." +
+                "Can be thought of as rotational drag")
+                        .define("rotation_slipperiness", 0.92, 0,1);
+        ROTATION_FRICTION_ON_W = builder.comment("Same as above but applied when you are pressing W. " +
+                "Lower number makes it harder to steer when accelerating forward")
+                        .define("rotation_slipperiness_on forward acceleration", 0.75, 0, 1);
+        builder.pop();
+
+        builder.push("steering").comment("Controls the forces applied each tick when moving a sled" +
+                "Also effectively indirectly alters the sled max speed");
+        FORWARD_ACCELERATION = builder.comment("Intensity of velocity increase applied when pressing forward")
+                        .define("forward_acceleration", 0.015, 0,1);
+        FORWARD_ACCELERATION_WOLF = builder.comment("Same as above but only when sled has a wolf")
+                .define("forward_acceleration_with_wolf", 0.017, 0,1);
+        FORWARD_ACCELERATION_WHEN_NOT_ON_SNOW = builder.comment("Acceleration when not on snow. Note that this is noticeably higher since its the higher frictions of those blocks that dont allow the sled to move fast")
+                .define("forward_acceleration_when_not_on_snow", 0.037F, 0, 1);
+        BACKWARDS_ACCELERATION = builder.define("backwards_acceleration", 0.005, 0,1);
+        SIDE_ACCELERATION = builder.define("backwards_acceleration", 0.005, 0,1);
+
+        STEER_FACTOR = builder.comment("Affects the intensity of side steering")
+                        .define("steer_factor",0.042, 0, 1);
+        STEER_FACTOR_WOLF = builder.comment("Same as above but when a wolf is active")
+                .define("steer_factor",0.042+0.025, 0, 1);
+        builder.pop();
+
+
+
+        builder.pop();
 
         builder.pop();
 
@@ -78,6 +125,7 @@ public class ModConfigs {
         //load early
         SPEC.loadFromFile();
     }
+
 
     public static final Supplier<Integer> START_DAY;
     public static final Supplier<Integer> START_MONTH;
@@ -94,6 +142,22 @@ public class ModConfigs {
     public static final Supplier<Boolean> PACK_DEPENDANT_ASSETS;
     public static final Supplier<Boolean> DEBUG_RESOURCES;
 
+    public static final Supplier<Double> SAND_FRICTION;
+    public static final Supplier<Double> SNOW_FRICTION;
+    public static final Supplier<Double> ICE_FRICTION_MULTIPLIER;
+    public static final Supplier<Double> SLOPE_FRICTION_INCREASE;
+    public static final Supplier<Double> ROTATION_FRICTION;
+    public static final Supplier<Double> ROTATION_FRICTION_ON_W;
+
+    public static final Supplier<Double> FORWARD_ACCELERATION;
+    public static final Supplier<Double> FORWARD_ACCELERATION_WOLF;
+    public static final Supplier<Double> FORWARD_ACCELERATION_WHEN_NOT_ON_SNOW;
+    public static final Supplier<Double> BACKWARDS_ACCELERATION;
+    public static final Supplier<Double> SIDE_ACCELERATION;
+
+    public static final Supplier<Double> STEER_FACTOR;
+    public static final Supplier<Double> STEER_FACTOR_WOLF;
+
     //registry stuff
     public static final Supplier<Boolean> SLEDS;
     public static final Supplier<Boolean> GUMDROPS;
@@ -105,9 +169,17 @@ public class ModConfigs {
     public static final Supplier<Boolean> SNOW_GLOBE;
 
 
-    private static Supplier<Boolean> regConfig(ConfigBuilder builder, String name, Boolean value) {
-        var config = builder.define(name, value);
-        CONFIGS_BY_NAME.put(name, config);
+    private static Supplier<Boolean> feature(ConfigBuilder builder) {
+        return feature(builder, "enabled", builder.currentCategory(), true);
+    }
+
+    private static Supplier<Boolean> feature(ConfigBuilder builder, String name) {
+        return feature(builder, name, name, true);
+    }
+
+    private static Supplier<Boolean> feature(ConfigBuilder builder, String name, String key, boolean value) {
+        var config = builder.gameRestart().define(name, value);
+        FEATURE_TOGGLES.put(key, config);
         return config;
     }
 
@@ -117,7 +189,7 @@ public class ModConfigs {
         else if(key.contains("gumdrop"))return GUMDROPS.get();
         else if(key.contains("glow_light"))return GLOW_LIGHTS.get();
         else if(key.contains("ginger"))return GINGER.get();
-        return CONFIGS_BY_NAME.getOrDefault(key, () -> true).get();
+        return FEATURE_TOGGLES.getOrDefault(key, () -> true).get();
     }
 
 }

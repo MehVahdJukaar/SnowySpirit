@@ -10,6 +10,7 @@ import net.mehvahdjukaar.moonlight.api.set.wood.WoodTypeRegistry;
 import net.mehvahdjukaar.snowyspirit.client.SledSoundInstance;
 import net.mehvahdjukaar.snowyspirit.common.network.NetworkHandler;
 import net.mehvahdjukaar.snowyspirit.common.network.ServerBoundUpdateSledState;
+import net.mehvahdjukaar.snowyspirit.configs.ModConfigs;
 import net.mehvahdjukaar.snowyspirit.reg.ModRegistry;
 import net.mehvahdjukaar.snowyspirit.reg.ModTags;
 import net.minecraft.BlockUtil;
@@ -828,8 +829,8 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
             int i1 = Mth.floor(aabb1.minZ) - 1;
             int j1 = Mth.ceil(aabb1.maxZ) + 1;
             VoxelShape voxelshape = Shapes.create(aabb1);
-            float f = 0.0F;
-            int k1 = 0;
+            float cumulativeFriction = 0.0F;
+            int blockCount = 0;
             BlockPos.MutableBlockPos mutable = new BlockPos.MutableBlockPos();
             boolean onSnow = false;
             boolean onSnowLayer = false;
@@ -840,45 +841,45 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
                         for (int k2 = k; k2 < l; ++k2) {
                             if (j2 <= 0 || k2 != k && k2 != l - 1) {
                                 mutable.set(l1, k2, i2);
-                                final float snowFriction = 0.985f;
+                                final double snowFriction = ModConfigs.SNOW_FRICTION.get();
                                 BlockState above = this.level.getBlockState(mutable.above());
                                 if (above.getBlock() instanceof SnowLayerBlock ||
                                         (above.hasProperty(SnowLayerBlock.LAYERS) && above.is(ModTags.SLED_SNOW))) {
                                     onSnowLayer = true;
-                                    f += snowFriction;
-                                    ++k1;
+                                    cumulativeFriction += snowFriction;
+                                    ++blockCount;
                                     continue;
                                 }
                                 BlockState blockstate = this.level.getBlockState(mutable);
                                 if (blockstate.is(ModTags.SLED_SNOW)) {
                                     onSnow = true;
-                                    f += snowFriction;
-                                    ++k1;
+                                    cumulativeFriction += snowFriction;
+                                    ++blockCount;
                                 } else if (blockstate.is(ModTags.SLED_SAND)) {
                                     //sand friction
-                                    f += 0.83;
-                                    ++k1;
+                                    cumulativeFriction += ModConfigs.SAND_FRICTION.get();
+                                    ++blockCount;
                                 } else if (Shapes.joinIsNotEmpty(blockstate.getCollisionShape(this.level, mutable).move(l1, k2, i2), voxelshape, BooleanOp.AND)) {
                                     //decreases friction for blocks and ice in particular
                                     float fr = ForgeHelper.getFriction(blockstate,this.level, mutable, this);
-                                    if (fr > 0.9) fr *= 0.97;
-                                    f += fr;
-                                    ++k1;
+                                    if (fr > 0.9) fr *= ModConfigs.ICE_FRICTION_MULTIPLIER.get();
+                                    cumulativeFriction += fr;
+                                    ++blockCount;
                                 }
                             }
                         }
                     }
                 }
             }
-            if (f <= 0) {
+            if (cumulativeFriction <= 0) {
                 return Status.IN_AIR;
             }
 
-            float friction = f / k1;
+            float friction = cumulativeFriction / blockCount;
             if (this.onGround) {
                 //alters friction when on slope
                 double slopeFriction = Mth.clamp(this.getXRot(), -45, 45) / 45f;
-                friction += 0.06 * slopeFriction;
+                friction += ModConfigs.SLOPE_FRICTION_INCREASE.get() * slopeFriction;
             }
 
             this.landFriction = Math.min(0.9995f, friction);
@@ -924,10 +925,10 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
             invFriction *= inc;
         }
 
-        this.setDeltaMovement(movement.x * (double) invFriction, movement.y + gravity, movement.z * (double) invFriction);
+        this.setDeltaMovement(movement.x * invFriction, movement.y + gravity, movement.z * invFriction);
         //rotation friction
         //increase rotation friction when going forward. Turning is hard!
-        this.deltaRotation *= Math.min(invFriction, (this.inputUp ? 0.75 : 0.92));
+        this.deltaRotation *= Math.min(invFriction, (this.inputUp ? ModConfigs.ROTATION_FRICTION_ON_W.get() : ModConfigs.ROTATION_FRICTION.get()));
     }
 
     private void controlSled() {
@@ -937,7 +938,7 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
 
             boolean canSteer = !(this.inputRight && this.inputLeft) && this.inputUp;
             boolean hasWolf = this.hasWolf();
-            final double steerFactor = 0.042 + (hasWolf ? 0.025 : 0);
+            final double steerFactor = hasWolf ? ModConfigs.STEER_FACTOR_WOLF.get() : ModConfigs.STEER_FACTOR.get();
 
             if (this.inputLeft) {
                 --this.deltaRotation;
@@ -967,20 +968,22 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
                 }
             }
 
+            //side acceleration
             if (this.inputRight != this.inputLeft && !this.inputUp && !this.inputDown) {
-                powah += 0.005F;
+                powah += ModConfigs.SIDE_ACCELERATION.get();
             }
 
             this.setYRot(this.getYRot() + this.deltaRotation);
             if (this.inputUp) {
                 if (this.status.onSnow()) {
-                    double acceleration = hasWolf ? 0.017f : 0.015;
+                    double acceleration = hasWolf ? ModConfigs.FORWARD_ACCELERATION_WOLF.get() : ModConfigs.FORWARD_ACCELERATION.get();
                     powah += acceleration;//0.04F;
-                } else powah += 0.037F;
+                } else powah += ModConfigs.FORWARD_ACCELERATION_WHEN_NOT_ON_SNOW.get();
             }
 
+            //brake straight when pressing down
             if (this.inputDown) {
-                powah -= 0.005F;
+                powah -= ModConfigs.BACKWARDS_ACCELERATION.get();
             }
 
 
@@ -1037,24 +1040,24 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
         }
     }
 
-    public void setDamage(float p_38312_) {
-        this.entityData.set(DATA_ID_DAMAGE, p_38312_);
+    public void setDamage(float v) {
+        this.entityData.set(DATA_ID_DAMAGE, v);
     }
 
     public float getDamage() {
         return this.entityData.get(DATA_ID_DAMAGE);
     }
 
-    public void setHurtTime(int p_38355_) {
-        this.entityData.set(DATA_ID_HURT, p_38355_);
+    public void setHurtTime(int i) {
+        this.entityData.set(DATA_ID_HURT, i);
     }
 
     public int getHurtTime() {
         return this.entityData.get(DATA_ID_HURT);
     }
 
-    public void setHurtDir(int p_38363_) {
-        this.entityData.set(DATA_ID_HURT_DIR, p_38363_);
+    public void setHurtDir(int i) {
+        this.entityData.set(DATA_ID_HURT_DIR, i);
     }
 
     public int getHurtDir() {

@@ -5,7 +5,7 @@
       "model": "snowyspirit:block/gingerbread_slab"
     },
     "type=double": {
-      "model": "snowyspirit:block/gingerbread"
+      "model": "snowyspirit:block/gingerbread_block"
     },
     "type=top": {
       "model": "snowyspirit:block/gingerbread_slab_top"

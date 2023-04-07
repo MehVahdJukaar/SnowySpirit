@@ -3,6 +3,7 @@ package net.mehvahdjukaar.snowyspirit;
 
 import net.mehvahdjukaar.moonlight.api.platform.PlatformHelper;
 import net.mehvahdjukaar.moonlight.api.platform.RegHelper;
+import net.mehvahdjukaar.snowyspirit.common.network.NetworkHandler;
 import net.mehvahdjukaar.snowyspirit.configs.ModConfigs;
 import net.mehvahdjukaar.snowyspirit.dynamicpack.ClientDynamicResourcesHandler;
 import net.mehvahdjukaar.snowyspirit.dynamicpack.ServerDynamicResourcesHandler;
@@ -40,6 +41,7 @@ public class SnowySpirit {
     public static void commonInit() {
         ModConfigs.init();
 
+        NetworkHandler.init();
 
         RegHelper.registerSimpleRecipeCondition(SnowySpirit.res("flag"), ModConfigs::isEnabled);
 
@@ -59,9 +61,8 @@ public class SnowySpirit {
     //snow globe item texture
     //Do this shit next christmas
     //sleds loose their chest
-    //TODO: add glow light particles & emissive model
     //TODO: add advancements
-    //TODO: sync xRot, chest weight, configs, tweak values
+    //TODO: sync xRot, chest weight, tweak values
     //TODO: nerf sled acceleration without wolf to make wolf more relevant. can still be used for downhill descent
     //TODO: maybe make friction delend also on xRot to better handle slope descent
 
