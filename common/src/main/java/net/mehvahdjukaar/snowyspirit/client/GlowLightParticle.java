@@ -10,6 +10,7 @@ import com.mojang.math.Quaternion;
 import com.mojang.math.Vector3f;
 import net.mehvahdjukaar.moonlight.api.client.util.ParticleUtil;
 import net.mehvahdjukaar.moonlight.api.util.math.MthUtils;
+import net.mehvahdjukaar.snowyspirit.configs.ClientConfigs;
 import net.minecraft.client.Camera;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.*;
@@ -79,7 +80,7 @@ public class GlowLightParticle extends TextureSheetParticle {
 
         float size = this.getQuadSize(partialTicks);
 
-        int mode = 0;
+        int mode = ClientConfigs.PARTICLE_MODE.get()-1;
 
         if(mode == 0){
             renderQuad(sprite,buffer,x,y,z,  lightColor, quadPos, size,

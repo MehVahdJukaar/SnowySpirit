@@ -33,8 +33,6 @@ public class ClientRegistry {
         ClientPlatformHelper.addModelLoaderRegistration(ClientRegistry::registerModelLoaders);
         ClientPlatformHelper.addBlockColorsRegistration(ClientRegistry::registerBlockColors);
         ClientPlatformHelper.addParticleRegistration(ClientRegistry::registerParticles);
-
-        SammysParticleHacks.init();
     }
 
     private static void registerParticles(ClientPlatformHelper.ParticleEvent event) {

@@ -4,6 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.mehvahdjukaar.moonlight.api.client.gui.LinkButton;
 import net.mehvahdjukaar.moonlight.api.platform.configs.fabric.FabricConfigListScreen;
 import net.mehvahdjukaar.snowyspirit.SnowySpirit;
+import net.mehvahdjukaar.snowyspirit.configs.ClientConfigs;
 import net.mehvahdjukaar.snowyspirit.configs.ModConfigs;
 import net.mehvahdjukaar.snowyspirit.reg.ModRegistry;
 import net.minecraft.ChatFormatting;
@@ -21,7 +22,7 @@ public class ModConfigScreen extends FabricConfigListScreen {
         super(SnowySpirit.MOD_ID, ModRegistry.WREATH.get().asItem().getDefaultInstance(),
                 Component.literal(ChatFormatting.AQUA + "Snowy Spirit Configs"),
                 SnowySpirit.res("textures/blocks/gingerbread_frosted_block.png"),
-                parent, ModConfigs.SPEC);
+                parent, ModConfigs.SPEC, ClientConfigs.SPEC);
     }
 
     @Override

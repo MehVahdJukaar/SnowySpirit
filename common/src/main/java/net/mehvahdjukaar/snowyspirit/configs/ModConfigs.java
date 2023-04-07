@@ -47,9 +47,6 @@ public class ModConfigs {
         builder.pop();
 
         builder.push("misc");
-        PACK_DEPENDANT_ASSETS = builder.comment("Allows generated assets to depend on installed resource and data packs. " +
-                "This means that if for example you have a texture pack that changes the planks texture all generated sleds textures will be based off that one instead" +
-                "Disable to have it only use vanilla assets").define("pack_dependant_assets", true);
         DEBUG_RESOURCES = builder.comment("Save generated resources to disk in a 'debug' folder in your game directory. Mainly for debug purposes but can be used to generate assets in all wood types for your mods :0")
                 .define("debug_save_dynamic_pack", false);
         CUSTOM_CONFIGURED_SCREEN = builder.comment("Enables custom Configured config screen")
@@ -66,13 +63,16 @@ public class ModConfigs {
         WREATH = feature(builder, "wreath");
         SNOW_GLOBE = feature(builder, "snow_globe");
 
+        builder.pop();
+
+
         builder.push("sleds");
         SLEDS = feature(builder);
 
         builder.push("physics").comment("Advanced settings. Use to alter sled physics");
 
 
-        builder.push("slipperiness").comment("Controls how sleds slide along other blocks." +
+        builder.push("friction").comment("Controls how sleds slide along other blocks." +
                 "In other words its the inverse of friction"+
                 "This number affect how the sled speed is multiplied each tick. A value of 1 will make it keep its velocity forever"+
                 "Increasing these values will effectively increase the sled top speed when on these blocks");
@@ -80,17 +80,17 @@ public class ModConfigs {
         SNOW_FRICTION = builder.define("snow_slipperiness",0.985d, 0,1);
         ICE_FRICTION_MULTIPLIER = builder.comment("Used to decrease ice friction (for sleds)")
                 .define("ice_slipperiness_mult", 0.97, 0, 1);
-        SLOPE_FRICTION_INCREASE = builder.comment("Factor that will be added to a block slipperiness when the sled is considered on a slope (angled down)" +
-                "This is also scaled by the slope angle, applying the full number at 45 degrees." +
+        SLOPE_FRICTION_INCREASE = builder.comment("Factor that will be added to a block slipperiness when the sled is considered on a slope (angled down) " +
+                "This is also scaled by the slope angle, applying the full number at 45 degrees. " +
                         "This config alters how fast sleds go down slopes")
                         .define("slope_slipperiness_increment", 0.06,0,1);
 
-        ROTATION_FRICTION = builder.comment("Multiply angular velocity by this number each tick." +
+        ROTATION_FRICTION = builder.comment("Multiply angular velocity by this number each tick. " +
                 "Can be thought of as rotational drag")
                         .define("rotation_slipperiness", 0.92, 0,1);
         ROTATION_FRICTION_ON_W = builder.comment("Same as above but applied when you are pressing W. " +
                 "Lower number makes it harder to steer when accelerating forward")
-                        .define("rotation_slipperiness_on forward acceleration", 0.75, 0, 1);
+                        .define("rotation_slipperiness_on_forward_acceleration", 0.75, 0, 1);
         builder.pop();
 
         builder.push("steering").comment("Controls the forces applied each tick when moving a sled" +
@@ -107,17 +107,13 @@ public class ModConfigs {
         STEER_FACTOR = builder.comment("Affects the intensity of side steering")
                         .define("steer_factor",0.042, 0, 1);
         STEER_FACTOR_WOLF = builder.comment("Same as above but when a wolf is active")
-                .define("steer_factor",0.042+0.025, 0, 1);
+                .define("steer_factor_with_wolf",0.042+0.025, 0, 1);
         builder.pop();
 
 
-
         builder.pop();
 
         builder.pop();
-
-
-
 
 
         builder.onChange(SnowySpirit::onConfigReload);
@@ -139,7 +135,6 @@ public class ModConfigs {
 
     public static final Supplier<Boolean> CUSTOM_CONFIGURED_SCREEN;
 
-    public static final Supplier<Boolean> PACK_DEPENDANT_ASSETS;
     public static final Supplier<Boolean> DEBUG_RESOURCES;
 
     public static final Supplier<Double> SAND_FRICTION;

@@ -1,5 +1,5 @@
 {
-    "parent": "snowyspirit:block/vertical_slab",
+    "parent": "moonlight:block/vertical_slab",
     "textures": {
         "bottom": "snowyspirit:blocks/gingerbread_block",
         "top": "snowyspirit:blocks/gingerbread_block",

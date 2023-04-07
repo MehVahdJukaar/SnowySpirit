@@ -92,7 +92,7 @@ public class ClientDynamicResourcesHandler extends DynClientResourcesProvider {
 
     @Override
     public boolean dependsOnLoadedPacks() {
-        return ModConfigs.PACK_DEPENDANT_ASSETS.get();
+        return true;
     }
 
     @Override

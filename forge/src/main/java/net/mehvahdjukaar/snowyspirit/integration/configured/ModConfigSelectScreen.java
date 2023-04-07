@@ -6,6 +6,7 @@ import com.mrcrayfish.configured.client.util.ScreenUtil;
 import net.mehvahdjukaar.moonlight.api.client.gui.LinkButton;
 import net.mehvahdjukaar.moonlight.api.integration.configured.CustomConfigSelectScreen;
 import net.mehvahdjukaar.snowyspirit.SnowySpirit;
+import net.mehvahdjukaar.snowyspirit.configs.ClientConfigs;
 import net.mehvahdjukaar.snowyspirit.configs.ModConfigs;
 import net.mehvahdjukaar.snowyspirit.reg.ModRegistry;
 import net.minecraft.ChatFormatting;
@@ -23,7 +24,7 @@ public class ModConfigSelectScreen extends CustomConfigSelectScreen {
         super(SnowySpirit.MOD_ID, ModRegistry.WREATH.get().asItem().getDefaultInstance(),
                 ChatFormatting.AQUA+ "Snowy Spirit Configured",
                 SnowySpirit.res("textures/blocks/gingerbread_frosted_block.png"),
-                parent, ModConfigScreen::new, ModConfigs.SPEC);
+                parent, ModConfigScreen::new, ModConfigs.SPEC, ClientConfigs.SPEC);
     }
 
 

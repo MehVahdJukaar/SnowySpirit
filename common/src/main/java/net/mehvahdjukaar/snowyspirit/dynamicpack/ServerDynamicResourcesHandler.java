@@ -34,7 +34,7 @@ public class ServerDynamicResourcesHandler extends DynServerResourcesProvider {
 
     @Override
     public boolean dependsOnLoadedPacks() {
-        return ModConfigs.PACK_DEPENDANT_ASSETS.get();
+        return true;
     }
 
     @Override

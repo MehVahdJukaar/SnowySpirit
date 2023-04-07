@@ -9,6 +9,7 @@
     "IglooPiecesMixin",
     "PowderSnowMixin",
     "SnowballMixin"
+
   ],
   "client": [
     "LivingEntityRendererMixin"

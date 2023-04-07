@@ -1,6 +1,7 @@
 package net.mehvahdjukaar.snowyspirit.client;
 
 import net.mehvahdjukaar.snowyspirit.common.entity.SledEntity;
+import net.mehvahdjukaar.snowyspirit.configs.ClientConfigs;
 import net.mehvahdjukaar.snowyspirit.reg.ModRegistry;
 import net.mehvahdjukaar.snowyspirit.reg.ModSounds;
 import net.minecraft.client.Minecraft;
@@ -82,7 +83,7 @@ public class SledSoundInstance extends AbstractTickableSoundInstance {
             }
 
             //amplify a bit since itwas too quiet
-            this.volume*=1.2f;
+            this.volume*= ClientConfigs.SLED_SOUND_AMPLIFIER.get();
 
         } else {
             this.stop();

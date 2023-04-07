@@ -78,15 +78,12 @@ public class SledEntityRenderer extends EntityRenderer<SledEntity> {
         poseStack.scale(0.75F, 0.75F, 0.75F);
         poseStack.translate(-0.5, 0, -0.5);
 
-        //TODO: add carpets colors
-
         poseStack.popPose();
 
         ResourceLocation resourcelocation = this.getTextureLocation(sled);
 
         poseStack.scale(-1.0F, -1.0F, 1.0F);
 
-        //boatmodel.setupAnim(sled, partialTicks, 0.0F, -0.1F, 0.0F, 0.0F);
 
         VertexConsumer vertexconsumer = bufferSource.getBuffer(model.renderType(resourcelocation));
         model.renderToBuffer(poseStack, vertexconsumer, light, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
@@ -134,7 +131,7 @@ public class SledEntityRenderer extends EntityRenderer<SledEntity> {
         pBuffer.vertex(matrix4f, 0.0F, eye, 0.0F)
                 .color(0, 255, 0, 255)
                 .normal(matrix3f, (float) movement.x, (float) movement.y, (float) movement.z).endVertex();
-        pBuffer.vertex(matrix4f, (float) (movement.x * mult), (float) ((double) eye + movement.y * mult), (float) (movement.z * mult))
+        pBuffer.vertex(matrix4f, (float) (movement.x * mult), (float) (eye + movement.y * mult), (float) (movement.z * mult))
                 .color(0, 255, 0, 255)
                 .normal(matrix3f, (float) movement.x, (float) movement.y, (float) movement.z).endVertex();
 
@@ -152,7 +149,7 @@ public class SledEntityRenderer extends EntityRenderer<SledEntity> {
             pBuffer.vertex(matrix4f, 0.0F, eye, 0.0F)
                     .color(255, 255, 0, 255)
                     .normal(matrix3f, (float) movement.x, (float) movement.y, (float) movement.z).endVertex();
-            pBuffer.vertex(matrix4f, (float) (movement.x), (float) ((double) eye + movement.y), (float) (movement.z))
+            pBuffer.vertex(matrix4f, (float) (movement.x), (float) (eye + movement.y), (float) (movement.z))
                     .color(255, 255, 0, 255)
                     .normal(matrix3f, (float) movement.x, (float) movement.y, (float) movement.z).endVertex();
         }
@@ -237,10 +234,11 @@ public class SledEntityRenderer extends EntityRenderer<SledEntity> {
         }
     }
 
-    private static void addVertexPair(VertexConsumer p_174308_, Matrix4f p_174309_, float p_174310_, float p_174311_, float p_174312_, int p_174313_, int p_174314_, int p_174315_, int p_174316_, float p_174317_, float p_174318_, float p_174319_, float p_174320_, int p_174321_, boolean p_174322_) {
-        float f = (float) p_174321_ / 24.0F;
-        int i = (int) Mth.lerp(f, (float) p_174313_, (float) p_174314_);
-        int j = (int) Mth.lerp(f, (float) p_174315_, (float) p_174316_);
+    //stolen from leash renderer
+    private static void addVertexPair(VertexConsumer vertexConsumer, Matrix4f matrix4f, float p_174310_, float p_174311_, float p_174312_, int p_174313_, int p_174314_, int p_174315_, int p_174316_, float p_174317_, float p_174318_, float p_174319_, float p_174320_, int p_174321_, boolean p_174322_) {
+        float f =  p_174321_ / 24.0F;
+        int i = (int) Mth.lerp(f,  p_174313_,  p_174314_);
+        int j = (int) Mth.lerp(f,  p_174315_,  p_174316_);
         int k = LightTexture.pack(i, j);
         float f1 = p_174321_ % 2 == (p_174322_ ? 1 : 0) ? 0.7F : 1.0F;
         float f2 = 0.5F * f1;
@@ -249,8 +247,8 @@ public class SledEntityRenderer extends EntityRenderer<SledEntity> {
         float f5 = p_174310_ * f;
         float f6 = p_174311_ > 0.0F ? p_174311_ * f * f : p_174311_ - p_174311_ * (1.0F - f) * (1.0F - f);
         float f7 = p_174312_ * f;
-        p_174308_.vertex(p_174309_, f5 - p_174319_, f6 + p_174318_, f7 + p_174320_).color(f2, f3, f4, 1.0F).uv2(k).endVertex();
-        p_174308_.vertex(p_174309_, f5 + p_174319_, f6 + p_174317_ - p_174318_, f7 - p_174320_).color(f2, f3, f4, 1.0F).uv2(k).endVertex();
+        vertexConsumer.vertex(matrix4f, f5 - p_174319_, f6 + p_174318_, f7 + p_174320_).color(f2, f3, f4, 1.0F).uv2(k).endVertex();
+        vertexConsumer.vertex(matrix4f, f5 + p_174319_, f6 + p_174317_ - p_174318_, f7 - p_174320_).color(f2, f3, f4, 1.0F).uv2(k).endVertex();
     }
 
 }
