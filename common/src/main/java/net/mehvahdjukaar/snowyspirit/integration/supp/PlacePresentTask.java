@@ -2,7 +2,7 @@ package net.mehvahdjukaar.snowyspirit.integration.supp;
 
 
 import com.google.common.collect.ImmutableMap;
-import net.mehvahdjukaar.moonlight.api.platform.PlatformHelper;
+import net.mehvahdjukaar.moonlight.api.platform.PlatHelper;
 import net.mehvahdjukaar.snowyspirit.SnowySpirit;
 import net.mehvahdjukaar.snowyspirit.reg.ModMemoryModules;
 import net.mehvahdjukaar.supplementaries.common.block.blocks.PresentBlock;
@@ -62,7 +62,7 @@ public class PlacePresentTask extends Behavior<Villager> {
         if (pOwner.isBaby()) return false;
         if (!SnowySpirit.isChristmasSeason(pOwner.level)) return false;
         //doesn't always start and gets put on cooldown
-        if (!PlatformHelper.isMobGriefingOn(pLevel, pOwner) || pLevel.random.nextInt(5) != 0) {
+        if (!PlatHelper.isMobGriefingOn(pLevel, pOwner) || pLevel.random.nextInt(5) != 0) {
             cooldown = 20 * 50;
             return false;
         }

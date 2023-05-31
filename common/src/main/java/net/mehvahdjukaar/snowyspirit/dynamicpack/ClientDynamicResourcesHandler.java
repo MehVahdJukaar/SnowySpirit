@@ -1,22 +1,19 @@
 package net.mehvahdjukaar.snowyspirit.dynamicpack;
 
-import com.mojang.blaze3d.platform.NativeImage;
 import net.mehvahdjukaar.moonlight.api.events.AfterLanguageLoadEvent;
-import net.mehvahdjukaar.moonlight.api.platform.PlatformHelper;
+import net.mehvahdjukaar.moonlight.api.platform.PlatHelper;
 import net.mehvahdjukaar.moonlight.api.resources.RPUtils;
 import net.mehvahdjukaar.moonlight.api.resources.ResType;
 import net.mehvahdjukaar.moonlight.api.resources.StaticResource;
 import net.mehvahdjukaar.moonlight.api.resources.assets.LangBuilder;
-import net.mehvahdjukaar.moonlight.api.resources.pack.DynClientResourcesProvider;
+import net.mehvahdjukaar.moonlight.api.resources.pack.DynClientResourcesGenerator;
 import net.mehvahdjukaar.moonlight.api.resources.pack.DynamicTexturePack;
 import net.mehvahdjukaar.moonlight.api.resources.textures.Palette;
 import net.mehvahdjukaar.moonlight.api.resources.textures.Respriter;
 import net.mehvahdjukaar.moonlight.api.resources.textures.SpriteUtils;
 import net.mehvahdjukaar.moonlight.api.resources.textures.TextureImage;
 import net.mehvahdjukaar.moonlight.api.util.Utils;
-import net.mehvahdjukaar.moonlight.api.util.math.colors.HCLColor;
 import net.mehvahdjukaar.moonlight.api.util.math.colors.HSVColor;
-import net.mehvahdjukaar.moonlight.api.util.math.colors.RGBColor;
 import net.mehvahdjukaar.snowyspirit.SnowySpirit;
 import net.mehvahdjukaar.snowyspirit.configs.ModConfigs;
 import net.mehvahdjukaar.snowyspirit.reg.ModRegistry;
@@ -32,13 +29,13 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
-public class ClientDynamicResourcesHandler extends DynClientResourcesProvider {
+public class ClientDynamicResourcesHandler extends DynClientResourcesGenerator {
 
     public static final ClientDynamicResourcesHandler INSTANCE = new ClientDynamicResourcesHandler();
 
     public ClientDynamicResourcesHandler() {
         super(new DynamicTexturePack(SnowySpirit.res("generated_pack")));
-        this.dynamicPack.generateDebugResources = PlatformHelper.isDev() || ModConfigs.DEBUG_RESOURCES.get();
+        this.dynamicPack.setGenerateDebugResources(PlatHelper.isDev() || ModConfigs.DEBUG_RESOURCES.get());
     }
 
     private static final Map<DyeColor, float[]> COLORS = new EnumMap<>(DyeColor.class);
@@ -49,7 +46,7 @@ public class ClientDynamicResourcesHandler extends DynClientResourcesProvider {
 
     public static float[] getGlowLightColor(DyeColor color, RandomSource randomSource) {
         if (color == null) {
-            var c = new HSVColor(randomSource.nextFloat(),1, 1f,1).asRGB();
+            var c = new HSVColor(randomSource.nextFloat(), 1, 1f, 1).asRGB();
             return new float[]{c.red(), c.green(), c.blue()};
             //color = BRIGHT_COLORS.get(randomSource.nextInt(BRIGHT_COLORS.size()));
         }

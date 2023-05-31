@@ -54,7 +54,8 @@ public class WildGingerBlock extends BushBlock implements BonemealableBlock {
         return 100;
     }
 
-    public boolean isValidBonemealTarget(BlockGetter worldIn, BlockPos pos, BlockState state, boolean isClient) {
+    @Override
+    public boolean isValidBonemealTarget(LevelReader level, BlockPos pos, BlockState state, boolean isClient) {
         return true;
     }
 

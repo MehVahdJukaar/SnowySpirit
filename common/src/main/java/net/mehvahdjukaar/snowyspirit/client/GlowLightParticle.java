@@ -1,29 +1,20 @@
 package net.mehvahdjukaar.snowyspirit.client;
 
-import com.mojang.blaze3d.platform.GlStateManager;
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.BufferBuilder;
-import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.blaze3d.vertex.VertexFormat;
-import com.mojang.math.Quaternion;
-import com.mojang.math.Vector3f;
+import com.mojang.math.Axis;
 import net.mehvahdjukaar.moonlight.api.client.util.ParticleUtil;
 import net.mehvahdjukaar.moonlight.api.util.math.MthUtils;
 import net.mehvahdjukaar.snowyspirit.configs.ClientConfigs;
 import net.minecraft.client.Camera;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.*;
-import net.minecraft.client.renderer.GameRenderer;
-import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
-
-import static com.mojang.blaze3d.vertex.DefaultVertexFormat.PARTICLE;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 
 public class GlowLightParticle extends TextureSheetParticle {
 
@@ -49,23 +40,23 @@ public class GlowLightParticle extends TextureSheetParticle {
 
     @Override
     public void render(VertexConsumer buffer, Camera renderInfo, float partialTicks) {
-        this.setSprite(sprites.get(0,3));
+        this.setSprite(sprites.get(0, 3));
 
         Vec3 vec3 = renderInfo.getPosition();
-        float x = (float)(Mth.lerp(partialTicks, this.xo, this.x) - vec3.x());
-        float y = (float)(Mth.lerp(partialTicks, this.yo, this.y) - vec3.y());
-        float z = (float)(Mth.lerp(partialTicks, this.zo, this.z) - vec3.z());
+        float x = (float) (Mth.lerp(partialTicks, this.xo, this.x) - vec3.x());
+        float y = (float) (Mth.lerp(partialTicks, this.yo, this.y) - vec3.y());
+        float z = (float) (Mth.lerp(partialTicks, this.zo, this.z) - vec3.z());
 
         int lightColor = this.getLightColor(partialTicks);
 
 
-        Quaternion quaternion;
+        Quaternionf quaternion;
         if (this.roll == 0.0F) {
             quaternion = renderInfo.rotation();
         } else {
-            quaternion = new Quaternion(renderInfo.rotation());
+            quaternion = new Quaternionf(renderInfo.rotation());
             float i = Mth.lerp(partialTicks, this.oRoll, this.roll);
-            quaternion.mul(Vector3f.ZP.rotation(i));
+            quaternion.mul(Axis.ZP.rotation(i));
         }
 
         Vector3f[] quadPos = new Vector3f[]{
@@ -74,45 +65,44 @@ public class GlowLightParticle extends TextureSheetParticle {
                 new Vector3f(1.0F, 1.0F, 0.0F),
                 new Vector3f(1.0F, -1.0F, 0.0F)
         };
-        for(var v : quadPos) {
-            v.transform(quaternion);
+        for (var v : quadPos) {
+            v.rotate(quaternion);
         }
 
         float size = this.getQuadSize(partialTicks);
 
-        int mode = ClientConfigs.PARTICLE_MODE.get()-1;
+        int mode = ClientConfigs.PARTICLE_MODE.get() - 1;
 
-        if(mode == 0){
-            renderQuad(sprite,buffer,x,y,z,  lightColor, quadPos, size,
-                    rCol,gCol,bCol, alpha*.4f);
+        if (mode == 0) {
+            renderQuad(sprite, buffer, x, y, z, lightColor, quadPos, size,
+                    rCol, gCol, bCol, alpha * .4f);
 
-            this.setSprite(sprites.get(2,3));
-            renderQuad(sprite,buffer,x,y,z, lightColor, quadPos, size,
-                    0.5f+rCol/2f,0.5f+gCol/2f,0.5f+bCol/2f,alpha*0.6f);
-        }else if(mode == 1){
+            this.setSprite(sprites.get(2, 3));
+            renderQuad(sprite, buffer, x, y, z, lightColor, quadPos, size,
+                    0.5f + rCol / 2f, 0.5f + gCol / 2f, 0.5f + bCol / 2f, alpha * 0.6f);
+        } else if (mode == 1) {
             renderQuad(sprite, buffer, x, y, z, lightColor, quadPos, size * 1.5f,
                     rCol, gCol, bCol, alpha * .3f);
 
-             renderQuad(sprite,buffer,x,y,z,  lightColor, quadPos, size,
-                      0.5f+rCol/2f,0.5f+gCol/2f,0.5f+bCol/2f, alpha*.4f);
+            renderQuad(sprite, buffer, x, y, z, lightColor, quadPos, size,
+                    0.5f + rCol / 2f, 0.5f + gCol / 2f, 0.5f + bCol / 2f, alpha * .4f);
 
-            this.setSprite(sprites.get(2,3));
-            renderQuad(sprite,buffer,x,y,z, lightColor, quadPos, size,
-                    1,1,1,alpha*0.3f);
-        }
-        else if(mode == 2){
+            this.setSprite(sprites.get(2, 3));
+            renderQuad(sprite, buffer, x, y, z, lightColor, quadPos, size,
+                    1, 1, 1, alpha * 0.3f);
+        } else if (mode == 2) {
             renderQuad(sprite, buffer, x, y, z, lightColor, quadPos, size,
                     rCol, gCol, bCol, alpha * .8f);
 
-            this.setSprite(sprites.get(2,3));
-            renderQuad(sprite,buffer,x,y,z, lightColor, quadPos, size,
-                    1,1,1,alpha*0.3f);
+            this.setSprite(sprites.get(2, 3));
+            renderQuad(sprite, buffer, x, y, z, lightColor, quadPos, size,
+                    1, 1, 1, alpha * 0.3f);
         }
 
 
-        this.setSprite(sprites.get(3,3));
-        renderQuad(sprite, buffer,x,y,z, lightColor, quadPos, size,
-                1,1,1,alpha*0.5f);
+        this.setSprite(sprites.get(3, 3));
+        renderQuad(sprite, buffer, x, y, z, lightColor, quadPos, size,
+                1, 1, 1, alpha * 0.5f);
 
 
     }
@@ -125,25 +115,25 @@ public class GlowLightParticle extends TextureSheetParticle {
         float v0 = sprite.getV0();
         float v1 = sprite.getV1();
 
-        u1 = u0+(u1-u0)*7/8f;
-        v1 =v0+ (v1-v0)*7/8f;
+        u1 = u0 + (u1 - u0) * 7 / 8f;
+        v1 = v0 + (v1 - v0) * 7 / 8f;
 
-        buffer.vertex(x+(quadPos[0].x()*size), y+(quadPos[0].y()*size), z+(quadPos[0].z()*size))
+        buffer.vertex(x + (quadPos[0].x() * size), y + (quadPos[0].y() * size), z + (quadPos[0].z() * size))
                 .uv(u1, v1)
                 .color(rCol, gCol, bCol, alpha)
                 .uv2(lightColor)
                 .endVertex();
-        buffer.vertex(x+(quadPos[1].x()*size), y+(quadPos[1].y()*size), z+(quadPos[1].z()*size))
+        buffer.vertex(x + (quadPos[1].x() * size), y + (quadPos[1].y() * size), z + (quadPos[1].z() * size))
                 .uv(u1, v0)
                 .color(rCol, gCol, bCol, alpha)
                 .uv2(lightColor)
                 .endVertex();
-        buffer.vertex(x+quadPos[2].x()*size, y+quadPos[2].y()*size, z+quadPos[2].z()*size)
+        buffer.vertex(x + quadPos[2].x() * size, y + quadPos[2].y() * size, z + quadPos[2].z() * size)
                 .uv(u0, v0)
                 .color(rCol, gCol, bCol, alpha)
                 .uv2(lightColor)
                 .endVertex();
-        buffer.vertex(x+quadPos[3].x()*size, y+quadPos[3].y()*size, z+quadPos[3].z()*size)
+        buffer.vertex(x + quadPos[3].x() * size, y + quadPos[3].y() * size, z + quadPos[3].z() * size)
                 .uv(u0, v1)
                 .color(rCol, gCol, bCol, alpha)
                 .uv2(lightColor)
@@ -164,7 +154,7 @@ public class GlowLightParticle extends TextureSheetParticle {
     public void tick() {
         super.tick();
         float sin = Mth.sin((float) (Math.PI * this.age / (this.lifetime)));
-        this.alpha =  (float) (Math.pow(sin, 0.2));
+        this.alpha = (float) (Math.pow(sin, 0.2));
         this.oldQuadSize = this.quadSize;
         this.quadSize = (float) (this.scale * Math.pow(sin, 0.4));
         this.oRoll = this.roll;

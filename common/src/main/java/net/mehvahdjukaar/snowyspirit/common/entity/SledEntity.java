@@ -4,7 +4,7 @@ import com.google.common.collect.Lists;
 import net.mehvahdjukaar.moonlight.api.entity.IControllableVehicle;
 import net.mehvahdjukaar.moonlight.api.entity.IExtraClientSpawnData;
 import net.mehvahdjukaar.moonlight.api.platform.ForgeHelper;
-import net.mehvahdjukaar.moonlight.api.platform.PlatformHelper;
+import net.mehvahdjukaar.moonlight.api.platform.PlatHelper;
 import net.mehvahdjukaar.moonlight.api.set.wood.WoodType;
 import net.mehvahdjukaar.moonlight.api.set.wood.WoodTypeRegistry;
 import net.mehvahdjukaar.snowyspirit.client.SledSoundInstance;
@@ -17,12 +17,14 @@ import net.minecraft.BlockUtil;
 import net.minecraft.CrashReport;
 import net.minecraft.CrashReportCategory;
 import net.minecraft.ReportedException;
+import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -94,7 +96,7 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
     public SledEntity(EntityType<? extends SledEntity> entityType, Level level) {
         super(entityType, level);
         this.blocksBuilding = true;
-        this.maxUpStep = 1;
+        this.setMaxUpStep(1);
     }
 
     public SledEntity(Level level, double x, double y, double z) {
@@ -106,8 +108,8 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
     }
 
     @Override
-    public Packet<?> getAddEntityPacket() {
-        return PlatformHelper.getEntitySpawnPacket(this);
+    public Packet<ClientGamePacketListener> getAddEntityPacket() {
+        return PlatHelper.getEntitySpawnPacket(this);
     }
 
     @Override
@@ -616,7 +618,7 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
                             try {
                                 blockstate.entityInside(this.level, blockPos, this);
                                 this.onInsideBlock(blockstate);
-                            } catch (Throwable throwable) {
+                            } catch (Exception throwable) {
                                 CrashReport crashreport = CrashReport.forThrowable(throwable, "Colliding entity with block");
                                 CrashReportCategory crashreportcategory = crashreport.addCategory("Block being collided with");
                                 CrashReportCategory.populateBlockDetails(crashreportcategory, this.level, blockPos, blockstate);
@@ -731,10 +733,11 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
         boolean flag1 = pVec.y != vec3.y;
         boolean flag2 = pVec.z != vec3.z;
         boolean flag3 = this.onGround || flag1 && pVec.y < 0.0D;
-        if (this.maxUpStep > 0.0F && flag3 && (flag || flag2)) {
-            Vec3 vec31 = collideBoundingBox(this, new Vec3(pVec.x, this.maxUpStep, pVec.z), aabb, this.level, list);
-            Vec3 vec32 = collideBoundingBox(this, new Vec3(0.0D, this.maxUpStep, 0.0D), aabb.expandTowards(pVec.x, 0.0D, pVec.z), this.level, list);
-            if (vec32.y < this.maxUpStep) {
+        float maxUpStep = this.maxUpStep();
+        if (maxUpStep > 0.0F && flag3 && (flag || flag2)) {
+            Vec3 vec31 = collideBoundingBox(this, new Vec3(pVec.x, maxUpStep, pVec.z), aabb, this.level, list);
+            Vec3 vec32 = collideBoundingBox(this, new Vec3(0.0D, maxUpStep, 0.0D), aabb.expandTowards(pVec.x, 0.0D, pVec.z), this.level, list);
+            if (vec32.y < maxUpStep) {
                 Vec3 vec33 = collideBoundingBox(this, new Vec3(pVec.x, 0.0D, pVec.z), aabb.move(vec32), this.level, list).add(vec32);
                 if (vec33.horizontalDistanceSqr() > vec31.horizontalDistanceSqr()) {
                     vec31 = vec33;
@@ -761,10 +764,11 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
         boolean changedY = pVec.y != vec3.y;
         boolean changedZ = pVec.z != vec3.z;
         boolean ySomething = this.onGround || changedY && pVec.y < 0.0D;
-        if (this.maxUpStep > 0.0F && ySomething && (changedX || changedZ)) {
-            Vec3 vec31 = collideBoundingBox(this, new Vec3(pVec.x, this.maxUpStep, pVec.z), aabb, this.level, list);
-            Vec3 vec32 = collideBoundingBox(this, new Vec3(0.0D, this.maxUpStep, 0.0D), aabb.expandTowards(pVec.x, 0.0D, pVec.z), this.level, list);
-            if (vec32.y < (double) this.maxUpStep) {
+        float maxUpStep = this.maxUpStep();
+        if (maxUpStep > 0.0F && ySomething && (changedX || changedZ)) {
+            Vec3 vec31 = collideBoundingBox(this, new Vec3(pVec.x, maxUpStep, pVec.z), aabb, this.level, list);
+            Vec3 vec32 = collideBoundingBox(this, new Vec3(0.0D, maxUpStep, 0.0D), aabb.expandTowards(pVec.x, 0.0D, pVec.z), this.level, list);
+            if (vec32.y <  maxUpStep) {
                 Vec3 vec33 = collideBoundingBox(this, new Vec3(pVec.x, 0.0D, pVec.z), aabb.move(vec32), this.level, list).add(vec32);
                 if (vec33.horizontalDistanceSqr() > vec31.horizontalDistanceSqr()) {
                     vec31 = vec33;
@@ -796,12 +800,12 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
         }
 
         if (this.lerpSteps > 0) {
-            double d0 = this.getX() + (this.lerpX - this.getX()) / (double) this.lerpSteps;
-            double d1 = this.getY() + (this.lerpY - this.getY()) / (double) this.lerpSteps;
-            double d2 = this.getZ() + (this.lerpZ - this.getZ()) / (double) this.lerpSteps;
-            double d3 = Mth.wrapDegrees(this.lerpYRot - (double) this.getYRot());
-            this.setYRot(this.getYRot() + (float) d3 / (float) this.lerpSteps);
-            this.setXRot(this.getXRot() + (float) (this.lerpXRot - (double) this.getXRot()) / (float) this.lerpSteps);
+            double d0 = this.getX() + (this.lerpX - this.getX()) / this.lerpSteps;
+            double d1 = this.getY() + (this.lerpY - this.getY()) /  this.lerpSteps;
+            double d2 = this.getZ() + (this.lerpZ - this.getZ()) /  this.lerpSteps;
+            double d3 = Mth.wrapDegrees(this.lerpYRot -  this.getYRot());
+            this.setYRot(this.getYRot() + (float) d3 /  this.lerpSteps);
+            this.setXRot(this.getXRot() + (float) (this.lerpXRot -  this.getXRot()) /  this.lerpSteps);
             --this.lerpSteps;
             this.setPos(d0, d1, d2);
             this.setRot(this.getYRot(), this.getXRot());
@@ -1036,7 +1040,7 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
 
             this.resetFallDistance();
         } else if (pY < 0.0D) {
-            this.fallDistance = (float) ((double) this.fallDistance - pY);
+            this.fallDistance = (float) ( this.fallDistance - pY);
         }
     }
 
@@ -1205,9 +1209,11 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
 
     @Nullable
     @Override
-    public Entity getControllingPassenger() {
-        return this.getFirstPassenger();
+    public LivingEntity getControllingPassenger() {
+        var v = this.getFirstPassenger();
+        return v instanceof LivingEntity le ? le : null;
     }
+
 
     @Override
     public void onInputUpdate(boolean left, boolean right, boolean up, boolean down, boolean sprint, boolean jumping) {
@@ -1307,13 +1313,13 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
 
                 }
                 Vec3 vec3 = (new Vec3(zPos, 0.0D, 0.0D)).yRot(-this.getYRot() * ((float) Math.PI / 180F) - ((float) Math.PI / 2F));
-                entity.setPos(this.getX() + vec3.x, this.getY() + (double) yPos, this.getZ() + vec3.z);
+                entity.setPos(this.getX() + vec3.x, this.getY() +  yPos, this.getZ() + vec3.z);
 
 
                 if (entity instanceof Animal animal && isMoreThanOneOnBoard) {
                     int yRot = entity.getId() % 2 == 0 ? 90 : 270;
-                    entity.setYBodyRot(animal.yBodyRot + (float) yRot);
-                    entity.setYHeadRot(entity.getYHeadRot() + (float) yRot);
+                    entity.setYBodyRot(animal.yBodyRot +  yRot);
+                    entity.setYHeadRot(entity.getYHeadRot() +  yRot);
                 }
             }
         }
@@ -1337,12 +1343,12 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
             List<Vec3> list = Lists.newArrayList();
             double d2 = this.level.getBlockFloorHeight(blockpos);
             if (DismountHelper.isBlockFloorValid(d2)) {
-                list.add(new Vec3(d0, (double) blockpos.getY() + d2, d1));
+                list.add(new Vec3(d0,  blockpos.getY() + d2, d1));
             }
 
             double d3 = this.level.getBlockFloorHeight(below);
             if (DismountHelper.isBlockFloorValid(d3)) {
-                list.add(new Vec3(d0, (double) below.getY() + d3, d1));
+                list.add(new Vec3(d0,  below.getY() + d3, d1));
             }
 
             for (Pose pose : entity.getDismountPoses()) {

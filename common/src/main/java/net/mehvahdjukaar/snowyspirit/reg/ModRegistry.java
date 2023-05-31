@@ -4,11 +4,11 @@ import com.google.common.base.Suppliers;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableMap;
+import com.teamabode.cave_enhancements.core.integration.quark.VerticalSlabBlock;
 import net.mehvahdjukaar.moonlight.api.block.ModStairBlock;
-import net.mehvahdjukaar.moonlight.api.block.VerticalSlabBlock;
 import net.mehvahdjukaar.moonlight.api.item.WoodBasedBlockItem;
 import net.mehvahdjukaar.moonlight.api.misc.Registrator;
-import net.mehvahdjukaar.moonlight.api.platform.PlatformHelper;
+import net.mehvahdjukaar.moonlight.api.platform.PlatHelper;
 import net.mehvahdjukaar.moonlight.api.platform.RegHelper;
 import net.mehvahdjukaar.moonlight.api.set.BlockSetAPI;
 import net.mehvahdjukaar.moonlight.api.set.BlockType;
@@ -92,7 +92,7 @@ public class ModRegistry {
     public static final Map<WoodType, SledItem> SLED_ITEMS = new HashMap<>();
 
     public static final CreativeModeTab MOD_TAB = !ModConfigs.MOD_TAB.get() ? null :
-            PlatformHelper.createModTab(SnowySpirit.res(SnowySpirit.MOD_ID),
+            PlatHelper.createModTab(SnowySpirit.res(SnowySpirit.MOD_ID),
                     () -> SLED_ITEMS.get(WoodTypeRegistry.OAK_TYPE).getDefaultInstance(), false);
 
     public static final Supplier<Block> CANDY_CANE_BLOCK = regWithItem("candy_cane_block", () ->
@@ -111,7 +111,7 @@ public class ModRegistry {
     public static final Supplier<Item> EGGNOG = regItem("eggnog", EggnogItem::new);
 
     public static final Supplier<Item> WINTER_DISC = regItem("winter_disc",
-            () -> PlatformHelper.newMusicDisc(14, ModSounds.WINTER_MUSIC, new Item.Properties()
+            () -> PlatHelper.newMusicDisc(14, ModSounds.WINTER_MUSIC, new Item.Properties()
                     .tab(getTab(CreativeModeTab.TAB_MISC, "winter_disc"))
                     .rarity(Rarity.RARE).stacksTo(1), 350));
 
@@ -132,7 +132,7 @@ public class ModRegistry {
     //vertical slab
     public static final Supplier<Block> GINGERBREAD_VERTICAL_SLAB = regWithItem("gingerbread_vertical_slab", () -> new VerticalSlabBlock(
             BlockBehaviour.Properties.copy(GINGERBREAD_BLOCK.get())
-    ), PlatformHelper.isModLoaded("quark") ? CreativeModeTab.TAB_BUILDING_BLOCKS : null);
+    ), PlatHelper.isModLoaded("quark") ? CreativeModeTab.TAB_BUILDING_BLOCKS : null);
 
     public static final Supplier<Block> GINGERBREAD_FROSTED_BLOCK = regWithItem("gingerbread_frosted", () ->
             new Block(BlockBehaviour.Properties.copy(GINGERBREAD_BLOCK.get())), CreativeModeTab.TAB_BUILDING_BLOCKS);
@@ -157,7 +157,7 @@ public class ModRegistry {
             () -> new Item(new Item.Properties().tab(CreativeModeTab.TAB_FOOD)));
 
     //pot
-    public static final Supplier<Block> GINGER_POT = regBlock("potted_ginger", () -> PlatformHelper.newFlowerPot(
+    public static final Supplier<Block> GINGER_POT = regBlock("potted_ginger", () -> PlatHelper.newFlowerPot(
             () -> (FlowerPotBlock) Blocks.FLOWER_POT, GINGER_CROP, BlockBehaviour.Properties.copy(Blocks.FLOWER_POT)));
 
     public static final Supplier<SimpleParticleType> GLOW_LIGHT_PARTICLE = RegHelper.registerParticle(
@@ -189,7 +189,7 @@ public class ModRegistry {
     });
 
     public static final Supplier<BlockEntityType<GlowLightsBlockTile>> GLOW_LIGHTS_BLOCK_TILE = regTile(
-            "glow_lights", () -> PlatformHelper.newBlockEntityType(GlowLightsBlockTile::new,
+            "glow_lights", () -> PlatHelper.newBlockEntityType(GlowLightsBlockTile::new,
                     ModRegistry.GLOW_LIGHTS_BLOCKS.values().stream().map(Supplier::get).toArray(Block[]::new)));
 
 

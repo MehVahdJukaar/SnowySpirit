@@ -1,7 +1,7 @@
 package net.mehvahdjukaar.snowyspirit.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Vector3f;
+import com.mojang.math.Axis;
 import net.mehvahdjukaar.snowyspirit.common.entity.ContainerHolderEntity;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -39,8 +39,8 @@ public class ContainerHolderEntityRenderer<T extends ContainerHolderEntity> exte
         float xRot = vehicle.getViewXRot(partialTicks);
         yRot = vehicle.getViewYRot(partialTicks);
 
-       poseStack.mulPose(Vector3f.YP.rotationDegrees(180.0F - yRot));
-       poseStack.mulPose(Vector3f.XN.rotationDegrees(xRot));
+       poseStack.mulPose(Axis.YP.rotationDegrees(180.0F - yRot));
+       poseStack.mulPose(Axis.XN.rotationDegrees(xRot));
 
         float f = (float) entity.getHurtTime() - partialTicks;
         float f1 = entity.getDamage() - partialTicks;
@@ -49,7 +49,7 @@ public class ContainerHolderEntityRenderer<T extends ContainerHolderEntity> exte
         }
 
         if (f > 0.0F) {
-           poseStack.mulPose(Vector3f.ZP.rotationDegrees(Mth.sin(f) * f * f1 / 10.0F));
+           poseStack.mulPose(Axis.ZP.rotationDegrees(Mth.sin(f) * f * f1 / 10.0F));
         }
 
 

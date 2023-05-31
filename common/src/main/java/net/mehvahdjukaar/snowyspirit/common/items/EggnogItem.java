@@ -18,7 +18,7 @@ import net.minecraft.world.level.Level;
 
 public class EggnogItem extends Item {
     public EggnogItem() {
-        super(new Item.Properties().tab(ModRegistry.getTab(CreativeModeTab.TAB_FOOD,"eggnog") ).food(new FoodProperties
+        super(new Item.Properties().food(new FoodProperties
                 .Builder().nutrition(4).saturationMod(2f).build()));
     }
 

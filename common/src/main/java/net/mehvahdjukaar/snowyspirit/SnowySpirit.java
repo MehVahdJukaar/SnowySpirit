@@ -1,7 +1,7 @@
 package net.mehvahdjukaar.snowyspirit;
 
 
-import net.mehvahdjukaar.moonlight.api.platform.PlatformHelper;
+import net.mehvahdjukaar.moonlight.api.platform.PlatHelper;
 import net.mehvahdjukaar.moonlight.api.platform.RegHelper;
 import net.mehvahdjukaar.snowyspirit.common.network.NetworkHandler;
 import net.mehvahdjukaar.snowyspirit.configs.ClientConfigs;
@@ -34,14 +34,13 @@ public class SnowySpirit {
 
     public static final Logger LOGGER = LogManager.getLogger();
 
-    public static final boolean SUPPLEMENTARIES_INSTALLED = PlatformHelper.isModLoaded("supplementaries");
-    public static final boolean FARMERSDELIGHT_INSTALLED = PlatformHelper.isModLoaded("farmersdelight");
-    public static final boolean SEASON_MOD_INSTALLED = PlatformHelper.isModLoaded(PlatformHelper.getPlatform().isForge() ? "sereneseasons" : "seasons");
+    public static final boolean SUPPLEMENTARIES_INSTALLED = PlatHelper.isModLoaded("supplementaries");
+    public static final boolean FARMERSDELIGHT_INSTALLED = PlatHelper.isModLoaded("farmersdelight");
+    public static final boolean SEASON_MOD_INSTALLED = PlatHelper.isModLoaded(PlatHelper.getPlatform().isForge() ? "sereneseasons" : "seasons");
 
 
     public static void commonInit() {
         ModConfigs.init();
-        ClientConfigs.init();
 
         NetworkHandler.init();
 
@@ -56,7 +55,9 @@ public class SnowySpirit {
 
         ServerDynamicResourcesHandler.INSTANCE.register();
 
-        if (PlatformHelper.getEnv().isClient()) {
+        if (PlatHelper.getPhysicalSide().isClient()) {
+            ClientConfigs.init();
+
             ClientDynamicResourcesHandler.INSTANCE.register();
         }
     }

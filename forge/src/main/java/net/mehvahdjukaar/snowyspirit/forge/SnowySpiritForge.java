@@ -1,6 +1,6 @@
 package net.mehvahdjukaar.snowyspirit.forge;
 
-import net.mehvahdjukaar.moonlight.api.platform.PlatformHelper;
+import net.mehvahdjukaar.moonlight.api.platform.PlatHelper;
 import net.mehvahdjukaar.moonlight.api.platform.network.NetworkDir;
 import net.mehvahdjukaar.moonlight.api.util.Utils;
 import net.mehvahdjukaar.snowyspirit.SnowySpirit;
@@ -33,7 +33,7 @@ public class SnowySpiritForge {
 
         SnowySpirit.commonInit();
 
-        if (PlatformHelper.getEnv().isClient()) {
+        if (PlatHelper.getEnv().isClient()) {
             ClientRegistry.init();
         }
 

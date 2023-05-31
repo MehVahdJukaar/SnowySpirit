@@ -6,6 +6,7 @@ import net.mehvahdjukaar.moonlight.api.platform.RegHelper;
 import net.mehvahdjukaar.snowyspirit.SnowySpirit;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 
 import java.util.Optional;
@@ -25,7 +26,7 @@ public class ModMemoryModules {
 
 
     public static <T extends MemoryModuleType<?>> RegSupplier<T> registerFeature(String name, Supplier<T> memoryModule) {
-        return RegHelper.register(SnowySpirit.res(name), memoryModule, Registry.MEMORY_MODULE_TYPE);
+        return RegHelper.register(SnowySpirit.res(name), memoryModule, Registries.MEMORY_MODULE_TYPE);
     }
 
 }

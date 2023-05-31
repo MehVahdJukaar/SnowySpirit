@@ -4,8 +4,8 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
 import net.fabricmc.fabric.api.biome.v1.BiomeSelectors;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents;
-import net.mehvahdjukaar.moonlight.api.platform.ClientPlatformHelper;
-import net.mehvahdjukaar.moonlight.api.platform.PlatformHelper;
+import net.mehvahdjukaar.moonlight.api.platform.ClientHelper;
+import net.mehvahdjukaar.moonlight.api.platform.PlatHelper;
 import net.mehvahdjukaar.moonlight.fabric.FabricSetupCallbacks;
 import net.mehvahdjukaar.snowyspirit.SnowySpirit;
 import net.mehvahdjukaar.snowyspirit.reg.ClientRegistry;
@@ -27,11 +27,11 @@ public class SnowySpiritFabric implements ModInitializer {
 
         SnowySpirit.commonInit();
 
-        PlatformHelper.addCommonSetup(SnowySpiritFabric::commonSetup);
+        PlatHelper.addCommonSetup(SnowySpiritFabric::commonSetup);
 
 
-        if (PlatformHelper.getEnv().isClient()) {
-            ClientPlatformHelper.addClientSetup(SnowySpiritFabric::initClient);
+        if (PlatHelper.getEnv().isClient()) {
+            ClientHelper.addClientSetup(SnowySpiritFabric::initClient);
         }
     }
 

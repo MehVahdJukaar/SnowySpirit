@@ -2,7 +2,7 @@ package net.mehvahdjukaar.snowyspirit.common.entity;
 
 import dev.architectury.injectables.annotations.PlatformOnly;
 import net.mehvahdjukaar.moonlight.api.entity.IExtraClientSpawnData;
-import net.mehvahdjukaar.moonlight.api.platform.PlatformHelper;
+import net.mehvahdjukaar.moonlight.api.platform.PlatHelper;
 import net.mehvahdjukaar.snowyspirit.SnowySpirit;
 import net.mehvahdjukaar.snowyspirit.reg.ModRegistry;
 import net.mehvahdjukaar.snowyspirit.integration.supp.SuppCompat;
@@ -13,6 +13,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -90,8 +91,8 @@ public class ContainerHolderEntity extends Entity implements Container, MenuProv
     }
 
     @Override
-    public Packet<?> getAddEntityPacket() {
-        return PlatformHelper.getEntitySpawnPacket(this);
+    public Packet<ClientGamePacketListener> getAddEntityPacket() {
+        return PlatHelper.getEntitySpawnPacket(this);
     }
 
     @Override
@@ -229,6 +230,11 @@ public class ContainerHolderEntity extends Entity implements Container, MenuProv
         this.setDamage(this.getDamage() + this.getDamage() * 10.0F);
     }
 
+    @Override
+    public void animateHurt(float f) {
+        super.animateHurt(f);
+    }
+
     /**
      * Returns true if other Entities should be prevented from moving through this Entity.
      */
@@ -264,7 +270,7 @@ public class ContainerHolderEntity extends Entity implements Container, MenuProv
             // this.xRotO = this.getXRot();
             //this.yRotO = this.getYRot();
         } else {
-            this.destroy(DamageSource.GENERIC);
+            this.destroy(this.damageSources().generic());
         }
     }
 
@@ -458,7 +464,7 @@ public class ContainerHolderEntity extends Entity implements Container, MenuProv
             LootContext.Builder builder = (new LootContext.Builder((ServerLevel) this.level))
                     .withParameter(LootContextParams.ORIGIN, this.position()).withOptionalRandomSeed(this.lootTableSeed);
 
-            if(PlatformHelper.getPlatform().isForge()) {
+            if(PlatHelper.getPlatform().isForge()) {
                 // Forge: add this entity to loot context, however, currently Vanilla uses 'this' for the player creating the chests. So we take over 'killer_entity' for this.
                 builder.withParameter(LootContextParams.KILLER_ENTITY, this);
             }

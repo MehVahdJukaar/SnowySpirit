@@ -21,7 +21,7 @@ public class GlowLightsItem extends Item {
     private final Block block;
 
     public GlowLightsItem(Block pBlock) {
-        super(new Item.Properties().tab(ModRegistry.getTab(CreativeModeTab.TAB_DECORATIONS,"glow_lights")));
+        super(new Item.Properties());
         this.block = pBlock;
     }
 

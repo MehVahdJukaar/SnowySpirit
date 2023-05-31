@@ -1,7 +1,7 @@
 package net.mehvahdjukaar.snowyspirit.reg;
 
 import net.mehvahdjukaar.moonlight.api.client.model.NestedModelLoader;
-import net.mehvahdjukaar.moonlight.api.platform.ClientPlatformHelper;
+import net.mehvahdjukaar.moonlight.api.platform.ClientHelper;
 import net.mehvahdjukaar.snowyspirit.SnowySpirit;
 import net.mehvahdjukaar.snowyspirit.client.*;
 import net.mehvahdjukaar.snowyspirit.common.block.GlowLightsBlockTile;
@@ -9,6 +9,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.color.block.BlockColor;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.BlockAndTintGetter;
@@ -28,51 +29,51 @@ public class ClientRegistry {
     }
 
     public static void init() {
-        ClientPlatformHelper.addModelLayerRegistration(ClientRegistry::registerModelLayers);
-        ClientPlatformHelper.addEntityRenderersRegistration(ClientRegistry::registerEntityRenderers);
-        ClientPlatformHelper.addModelLoaderRegistration(ClientRegistry::registerModelLoaders);
-        ClientPlatformHelper.addBlockColorsRegistration(ClientRegistry::registerBlockColors);
-        ClientPlatformHelper.addParticleRegistration(ClientRegistry::registerParticles);
+        ClientHelper.addModelLayerRegistration(ClientRegistry::registerModelLayers);
+        ClientHelper.addEntityRenderersRegistration(ClientRegistry::registerEntityRenderers);
+        ClientHelper.addModelLoaderRegistration(ClientRegistry::registerModelLoaders);
+        ClientHelper.addBlockColorsRegistration(ClientRegistry::registerBlockColors);
+        ClientHelper.addParticleRegistration(ClientRegistry::registerParticles);
     }
 
-    private static void registerParticles(ClientPlatformHelper.ParticleEvent event) {
+    private static void registerParticles(ClientHelper.ParticleEvent event) {
         event.register(ModRegistry.GLOW_LIGHT_PARTICLE.get(), GlowLightParticle.Provider::new);
     }
 
 
     public static void setup() {
-        ClientPlatformHelper.registerRenderType(ModRegistry.GINGER_CROP.get(), RenderType.cutout());
-        ClientPlatformHelper.registerRenderType(ModRegistry.GINGER_WILD.get(), RenderType.cutout());
-        ClientPlatformHelper.registerRenderType(ModRegistry.SNOW_GLOBE.get(), RenderType.cutout());
-        ClientPlatformHelper.registerRenderType(ModRegistry.WREATH.get(), RenderType.cutout());
-        ClientPlatformHelper.registerRenderType(ModRegistry.GINGER_POT.get(), RenderType.cutout());
+        ClientHelper.registerRenderType(ModRegistry.GINGER_CROP.get(), RenderType.cutout());
+        ClientHelper.registerRenderType(ModRegistry.GINGER_WILD.get(), RenderType.cutout());
+        ClientHelper.registerRenderType(ModRegistry.SNOW_GLOBE.get(), RenderType.cutout());
+        ClientHelper.registerRenderType(ModRegistry.WREATH.get(), RenderType.cutout());
+        ClientHelper.registerRenderType(ModRegistry.GINGER_POT.get(), RenderType.cutout());
         for (var v : ModRegistry.GUMDROPS_BUTTONS.values()) {
-            ClientPlatformHelper.registerRenderType(v.get(), RenderType.translucent());
+            ClientHelper.registerRenderType(v.get(), RenderType.translucent());
         }
         for (var v : ModRegistry.GLOW_LIGHTS_BLOCKS.values()) {
             //TODO: use forge emissive layer
-            ClientPlatformHelper.registerRenderType(v.get(), RenderType.cutout());
+            ClientHelper.registerRenderType(v.get(), RenderType.cutout());
         }
 
-        ClientPlatformHelper.registerItemProperty(ModRegistry.GINGERBREAD_COOKIE.get(), new ResourceLocation("shape"),
+        ItemProperties.register(ModRegistry.GINGERBREAD_COOKIE.get(), new ResourceLocation("shape"),
                 (stack, world, entity, s) -> (System.identityHashCode(stack) % 4)/3f);
     }
 
-    private static void registerEntityRenderers(ClientPlatformHelper.EntityRendererEvent event) {
+    private static void registerEntityRenderers(ClientHelper.EntityRendererEvent event) {
         event.register(ModRegistry.SLED.get(), SledEntityRenderer::new);
         event.register(ModRegistry.CONTAINER_ENTITY.get(), ContainerHolderEntityRenderer::new);
     }
 
-    private static void registerModelLayers(ClientPlatformHelper.ModelLayerEvent event) {
+    private static void registerModelLayers(ClientHelper.ModelLayerEvent event) {
         event.register(SLED_MODEL, SledModel::createBodyLayer);
         event.register(QUILT_MODEL, QuiltModel::createBodyLayer);
     }
 
-    private static void registerModelLoaders(ClientPlatformHelper.ModelLoaderEvent event) {
+    private static void registerModelLoaders(ClientHelper.ModelLoaderEvent event) {
         event.register(SnowySpirit.res("glow_lights"),  new NestedModelLoader("overlay", GlowLightsBakedModel::new));
     }
 
-    private static void registerBlockColors(ClientPlatformHelper.BlockColorEvent event) {
+    private static void registerBlockColors(ClientHelper.BlockColorEvent event) {
         event.register(new MimicBlockColor(), ModRegistry.GLOW_LIGHTS_BLOCKS.values().stream()
                 .map(Supplier::get).toArray(Block[]::new));
 

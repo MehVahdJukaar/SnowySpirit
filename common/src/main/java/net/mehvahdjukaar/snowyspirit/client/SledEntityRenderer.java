@@ -3,9 +3,7 @@ package net.mehvahdjukaar.snowyspirit.client;
 import com.google.common.collect.ImmutableMap;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.math.Matrix3f;
-import com.mojang.math.Matrix4f;
-import com.mojang.math.Vector3f;
+import com.mojang.math.Axis;
 import net.mehvahdjukaar.moonlight.api.set.wood.WoodType;
 import net.mehvahdjukaar.moonlight.api.set.wood.WoodTypeRegistry;
 import net.mehvahdjukaar.moonlight.api.util.Utils;
@@ -16,8 +14,10 @@ import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
+import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
@@ -27,6 +27,9 @@ import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import org.joml.Matrix3f;
+import org.joml.Matrix4f;
+import org.joml.Vector3f;
 
 import java.util.Map;
 import java.util.stream.Stream;
@@ -61,8 +64,8 @@ public class SledEntityRenderer extends EntityRenderer<SledEntity> {
         //same stuff that happens to yRot when its created
         float xRot = sled.getViewXRot(partialTicks);
 
-        poseStack.mulPose(Vector3f.YP.rotationDegrees(180.0F - yRot));
-        poseStack.mulPose(Vector3f.XN.rotationDegrees(xRot));
+        poseStack.mulPose(Axis.YP.rotationDegrees(180.0F - yRot));
+        poseStack.mulPose(Axis.XN.rotationDegrees(xRot));
         float f = (float) sled.getHurtTime() - partialTicks;
         float f1 = sled.getDamage() - partialTicks;
         if (f1 < 0.0F) {
@@ -70,7 +73,7 @@ public class SledEntityRenderer extends EntityRenderer<SledEntity> {
         }
 
         if (f > 0.0F) {
-            poseStack.mulPose(Vector3f.ZP.rotationDegrees(Mth.sin(f) * f * f1 / 10.0F * (float) sled.getHurtDir()));
+            poseStack.mulPose(Axis.ZP.rotationDegrees(Mth.sin(f) * f * f1 / 10.0F * (float) sled.getHurtDir()));
         }
 
         poseStack.pushPose();
@@ -207,11 +210,12 @@ public class SledEntityRenderer extends EntityRenderer<SledEntity> {
                 float width = 0.025F;
 
                 Matrix4f matrix4f = poseStack.last().pose();
-                float f4 = Mth.fastInvSqrt(deltaX * deltaX + deltaZ * deltaZ) * width / 2.0F;
+                float f4 = Mth.invSqrt(deltaX * deltaX + deltaZ * deltaZ) * width / 2.0F;
                 float f5 = deltaZ * f4;
+
                 float f6 = deltaX * f4;
-                BlockPos blockpos = new BlockPos(sled.getEyePosition(pPartialTicks));
-                BlockPos blockpos1 = new BlockPos(wolf.getEyePosition(pPartialTicks));
+                BlockPos blockpos = BlockPos.containing(sled.getEyePosition(pPartialTicks));
+                BlockPos blockpos1 = BlockPos.containing(wolf.getEyePosition(pPartialTicks));
                 int i = this.getBlockLightLevel(sled, blockpos);
                 int j = sled.level.getBrightness(LightLayer.BLOCK, blockpos1);
                 int k = sled.level.getBrightness(LightLayer.SKY, blockpos);
@@ -235,20 +239,20 @@ public class SledEntityRenderer extends EntityRenderer<SledEntity> {
     }
 
     //stolen from leash renderer
-    private static void addVertexPair(VertexConsumer vertexConsumer, Matrix4f matrix4f, float p_174310_, float p_174311_, float p_174312_, int p_174313_, int p_174314_, int p_174315_, int p_174316_, float p_174317_, float p_174318_, float p_174319_, float p_174320_, int p_174321_, boolean p_174322_) {
-        float f =  p_174321_ / 24.0F;
-        int i = (int) Mth.lerp(f,  p_174313_,  p_174314_);
-        int j = (int) Mth.lerp(f,  p_174315_,  p_174316_);
+    private static void addVertexPair(VertexConsumer vertexConsumer, Matrix4f matrix4f, float v, float v1, float v2, int i1, int i2, int i3, int i4, float v3, float v4, float v5, float v6, int i5, boolean b) {
+        float f =  i5 / 24.0F;
+        int i = (int) Mth.lerp(f,  i1,  i2);
+        int j = (int) Mth.lerp(f,  i3,  i4);
         int k = LightTexture.pack(i, j);
-        float f1 = p_174321_ % 2 == (p_174322_ ? 1 : 0) ? 0.7F : 1.0F;
+        float f1 = i5 % 2 == (b ? 1 : 0) ? 0.7F : 1.0F;
         float f2 = 0.5F * f1;
         float f3 = 0.4F * f1;
         float f4 = 0.3F * f1;
-        float f5 = p_174310_ * f;
-        float f6 = p_174311_ > 0.0F ? p_174311_ * f * f : p_174311_ - p_174311_ * (1.0F - f) * (1.0F - f);
-        float f7 = p_174312_ * f;
-        vertexConsumer.vertex(matrix4f, f5 - p_174319_, f6 + p_174318_, f7 + p_174320_).color(f2, f3, f4, 1.0F).uv2(k).endVertex();
-        vertexConsumer.vertex(matrix4f, f5 + p_174319_, f6 + p_174317_ - p_174318_, f7 - p_174320_).color(f2, f3, f4, 1.0F).uv2(k).endVertex();
+        float f5 = v * f;
+        float f6 = v1 > 0.0F ? v1 * f * f : v1 - v1 * (1.0F - f) * (1.0F - f);
+        float f7 = v2 * f;
+        vertexConsumer.vertex(matrix4f, f5 - v5, f6 + v4, f7 + v6).color(f2, f3, f4, 1.0F).uv2(k).endVertex();
+        vertexConsumer.vertex(matrix4f, f5 + v5, f6 + v3 - v4, f7 - v6).color(f2, f3, f4, 1.0F).uv2(k).endVertex();
     }
 
 }

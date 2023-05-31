@@ -37,7 +37,7 @@ public class GlowLightsBakedModel implements CustomBakedModel {
         if (state != null) {
             //always cutout
             try {
-                BlockState mimic = extraData.get(GlowLightsBlockTile.MIMIC);
+                BlockState mimic = extraData.get(GlowLightsBlockTile.MIMIC_KEY);
                 if (mimic != null && !mimic.isAir()) {
                     BakedModel model = blockModelShaper.getBlockModel(mimic);
                     quads.addAll(model.getQuads(state, side, rand));
@@ -58,7 +58,7 @@ public class GlowLightsBakedModel implements CustomBakedModel {
 
     @Override
     public TextureAtlasSprite getBlockParticle(ExtraModelData data) {
-        BlockState mimic = data.get(GlowLightsBlockTile.MIMIC);
+        BlockState mimic = data.get(GlowLightsBlockTile.MIMIC_KEY);
         if (mimic != null && !mimic.isAir()) {
 
             BakedModel model = blockModelShaper.getBlockModel(mimic);

@@ -29,7 +29,7 @@ public class SledItem extends WoodBasedItem {
 
 
     public SledItem(WoodType type) {
-        super(new Item.Properties().stacksTo(1).tab(CreativeModeTab.TAB_TRANSPORTATION), type, 200);
+        super(new Item.Properties().stacksTo(1), type, 200);
     }
 
     @Override
@@ -61,7 +61,7 @@ public class SledItem extends WoodBasedItem {
                 } else {
                     if (!pLevel.isClientSide) {
                         pLevel.addFreshEntity(boat);
-                        pLevel.gameEvent(pPlayer, GameEvent.ENTITY_PLACE, new BlockPos(hitresult.getLocation()));
+                        pLevel.gameEvent(pPlayer, GameEvent.ENTITY_PLACE, BlockPos.containing(hitresult.getLocation()));
                         if (!pPlayer.getAbilities().instabuild) {
                             itemstack.shrink(1);
                         }
