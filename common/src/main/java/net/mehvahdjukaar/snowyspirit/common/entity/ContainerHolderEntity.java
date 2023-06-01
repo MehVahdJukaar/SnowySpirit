@@ -225,14 +225,9 @@ public class ContainerHolderEntity extends Entity implements Container, MenuProv
      * Setups the entity to do the hurt animation. Only used by packets in multiplayer.
      */
     @Override
-    public void animateHurt() {
+    public void animateHurt(float hurtYaw) {
         this.setHurtTime(10);
         this.setDamage(this.getDamage() + this.getDamage() * 10.0F);
-    }
-
-    @Override
-    public void animateHurt(float f) {
-        super.animateHurt(f);
     }
 
     /**

@@ -5,6 +5,7 @@ import net.mehvahdjukaar.moonlight.api.entity.IControllableVehicle;
 import net.mehvahdjukaar.moonlight.api.entity.IExtraClientSpawnData;
 import net.mehvahdjukaar.moonlight.api.platform.ForgeHelper;
 import net.mehvahdjukaar.moonlight.api.platform.PlatHelper;
+import net.mehvahdjukaar.moonlight.api.set.BlocksColorAPI;
 import net.mehvahdjukaar.moonlight.api.set.wood.WoodType;
 import net.mehvahdjukaar.moonlight.api.set.wood.WoodTypeRegistry;
 import net.mehvahdjukaar.snowyspirit.client.SledSoundInstance;
@@ -17,7 +18,6 @@ import net.minecraft.BlockUtil;
 import net.minecraft.CrashReport;
 import net.minecraft.CrashReportCategory;
 import net.minecraft.ReportedException;
-import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
@@ -67,9 +67,12 @@ import java.util.UUID;
 import java.util.function.Supplier;
 
 public class SledEntity extends Entity implements IControllableVehicle, IExtraClientSpawnData {
+
+    //all these 3 just for hurt animation. thx boat code...
     private static final EntityDataAccessor<Integer> DATA_ID_HURT = SynchedEntityData.defineId(SledEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> DATA_ID_HURT_DIR = SynchedEntityData.defineId(SledEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Float> DATA_ID_DAMAGE = SynchedEntityData.defineId(SledEntity.class, EntityDataSerializers.FLOAT);
+
     private static final EntityDataAccessor<String> DATA_ID_TYPE = SynchedEntityData.defineId(SledEntity.class, EntityDataSerializers.STRING);
     private static final EntityDataAccessor<Integer> DATA_SEAT_TYPE = SynchedEntityData.defineId(SledEntity.class, EntityDataSerializers.INT);
 
@@ -92,6 +95,9 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
     private boolean inputDown;
     private float landFriction;
     private Status status;
+
+    //if it's restoring a wolf from a save
+    private UUID restoreWolfUUID = null;
 
     public SledEntity(EntityType<? extends SledEntity> entityType, Level level) {
         super(entityType, level);
@@ -127,9 +133,6 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
             tag.putUUID("Wolf", this.wolf.getUUID());
         }
     }
-
-    //if it's restoring a wolf from a save
-    private UUID restoreWolfUUID = null;
 
     @Override
     protected void readAdditionalSaveData(CompoundTag tag) {
@@ -179,7 +182,7 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
     }
 
 
-    //maybe if it can be controlled like a horse?
+    //should control sounds i think
     @Override
     protected MovementEmission getMovementEmission() {
         return MovementEmission.NONE;
@@ -206,6 +209,7 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
         return LivingEntity.resetForwardDirectionOfRelativePortalPosition(super.getRelativePortalPosition(axis, rectangle));
     }
 
+    //boat code here
     @Override
     public boolean hurt(DamageSource source, float amount) {
         if (this.isInvulnerableTo(source)) {
@@ -222,7 +226,8 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
                     this.spawnAtLocation(this.getSledItem());
                     DyeColor seat = this.getSeatType();
                     if (seat != null) {
-                        this.spawnAtLocation(ModRegistry.CARPETS.get().get(seat));
+                        Item carpet = BlocksColorAPI.getColoredItem("carpet", seat);
+                        if (carpet != null) this.spawnAtLocation(carpet);
                     }
                     if (this.hasWolf()) {
                         this.spawnAtLocation(Items.LEAD);
@@ -234,8 +239,9 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
         return true;
     }
 
+    //still boat code
     @Override
-    public void animateHurt() {
+    public void animateHurt(float hitYaw) {
         this.setHurtDir(-this.getHurtDir());
         this.setHurtTime(10);
         this.setDamage(this.getDamage() * 11.0F);
@@ -245,7 +251,7 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
      * Applies a velocity to the entities, to push them away from eachother.
      */
     @Override
-    public void push(@NotNull Entity pEntity) {
+    public void push(Entity pEntity) {
         if (pEntity instanceof Boat) {
             if (pEntity.getBoundingBox().minY < this.getBoundingBox().maxY) {
                 super.push(pEntity);
@@ -267,16 +273,6 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
         this.lerpXRot = xRot;
         //ticks it takes to lerp to (10)
         this.lerpSteps = 5;
-    }
-
-    @Override
-    protected AABB getBoundingBoxForPose(Pose pPose) {
-        return super.getBoundingBoxForPose(pPose);
-    }
-
-    @Override
-    public AABB getBoundingBoxForCulling() {
-        return super.getBoundingBoxForCulling();
     }
 
     /**
@@ -462,15 +458,15 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
         if (this.wolf != null && wolf.isRemoved()) this.wolf = null;
 
         boolean hasWolf = false;
-        if(this.wolf != null && this.level.isClientSide) { //hackery to fix client side wold since we arent resetting it properly
+        if (this.wolf != null && this.level.isClientSide) { //hackery to fix client side wold since we arent resetting it properly
             //TODO: handle clientside wold properly, possibly not as a passenger
             for (var passenger : this.getPassengers()) {
-                if (passenger == wolf){
+                if (passenger == wolf) {
                     hasWolf = true;
                     break;
                 }
             }
-            if(!hasWolf) this.wolf = null;
+            if (!hasWolf) this.wolf = null;
         }
 
         //on first and second tick cause of passengers fuckery needing 2 ticks to get added
@@ -604,8 +600,8 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
     @Override
     protected void checkInsideBlocks() {
         AABB aabb = this.getBoundingBox();
-        BlockPos blockpos = new BlockPos(aabb.minX + 0.001D, aabb.minY + 0.001D, aabb.minZ + 0.001D);
-        BlockPos blockpos1 = new BlockPos(aabb.maxX - 0.001D, aabb.maxY - 0.001D, aabb.maxZ - 0.001D);
+        BlockPos blockpos = BlockPos.containing(aabb.minX + 0.001D, aabb.minY + 0.001D, aabb.minZ + 0.001D);
+        BlockPos blockpos1 = BlockPos.containing(aabb.maxX - 0.001D, aabb.maxY - 0.001D, aabb.maxZ - 0.001D);
         if (this.level.hasChunksAt(blockpos, blockpos1)) {
             BlockPos.MutableBlockPos blockPos = new BlockPos.MutableBlockPos();
 
@@ -768,7 +764,7 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
         if (maxUpStep > 0.0F && ySomething && (changedX || changedZ)) {
             Vec3 vec31 = collideBoundingBox(this, new Vec3(pVec.x, maxUpStep, pVec.z), aabb, this.level, list);
             Vec3 vec32 = collideBoundingBox(this, new Vec3(0.0D, maxUpStep, 0.0D), aabb.expandTowards(pVec.x, 0.0D, pVec.z), this.level, list);
-            if (vec32.y <  maxUpStep) {
+            if (vec32.y < maxUpStep) {
                 Vec3 vec33 = collideBoundingBox(this, new Vec3(pVec.x, 0.0D, pVec.z), aabb.move(vec32), this.level, list).add(vec32);
                 if (vec33.horizontalDistanceSqr() > vec31.horizontalDistanceSqr()) {
                     vec31 = vec33;
@@ -801,11 +797,11 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
 
         if (this.lerpSteps > 0) {
             double d0 = this.getX() + (this.lerpX - this.getX()) / this.lerpSteps;
-            double d1 = this.getY() + (this.lerpY - this.getY()) /  this.lerpSteps;
-            double d2 = this.getZ() + (this.lerpZ - this.getZ()) /  this.lerpSteps;
-            double d3 = Mth.wrapDegrees(this.lerpYRot -  this.getYRot());
-            this.setYRot(this.getYRot() + (float) d3 /  this.lerpSteps);
-            this.setXRot(this.getXRot() + (float) (this.lerpXRot -  this.getXRot()) /  this.lerpSteps);
+            double d1 = this.getY() + (this.lerpY - this.getY()) / this.lerpSteps;
+            double d2 = this.getZ() + (this.lerpZ - this.getZ()) / this.lerpSteps;
+            double d3 = Mth.wrapDegrees(this.lerpYRot - this.getYRot());
+            this.setYRot(this.getYRot() + (float) d3 / this.lerpSteps);
+            this.setXRot(this.getXRot() + (float) (this.lerpXRot - this.getXRot()) / this.lerpSteps);
             --this.lerpSteps;
             this.setPos(d0, d1, d2);
             this.setRot(this.getYRot(), this.getXRot());
@@ -865,7 +861,7 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
                                     ++blockCount;
                                 } else if (Shapes.joinIsNotEmpty(blockstate.getCollisionShape(this.level, mutable).move(l1, k2, i2), voxelshape, BooleanOp.AND)) {
                                     //decreases friction for blocks and ice in particular
-                                    float fr = ForgeHelper.getFriction(blockstate,this.level, mutable, this);
+                                    float fr = ForgeHelper.getFriction(blockstate, this.level, mutable, this);
                                     if (fr > 0.9) fr *= ModConfigs.ICE_FRICTION_MULTIPLIER.get();
                                     cumulativeFriction += fr;
                                     ++blockCount;
@@ -1040,7 +1036,7 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
 
             this.resetFallDistance();
         } else if (pY < 0.0D) {
-            this.fallDistance = (float) ( this.fallDistance - pY);
+            this.fallDistance = (float) (this.fallDistance - pY);
         }
     }
 
@@ -1313,13 +1309,13 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
 
                 }
                 Vec3 vec3 = (new Vec3(zPos, 0.0D, 0.0D)).yRot(-this.getYRot() * ((float) Math.PI / 180F) - ((float) Math.PI / 2F));
-                entity.setPos(this.getX() + vec3.x, this.getY() +  yPos, this.getZ() + vec3.z);
+                entity.setPos(this.getX() + vec3.x, this.getY() + yPos, this.getZ() + vec3.z);
 
 
                 if (entity instanceof Animal animal && isMoreThanOneOnBoard) {
                     int yRot = entity.getId() % 2 == 0 ? 90 : 270;
-                    entity.setYBodyRot(animal.yBodyRot +  yRot);
-                    entity.setYHeadRot(entity.getYHeadRot() +  yRot);
+                    entity.setYBodyRot(animal.yBodyRot + yRot);
+                    entity.setYHeadRot(entity.getYHeadRot() + yRot);
                 }
             }
         }
@@ -1337,18 +1333,18 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
         Vec3 vec3 = getCollisionHorizontalEscapeVector(this.getBbWidth() * Mth.SQRT_OF_TWO, (double) entity.getBbWidth(), entity.getYRot());
         double d0 = this.getX() + vec3.x;
         double d1 = this.getZ() + vec3.z;
-        BlockPos blockpos = new BlockPos(d0, this.getBoundingBox().maxY, d1);
+        BlockPos blockpos = BlockPos.containing(d0, this.getBoundingBox().maxY, d1);
         BlockPos below = blockpos.below();
         if (!this.level.isWaterAt(below)) {
             List<Vec3> list = Lists.newArrayList();
             double d2 = this.level.getBlockFloorHeight(blockpos);
             if (DismountHelper.isBlockFloorValid(d2)) {
-                list.add(new Vec3(d0,  blockpos.getY() + d2, d1));
+                list.add(new Vec3(d0, blockpos.getY() + d2, d1));
             }
 
             double d3 = this.level.getBlockFloorHeight(below);
             if (DismountHelper.isBlockFloorValid(d3)) {
-                list.add(new Vec3(d0,  below.getY() + d3, d1));
+                list.add(new Vec3(d0, below.getY() + d3, d1));
             }
 
             for (Pose pose : entity.getDismountPoses()) {
@@ -1480,20 +1476,16 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
 
     public void updateWolfAnimations() {
         if (this.wolf != null) {
-            this.wolf.animationSpeedOld = this.wolfAnimationSpeed;
-            double d0 = wolf.getX() - wolf.xo;
-            double d1 = 0.0D;
-            double d2 = wolf.getZ() - wolf.zo;
-            float f = (float) Math.sqrt(d0 * d0 + d1 * d1 + d2 * d2) * 4.0F;
-            if (f > 1.0F) {
-                f = 1.0F;
+            double travelX = wolf.getX() - wolf.xo;
+            double travelY = 0.0D;
+            double travelZ = wolf.getZ() - wolf.zo;
+            float speed = (float) Math.sqrt(travelX * travelX + travelY * travelY + travelZ * travelZ) * 4.0F;
+            if (speed > 1.0F) {
+                speed = 1.0F;
             }
 
-            this.wolfAnimationSpeed += (f - this.wolfAnimationSpeed) * 0.4F;
-            this.wolfAnimationPosition += this.wolfAnimationSpeed;
+            this.wolf.walkAnimation.update(speed, 0.4f);
 
-            this.wolf.animationSpeed = this.wolfAnimationSpeed;
-            this.wolf.animationPosition = this.wolfAnimationPosition;
             Vec3 m = this.isControlledByLocalInstance() ? this.getDeltaMovement() : this.getSyncedMovement();
             boolean sit = m.lengthSqr() < 0.00001;
             if (this.wolf instanceof TamableAnimal tamableAnimal) {
@@ -1511,7 +1503,6 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
 
 
     //chest madness
-
     private boolean canAddChest() {
         return this.getPassengers().size() < this.getMaxPassengersSize() && !this.hasChest();
     }
