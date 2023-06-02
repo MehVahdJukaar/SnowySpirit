@@ -71,7 +71,7 @@ public class ModConfigScreen extends CustomConfigScreen {
         var level = Minecraft.getInstance().level;
         if (level != null && SnowySpirit.isChristmasSeason(level)) {
             int x = (int) (this.width * 0.93f);
-            this.itemRenderer.renderAndDecorateFakeItem(Items.SNOWBALL.getDefaultInstance(), x, 16);
+            this.itemRenderer.renderAndDecorateFakeItem(poseStack, Items.SNOWBALL.getDefaultInstance(), x, 16);
             if (ScreenUtil.isMouseWithin(x, 16, 16, 16, mouseX, mouseY)) {
                 this.renderTooltip(poseStack, this.font.split(Component.translatable("gui.snowyspirit.snow_season_on").withStyle(ChatFormatting.AQUA), 200), mouseX, mouseY);
             }

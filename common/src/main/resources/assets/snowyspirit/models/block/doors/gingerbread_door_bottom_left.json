@@ -1,7 +1,7 @@
 {
   "parent": "minecraft:block/door_bottom_left",
   "textures": {
-    "top": "snowyspirit:blocks/gingerbread_door_top",
-    "bottom": "snowyspirit:blocks/gingerbread_door_bottom"
+    "top": "snowyspirit:block/gingerbread_door_top",
+    "bottom": "snowyspirit:block/gingerbread_door_bottom"
   }
 }

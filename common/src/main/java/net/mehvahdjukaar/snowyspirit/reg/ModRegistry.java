@@ -1,20 +1,14 @@
 package net.mehvahdjukaar.snowyspirit.reg;
 
-import com.google.common.base.Suppliers;
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableMap;
-import com.teamabode.cave_enhancements.core.integration.quark.VerticalSlabBlock;
 import net.mehvahdjukaar.moonlight.api.block.ModStairBlock;
 import net.mehvahdjukaar.moonlight.api.item.WoodBasedBlockItem;
 import net.mehvahdjukaar.moonlight.api.misc.Registrator;
 import net.mehvahdjukaar.moonlight.api.platform.PlatHelper;
 import net.mehvahdjukaar.moonlight.api.platform.RegHelper;
 import net.mehvahdjukaar.moonlight.api.set.BlockSetAPI;
-import net.mehvahdjukaar.moonlight.api.set.BlockType;
 import net.mehvahdjukaar.moonlight.api.set.BlocksColorAPI;
 import net.mehvahdjukaar.moonlight.api.set.wood.WoodType;
-import net.mehvahdjukaar.moonlight.api.set.wood.WoodTypeRegistry;
 import net.mehvahdjukaar.snowyspirit.SnowySpirit;
 import net.mehvahdjukaar.snowyspirit.common.block.*;
 import net.mehvahdjukaar.snowyspirit.common.entity.ContainerHolderEntity;
@@ -23,7 +17,6 @@ import net.mehvahdjukaar.snowyspirit.common.items.CandyCaneItem;
 import net.mehvahdjukaar.snowyspirit.common.items.EggnogItem;
 import net.mehvahdjukaar.snowyspirit.common.items.GlowLightsItem;
 import net.mehvahdjukaar.snowyspirit.common.items.SledItem;
-import net.mehvahdjukaar.snowyspirit.configs.ModConfigs;
 import net.minecraft.Util;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.world.entity.Entity;
@@ -35,50 +28,35 @@ import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.properties.BlockSetType;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.material.MaterialColor;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
 @SuppressWarnings("ConstantConditions")
 public class ModRegistry {
 
-    //vanilla carpets color cache
-    public static final Supplier<BiMap<DyeColor, Item>> CARPETS = Suppliers.memoize(() -> {
-        var m = HashBiMap.<DyeColor, Item>create();
-        for (DyeColor c : DyeColor.values()) {
-            m.put(c, BlocksColorAPI.getColoredItem("carpet", c));
-        }
-        return m;
-    });
-
     public static void init() {
         BlockSetAPI.addDynamicItemRegistration(ModRegistry::registerSledItems, WoodType.class);
-        BlockSetAPI.addDynamicBlockRegistration(ModRegistry::hack, WoodType.class);
-    }
-
-    //TODO: remove and fix in moonlignt
-    private static <T extends BlockType> void hack(Registrator<Block> itemRegistrator, Collection<T> ts) {
     }
 
     private static void registerSledItems(Registrator<Item> event, Collection<WoodType> woodTypes) {
         for (WoodType wood : woodTypes) {
             if (wood.canBurn()) {
-                String name = wood.getVariantId("sled");
+                String name = wood.getVariantId(SLED_NAME);
                 SledItem item = new SledItem(wood);
                 event.register(SnowySpirit.res(name), item);
                 SLED_ITEMS.put(wood, item);
-                wood.addChild("sled", (Object) item);
+                wood.addChild(SLED_NAME, item);
             }
         }
     }
 
-    public static final Supplier<EntityType<SledEntity>> SLED = regEntity("sled",
+    public static final String SLED_NAME = "sled";
+    public static final Supplier<EntityType<SledEntity>> SLED = regEntity(SLED_NAME,
             () -> EntityType.Builder.<SledEntity>of(SledEntity::new, MobCategory.MISC)
                     .sized(1.375F, 0.5625F)
                     .clientTrackingRange(10));
@@ -89,72 +67,63 @@ public class ModRegistry {
                     .clientTrackingRange(8));
 
 
-    public static final Map<WoodType, SledItem> SLED_ITEMS = new HashMap<>();
-
-    public static final CreativeModeTab MOD_TAB = !ModConfigs.MOD_TAB.get() ? null :
-            PlatHelper.createModTab(SnowySpirit.res(SnowySpirit.MOD_ID),
-                    () -> SLED_ITEMS.get(WoodTypeRegistry.OAK_TYPE).getDefaultInstance(), false);
+    public static final Map<WoodType, SledItem> SLED_ITEMS = new LinkedHashMap<>();
 
     public static final Supplier<Block> CANDY_CANE_BLOCK = regWithItem("candy_cane_block", () ->
-                    new RotatedPillarBlock(BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_PINK)
-                            .requiresCorrectToolForDrops().strength(1.5F).sound(SoundType.CALCITE)),
-            CreativeModeTab.TAB_BUILDING_BLOCKS);
+            new RotatedPillarBlock(BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_PINK)
+                    .requiresCorrectToolForDrops().strength(1.5F).sound(SoundType.CALCITE)));
 
-    public static final Supplier<Item> CANDY_CANE = regItem("candy_cane",
-            () -> new CandyCaneItem(new Item.Properties().tab(getTab(CreativeModeTab.TAB_FOOD, "candy_cane"))
+    public static final String CANDY_CANE_NAME = "candy_cane";
+    public static final Supplier<Item> CANDY_CANE = regItem(CANDY_CANE_NAME,
+            () -> new CandyCaneItem(new Item.Properties()
                     .food(new FoodProperties.Builder().nutrition(2).saturationMod(0.4f).build())));
 
     public static final Supplier<Item> GINGERBREAD_COOKIE = regItem("gingerbread_cookie",
-            () -> new Item(new Item.Properties().tab(getTab(CreativeModeTab.TAB_FOOD, "gingerbread_cookie"))
+            () -> new Item(new Item.Properties()
                     .food(new FoodProperties.Builder().nutrition(1).fast().saturationMod(0.4f).build())));
 
-    public static final Supplier<Item> EGGNOG = regItem("eggnog", EggnogItem::new);
+    public static final String EGGNOG_NAME = "eggnog";
+    public static final Supplier<Item> EGGNOG = regItem(EGGNOG_NAME, EggnogItem::new);
 
-    public static final Supplier<Item> WINTER_DISC = regItem("winter_disc",
+    public static final String WINTER_DISC_NAME = "music_disc_winter";
+    public static final Supplier<Item> WINTER_DISC = regItem(WINTER_DISC_NAME,
             () -> PlatHelper.newMusicDisc(14, ModSounds.WINTER_MUSIC, new Item.Properties()
-                    .tab(getTab(CreativeModeTab.TAB_MISC, "winter_disc"))
                     .rarity(Rarity.RARE).stacksTo(1), 350));
 
     public static final Supplier<Block> GINGERBREAD_BLOCK = regWithItem("gingerbread", () ->
             new Block(BlockBehaviour.Properties.of(Material.STONE, MaterialColor.TERRACOTTA_ORANGE)
-                    .sound(SoundType.WOOD).strength(1F)), CreativeModeTab.TAB_BUILDING_BLOCKS);
+                    .sound(SoundType.WOOD).strength(1F)));
 
     //slab
     public static final Supplier<Block> GINGERBREAD_STAIRS = regWithItem("gingerbread_stairs", () -> new ModStairBlock(
-            GINGERBREAD_BLOCK, BlockBehaviour.Properties.copy(GINGERBREAD_BLOCK.get())
-    ), CreativeModeTab.TAB_BUILDING_BLOCKS);
-    //TODO: finish
+            GINGERBREAD_BLOCK, BlockBehaviour.Properties.copy(GINGERBREAD_BLOCK.get())));
+
     //slab
     public static final Supplier<Block> GINGERBREAD_SLAB = regWithItem("gingerbread_slab", () -> new SlabBlock(
-            BlockBehaviour.Properties.copy(GINGERBREAD_BLOCK.get())
-    ), CreativeModeTab.TAB_BUILDING_BLOCKS);
-
-    //vertical slab
-    public static final Supplier<Block> GINGERBREAD_VERTICAL_SLAB = regWithItem("gingerbread_vertical_slab", () -> new VerticalSlabBlock(
-            BlockBehaviour.Properties.copy(GINGERBREAD_BLOCK.get())
-    ), PlatHelper.isModLoaded("quark") ? CreativeModeTab.TAB_BUILDING_BLOCKS : null);
+            BlockBehaviour.Properties.copy(GINGERBREAD_BLOCK.get())));
 
     public static final Supplier<Block> GINGERBREAD_FROSTED_BLOCK = regWithItem("gingerbread_frosted", () ->
-            new Block(BlockBehaviour.Properties.copy(GINGERBREAD_BLOCK.get())), CreativeModeTab.TAB_BUILDING_BLOCKS);
+            new Block(BlockBehaviour.Properties.copy(GINGERBREAD_BLOCK.get())));
 
     public static final Supplier<Block> GINGERBREAD_DOOR = regWithItem("gingerbread_door", () ->
-            new DoorBlock(BlockBehaviour.Properties.copy(GINGERBREAD_BLOCK.get())) {
-            }, CreativeModeTab.TAB_REDSTONE);
+            new DoorBlock(BlockBehaviour.Properties.copy(GINGERBREAD_BLOCK.get()), BlockSetType.ACACIA) {
+            });
 
     public static final Supplier<Block> GINGERBREAD_TRAPDOOR = regWithItem("gingerbread_trapdoor", () ->
-            new TrapDoorBlock(BlockBehaviour.Properties.copy(GINGERBREAD_BLOCK.get())) {
-            }, CreativeModeTab.TAB_REDSTONE);
+            new TrapDoorBlock(BlockBehaviour.Properties.copy(GINGERBREAD_BLOCK.get()), BlockSetType.ACACIA) {
+            });
 
 
     public static final Supplier<Block> GINGER_WILD = regWithItem("wild_ginger", () -> new WildGingerBlock(
-            BlockBehaviour.Properties.copy(Blocks.TALL_GRASS)), CreativeModeTab.TAB_DECORATIONS);
+            BlockBehaviour.Properties.copy(Blocks.TALL_GRASS)));
 
-    public static final Supplier<Block> GINGER_CROP = regBlock("ginger", () ->
+    public static final String GINGER_NAME = "ginger";
+    public static final Supplier<Block> GINGER_CROP = regBlock(GINGER_NAME, () ->
             new GingerBlock(BlockBehaviour.Properties.of(Material.PLANT).noCollission().randomTicks().instabreak().sound(SoundType.CROP)));
     public static final Supplier<Item> GINGER_FLOWER = regItem("ginger_flower",
-            () -> new ItemNameBlockItem(GINGER_CROP.get(), new Item.Properties().tab(CreativeModeTab.TAB_MISC)));
+            () -> new ItemNameBlockItem(GINGER_CROP.get(), new Item.Properties()));
     public static final Supplier<Item> GINGER = regItem("ginger",
-            () -> new Item(new Item.Properties().tab(CreativeModeTab.TAB_FOOD)));
+            () -> new Item(new Item.Properties()));
 
     //pot
     public static final Supplier<Block> GINGER_POT = regBlock("potted_ginger", () -> PlatHelper.newFlowerPot(
@@ -164,24 +133,24 @@ public class ModRegistry {
             SnowySpirit.res("glow_light"));
 
 
+    public static final String GUMDROP_NAME = "gumdrop";
     public static final Map<DyeColor, Supplier<Block>> GUMDROPS_BUTTONS =
-            Arrays.stream(DyeColor.values()).collect(ImmutableMap.toImmutableMap(Function.identity(),
-                    c -> regWithItem("gumdrop_" + c.getName(), () -> new GumdropButton(c),
-                            CreativeModeTab.TAB_DECORATIONS)));
+           BlocksColorAPI.SORTED_COLORS.stream().collect(ImmutableMap.toImmutableMap(Function.identity(),
+                    c -> regWithItem(GUMDROP_NAME + "_" + c.getName(), () -> new GumdropButton(c))));
 
-
+    public static final String GLOW_LIGHTS_NAME = "glow_lights";
     public static final Map<DyeColor, Supplier<Block>> GLOW_LIGHTS_BLOCKS = Util.make(() -> {
         var m = new HashMap<DyeColor, Supplier<Block>>();
         for (DyeColor c : DyeColor.values()) {
-            m.put(c, regBlock("glow_lights_" + c.getName(), () -> new GlowLightsBlock(c)));
+            m.put(c, regBlock(GLOW_LIGHTS_NAME + "_" + c.getName(), () -> new GlowLightsBlock(c)));
         }
-        m.put(null, regBlock("glow_lights_prismatic", () -> new GlowLightsBlock(null)));
+        m.put(null, regBlock(GLOW_LIGHTS_NAME + "_prismatic", () -> new GlowLightsBlock(null)));
         return m;
     });
 
     public static final Map<DyeColor, Supplier<Item>> GLOW_LIGHTS_ITEMS = Util.make(() -> {
         var m = new HashMap<DyeColor, Supplier<Item>>();
-        for (DyeColor c : DyeColor.values()) {
+        for (DyeColor c : BlocksColorAPI.SORTED_COLORS) {
             m.put(c, regItem("glow_lights_" + c.getName(), () -> new GlowLightsItem(GLOW_LIGHTS_BLOCKS.get(c).get())));
         }
         m.put(null, regItem("glow_lights_prismatic", () -> new GlowLightsItem(GLOW_LIGHTS_BLOCKS.get(null).get())));
@@ -193,22 +162,15 @@ public class ModRegistry {
                     ModRegistry.GLOW_LIGHTS_BLOCKS.values().stream().map(Supplier::get).toArray(Block[]::new)));
 
 
-    public static final Supplier<Block> WREATH = regWithItem("wreath", () ->
+    public static final String WREATH_NAME = "wreath";
+    public static final Supplier<Block> WREATH = regWithItem(WREATH_NAME, () ->
             new WreathBlock(BlockBehaviour.Properties.of(Material.PLANT, MaterialColor.COLOR_GREEN)
-                    .sound(SoundType.VINE).strength(0.1f).noCollission()), CreativeModeTab.TAB_DECORATIONS);
+                    .sound(SoundType.VINE).strength(0.1f).noCollission()));
 
 
-    public static final Supplier<Block> SNOW_GLOBE = regWithItem("snow_globe", () ->
-            new SnowGlobeBlock(BlockBehaviour.Properties.of(Material.STONE).strength(0.5f)), CreativeModeTab.TAB_DECORATIONS);
-
-
-    //gets the tab given or null if the item is disabled
-    public static CreativeModeTab getTab(CreativeModeTab g, String regName) {
-        if (ModConfigs.isEnabled(regName)) {
-            return MOD_TAB == null ? g : MOD_TAB;
-        }
-        return null;
-    }
+    public static final String SNOW_GLOBE_NAME = "snow_globe";
+    public static final Supplier<Block> SNOW_GLOBE = regWithItem(SNOW_GLOBE_NAME, () ->
+            new SnowGlobeBlock(BlockBehaviour.Properties.of(Material.STONE).strength(0.5f)));
 
 
     public static <T extends Item> Supplier<T> regItem(String name, Supplier<T> sup) {
@@ -223,8 +185,8 @@ public class ModRegistry {
         return RegHelper.registerBlock(SnowySpirit.res(name), sup);
     }
 
-    public static <T extends Block> Supplier<T> regWithItem(String name, Supplier<T> blockFactory, CreativeModeTab tab) {
-        return regWithItem(name, blockFactory, new Item.Properties().tab(getTab(tab, name)), 0);
+    public static <T extends Block> Supplier<T> regWithItem(String name, Supplier<T> blockFactory) {
+        return regWithItem(name, blockFactory, new Item.Properties(), 0);
     }
 
     public static <T extends Block> Supplier<T> regWithItem(String name, Supplier<T> blockFactory, Item.Properties properties, int burnTime) {

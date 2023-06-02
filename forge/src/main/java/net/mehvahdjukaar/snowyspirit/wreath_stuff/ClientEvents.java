@@ -2,7 +2,7 @@ package net.mehvahdjukaar.snowyspirit.wreath_stuff;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Vector3f;
+import com.mojang.math.Axis;
 import net.mehvahdjukaar.moonlight.api.client.util.RenderUtil;
 import net.mehvahdjukaar.snowyspirit.SnowySpirit;
 import net.mehvahdjukaar.snowyspirit.reg.ModRegistry;
@@ -79,13 +79,13 @@ public class ClientEvents {
 
                         if (dim != null) {
                             poseStack.pushPose();
-                            poseStack.mulPose(Vector3f.YP.rotationDegrees(-dir.toYRot()));
+                            poseStack.mulPose(Axis.YP.rotationDegrees(-dir.toYRot()));
                             poseStack.translate(-0.5, -0.5, -0.5 + dim.getSecond());
                             RenderUtil.renderBlock(0, poseStack, bufferSource, state, level, pos, blockRenderer);
                             poseStack.popPose();
 
                             poseStack.pushPose();
-                            poseStack.mulPose(Vector3f.YP.rotationDegrees(-dir.getOpposite().toYRot()));
+                            poseStack.mulPose(Axis.YP.rotationDegrees(-dir.getOpposite().toYRot()));
                             poseStack.translate(-0.5, -0.5, -0.5 + dim.getFirst());
                             RenderUtil.renderBlock(0, poseStack, bufferSource, state, level, pos, blockRenderer);
                             poseStack.popPose();

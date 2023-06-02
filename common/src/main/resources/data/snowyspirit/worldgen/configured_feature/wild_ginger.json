@@ -1,0 +1,41 @@
+{
+  "config": {
+    "tries": 40,
+    "xz_spread": 4,
+    "y_spread": 1,
+    "feature": {
+      "feature": {
+        "config": {
+          "to_place": {
+            "type": "minecraft:simple_state_provider",
+            "state": {
+              "Name": "snowyspirit:wild_ginger"
+            }
+          }
+        },
+        "type": "minecraft:simple_block"
+      },
+      "placement": [
+        {
+          "predicate": {
+            "predicates": [
+              {
+                "blocks": "minecraft:air",
+                "type": "minecraft:matching_blocks"
+              },
+              {
+                "state": {
+                  "Name": "snowyspirit:wild_ginger"
+                },
+                "type": "minecraft:would_survive"
+              }
+            ],
+            "type": "minecraft:all_of"
+          },
+          "type": "minecraft:block_predicate_filter"
+        }
+      ]
+    }
+  },
+  "type": "minecraft:random_patch"
+}

@@ -66,14 +66,14 @@ public class SledEntityRenderer extends EntityRenderer<SledEntity> {
 
         poseStack.mulPose(Axis.YP.rotationDegrees(180.0F - yRot));
         poseStack.mulPose(Axis.XN.rotationDegrees(xRot));
-        float f = (float) sled.getHurtTime() - partialTicks;
-        float f1 = sled.getDamage() - partialTicks;
-        if (f1 < 0.0F) {
-            f1 = 0.0F;
+        float hurtTme = (float) sled.getHurtTime() - partialTicks;
+        float damage = sled.getDamage() - partialTicks;
+        if (damage < 0.0F) {
+            damage = 0.0F;
         }
 
-        if (f > 0.0F) {
-            poseStack.mulPose(Axis.ZP.rotationDegrees(Mth.sin(f) * f * f1 / 10.0F * (float) sled.getHurtDir()));
+        if (hurtTme > 0.0F) {
+            poseStack.mulPose(Axis.ZP.rotationDegrees(Mth.sin(hurtTme) * hurtTme * damage / 10.0F * (float) sled.getHurtDir()));
         }
 
         poseStack.pushPose();

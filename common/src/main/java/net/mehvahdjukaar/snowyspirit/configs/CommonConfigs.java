@@ -5,12 +5,13 @@ import net.mehvahdjukaar.moonlight.api.platform.configs.ConfigSpec;
 import net.mehvahdjukaar.moonlight.api.platform.configs.ConfigType;
 import net.mehvahdjukaar.snowyspirit.SnowySpirit;
 import net.mehvahdjukaar.snowyspirit.integration.SeasonModCompat;
+import net.mehvahdjukaar.snowyspirit.reg.ModRegistry;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
 
-public class ModConfigs {
+public class CommonConfigs {
 
     public static final ConfigSpec SPEC;
 
@@ -55,18 +56,18 @@ public class ModConfigs {
         builder.pop();
 
         builder.push("blocks_and_items");
-        GUMDROPS = feature(builder, "gumdrops");
-        GLOW_LIGHTS = feature(builder, "glow_lights");
-        CANDY_CANE = feature(builder, "candy_cane");
-        GINGER = feature(builder, "ginger");
-        EGGNOG = feature(builder, "eggnog");
-        WREATH = feature(builder, "wreath");
-        SNOW_GLOBE = feature(builder, "snow_globe");
+        GUMDROPS = feature(builder, ModRegistry.GUMDROP_NAME);
+        GLOW_LIGHTS = feature(builder, ModRegistry.GLOW_LIGHTS_NAME);
+        CANDY_CANE = feature(builder, ModRegistry.CANDY_CANE_NAME);
+        GINGER = feature(builder, ModRegistry.GINGER_NAME);
+        EGGNOG = feature(builder, ModRegistry.EGGNOG_NAME);
+        WREATH = feature(builder, ModRegistry.WREATH_NAME);
+        SNOW_GLOBE = feature(builder, ModRegistry.SNOW_GLOBE_NAME);
 
         builder.pop();
 
 
-        builder.push("sleds");
+        builder.push(ModRegistry.SLED_NAME);
         SLEDS = feature(builder);
 
         builder.push("physics").comment("Advanced settings. Use to alter sled physics");

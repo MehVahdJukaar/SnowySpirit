@@ -1,6 +1,6 @@
 {
 	"parent": "minecraft:block/cube_all",
 	"textures": {
-		"all": "snowyspirit:blocks/gingerbread_frosted_block"
+		"all": "snowyspirit:block/gingerbread_frosted_block"
 	}
 }

@@ -2,10 +2,10 @@
 	"credit": "Made with Blockbench",
 	"parent": "minecraft:block/cube",
 	"textures": {
-		"1": "snowyspirit:blocks/snowglobe_inside_snow",
-		"2": "snowyspirit:blocks/snowglobe_outside",
-		"3": "snowyspirit:blocks/globe_snow",
-		"particle": "snowyspirit:blocks/snowglobe_outside"
+		"1": "snowyspirit:block/snowglobe_inside_snow",
+		"2": "snowyspirit:block/snowglobe_outside",
+		"3": "snowyspirit:block/globe_snow",
+		"particle": "snowyspirit:block/snowglobe_outside"
 	},
 	"elements": [
 		{

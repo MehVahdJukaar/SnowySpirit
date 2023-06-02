@@ -3,7 +3,7 @@ package net.mehvahdjukaar.snowyspirit.mixins;
 import net.mehvahdjukaar.snowyspirit.SnowySpirit;
 import net.mehvahdjukaar.snowyspirit.common.entity.ContainerHolderEntity;
 import net.mehvahdjukaar.snowyspirit.common.entity.SledEntity;
-import net.mehvahdjukaar.snowyspirit.configs.ModConfigs;
+import net.mehvahdjukaar.snowyspirit.configs.CommonConfigs;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
@@ -46,7 +46,7 @@ public abstract class IglooPiecesMixin extends TemplateStructurePiece {
                           ChunkGenerator chunkGenerator, RandomSource pRandom, BoundingBox pBox,
                           ChunkPos chunkPos, BlockPos pos, CallbackInfo ci) {
 
-        if (pRandom.nextFloat() > 0.3 && ModConfigs.SLEDS.get()) {
+        if (pRandom.nextFloat() > 0.3 && CommonConfigs.SLEDS.get()) {
 
             ResourceLocation resourcelocation = new ResourceLocation(this.templateName);
             if (resourcelocation.equals(new ResourceLocation("igloo/top"))) {

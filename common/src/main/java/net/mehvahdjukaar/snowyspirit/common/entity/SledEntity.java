@@ -3,7 +3,6 @@ package net.mehvahdjukaar.snowyspirit.common.entity;
 import com.google.common.collect.Lists;
 import net.mehvahdjukaar.moonlight.api.entity.IControllableVehicle;
 import net.mehvahdjukaar.moonlight.api.entity.IExtraClientSpawnData;
-import net.mehvahdjukaar.moonlight.api.platform.ForgeHelper;
 import net.mehvahdjukaar.moonlight.api.platform.PlatHelper;
 import net.mehvahdjukaar.moonlight.api.set.BlocksColorAPI;
 import net.mehvahdjukaar.moonlight.api.set.wood.WoodType;
@@ -11,7 +10,7 @@ import net.mehvahdjukaar.moonlight.api.set.wood.WoodTypeRegistry;
 import net.mehvahdjukaar.snowyspirit.client.SledSoundInstance;
 import net.mehvahdjukaar.snowyspirit.common.network.NetworkHandler;
 import net.mehvahdjukaar.snowyspirit.common.network.ServerBoundUpdateSledState;
-import net.mehvahdjukaar.snowyspirit.configs.ModConfigs;
+import net.mehvahdjukaar.snowyspirit.configs.CommonConfigs;
 import net.mehvahdjukaar.snowyspirit.reg.ModRegistry;
 import net.mehvahdjukaar.snowyspirit.reg.ModTags;
 import net.minecraft.BlockUtil;
@@ -55,7 +54,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.minecraft.world.phys.shapes.BooleanOp;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.NotNull;
@@ -89,12 +87,16 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
     private double lerpZ;
     private double lerpYRot;
     private double lerpXRot;
+
+    //client one
     private boolean inputLeft;
     private boolean inputRight;
     private boolean inputUp;
     private boolean inputDown;
+
+    //friction
     private float landFriction;
-    private Status status;
+    private GroundStatus groundStatus;
 
     //if it's restoring a wolf from a save
     private UUID restoreWolfUUID = null;
@@ -242,6 +244,7 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
     //still boat code
     @Override
     public void animateHurt(float hitYaw) {
+        //TODO: use t
         this.setHurtDir(-this.getHurtDir());
         this.setHurtTime(10);
         this.setDamage(this.getDamage() * 11.0F);
@@ -320,6 +323,7 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
     public Vec3 prevProjectedPos = Vec3.ZERO;
     public Vec3 prevDeltaMovement = Vec3.ZERO;
     public boolean boost = false;
+
     //how much movement direction is misaligned from sled direction. determines actual fcition
     public double misalignedFrictionFactor = 1;
 
@@ -393,7 +397,7 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
         final float snowLayerHeight = 0.0625f;
 
         //raise when on snow layer
-        if (this.status == Status.ON_SNOW_LAYER && localAdditionalY < 0.0625) {
+        if (this.groundStatus == GroundStatus.ON_SNOW_LAYER && localAdditionalY < 0.0625) {
             localAdditionalY += snowLayerHeight;
         }
 
@@ -410,7 +414,7 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
 
         if (this.cachedAdditionalY > 0 && oldPos.y < this.getY()) {
 
-            float newHeight = this.status == Status.ON_SNOW_LAYER ? snowLayerHeight : 0;
+            float newHeight = this.groundStatus == GroundStatus.ON_SNOW_LAYER ? snowLayerHeight : 0;
             //adjust bounding box
             this.setDataAdditionalY(newHeight);
             this.cachedAdditionalY = newHeight;
@@ -490,7 +494,9 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
             this.setDamage(this.getDamage() - 1.0F);
         }
 
-        this.status = this.getStatusAndUpdateFriction();
+        var newStatus = GroundStatus.computeFriction(this);
+        this.groundStatus = newStatus.getFirst();
+        this.landFriction = newStatus.getSecond();
 
         //movement stuff start
 
@@ -629,7 +635,7 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
 
 
     private void spawnTrailParticles(Vec3 movement, double horizontalSpeed) {
-        if (this.status.onSnow() && this.onGround) {
+        if (this.groundStatus.onSnow() && this.onGround) {
             float xRot = this.getXRot();
             float yRot = this.getYRot();
             Vec3 left = null;
@@ -702,18 +708,22 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
 
     @Override
     public boolean canSpawnSprintParticle() {
-        return !this.status.onSnow() && super.canSpawnSprintParticle();
+        return !this.groundStatus.onSnow() && super.canSpawnSprintParticle();
     }
 
     @Override
     protected @NotNull AABB makeBoundingBox() {
         float additionalY = this.getAdditionalY();
         if (additionalY > 0) {
+            //is this needed on server side? cant we yeet that additiona y data?
             return super.makeBoundingBox().expandTowards(0, additionalY, 0);
         }
         return super.makeBoundingBox();
     }
 
+    /**
+     * Given a motion vector, return an updated vector that takes into account restrictions such as collisions (from all directions) and step-up from stepHeight
+     */
     @Override
     public Vec3 collide(Vec3 pVec) {
         AABB aabb = this.getBoundingBox();
@@ -722,59 +732,48 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
         double lengthSqr = pVec.lengthSqr();
 
         //todo: maye re enable. this pretty much disable collisions with wolf at all times since it causes desync and glitchynes when going uphill
-        if (this.hasWolf() && lengthSqr < 0.08) list.add(Shapes.create(this.pullerAABB));
+        //if (this.hasWolf() && lengthSqr < 0.08) list.add(Shapes.create(this.pullerAABB));
 
         Vec3 vec3 = lengthSqr == 0.0D ? pVec : collideBoundingBox(this, pVec, aabb, this.level, list);
-        boolean flag = pVec.x != vec3.x;
-        boolean flag1 = pVec.y != vec3.y;
-        boolean flag2 = pVec.z != vec3.z;
-        boolean flag3 = this.onGround || flag1 && pVec.y < 0.0D;
-        float maxUpStep = this.maxUpStep();
-        if (maxUpStep > 0.0F && flag3 && (flag || flag2)) {
-            Vec3 vec31 = collideBoundingBox(this, new Vec3(pVec.x, maxUpStep, pVec.z), aabb, this.level, list);
-            Vec3 vec32 = collideBoundingBox(this, new Vec3(0.0D, maxUpStep, 0.0D), aabb.expandTowards(pVec.x, 0.0D, pVec.z), this.level, list);
-            if (vec32.y < maxUpStep) {
-                Vec3 vec33 = collideBoundingBox(this, new Vec3(pVec.x, 0.0D, pVec.z), aabb.move(vec32), this.level, list).add(vec32);
-                if (vec33.horizontalDistanceSqr() > vec31.horizontalDistanceSqr()) {
-                    vec31 = vec33;
-                }
-            }
-
-            if (vec31.horizontalDistanceSqr() > vec3.horizontalDistanceSqr()) {
-                return vec31.add(collideBoundingBox(this, new Vec3(0.0D, -vec31.y + pVec.y, 0.0D), aabb.move(vec31), this.level, list));
-            }
-        }
+        Vec3 vec31 = maybeClimbUp(pVec, aabb, list, vec3);
+        if (vec31 != null) return vec31;
 
         return vec3;
     }
 
-    /**
-     * Given a motion vector, return an updated vector that takes into account restrictions such as collisions (from all
-     * directions) and step-up from stepHeight
-     */
-    private Vec3 calculateSlopePosition(Vec3 pVec, AABB aabb, Supplier<AABB> aabbResetter, float maxDownStep) {
-
-        List<VoxelShape> list = this.level.getEntityCollisions(this, aabb.expandTowards(pVec));
-        Vec3 vec3 = pVec.lengthSqr() == 0.0D ? pVec : collideBoundingBox(this, pVec, aabb, this.level, list);
-        boolean changedX = pVec.x != vec3.x;
-        boolean changedY = pVec.y != vec3.y;
-        boolean changedZ = pVec.z != vec3.z;
-        boolean ySomething = this.onGround || changedY && pVec.y < 0.0D;
+    //copied from original collide method
+    @Nullable
+    private Vec3 maybeClimbUp(Vec3 originalMot, AABB aabb, List<VoxelShape> voxelShapes, Vec3 horizonalMot) {
+        boolean restrictedX = originalMot.x != horizonalMot.x;
+        boolean restrictedY = originalMot.y != horizonalMot.y;
+        boolean restrictedZ = originalMot.z != horizonalMot.z;
+        boolean onGround = this.onGround || restrictedY && originalMot.y < 0.0D;
         float maxUpStep = this.maxUpStep();
-        if (maxUpStep > 0.0F && ySomething && (changedX || changedZ)) {
-            Vec3 vec31 = collideBoundingBox(this, new Vec3(pVec.x, maxUpStep, pVec.z), aabb, this.level, list);
-            Vec3 vec32 = collideBoundingBox(this, new Vec3(0.0D, maxUpStep, 0.0D), aabb.expandTowards(pVec.x, 0.0D, pVec.z), this.level, list);
+        if (maxUpStep > 0.0F && onGround && (restrictedX || restrictedZ)) {
+            Vec3 vec31 = collideBoundingBox(this, new Vec3(originalMot.x, maxUpStep, originalMot.z), aabb, this.level, voxelShapes);
+            Vec3 vec32 = collideBoundingBox(this, new Vec3(0.0D, maxUpStep, 0.0D), aabb.expandTowards(originalMot.x, 0.0D, originalMot.z), this.level, voxelShapes);
             if (vec32.y < maxUpStep) {
-                Vec3 vec33 = collideBoundingBox(this, new Vec3(pVec.x, 0.0D, pVec.z), aabb.move(vec32), this.level, list).add(vec32);
+                Vec3 vec33 = collideBoundingBox(this, new Vec3(originalMot.x, 0.0D, originalMot.z), aabb.move(vec32), this.level, voxelShapes).add(vec32);
                 if (vec33.horizontalDistanceSqr() > vec31.horizontalDistanceSqr()) {
                     vec31 = vec33;
                 }
             }
 
-            if (vec31.horizontalDistanceSqr() > vec3.horizontalDistanceSqr()) {
-                return vec31.add(collideBoundingBox(this, new Vec3(0.0D, -vec31.y + pVec.y, 0.0D), aabb.move(vec31), this.level, list));
+            if (vec31.horizontalDistanceSqr() > horizonalMot.horizontalDistanceSqr()) {
+                return vec31.add(collideBoundingBox(this, new Vec3(0.0D, -vec31.y + originalMot.y, 0.0D), aabb.move(vec31), this.level, voxelShapes));
             }
         }
+        return null;
+    }
+
+    /**
+     * Modified version of collide. calculates another collision for projected bb to calculate slope
+     */
+    private Vec3 calculateSlopePosition(Vec3 pVec, AABB aabb, Supplier<AABB> aabbResetter, float maxDownStep) {
+        List<VoxelShape> list = this.level.getEntityCollisions(this, aabb.expandTowards(pVec));
+        Vec3 vec3 = pVec.lengthSqr() == 0.0D ? pVec : collideBoundingBox(this, pVec, aabb, this.level, list);
+        Vec3 vec31 = maybeClimbUp(pVec, aabb, list, vec3);
+        if (vec31 != null) return vec31;
         //hack to get down pos
         Vec3 cached = this.position();
         Vec3 newPos = cached.add(vec3);
@@ -808,94 +807,16 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
         }
     }
 
-    public Status getCurrentStatus() {
-        return this.status;
+    public GroundStatus getCurrentStatus() {
+        return this.groundStatus;
     }
-
-    /**
-     * Decides how much the boat should be gliding on the land (based on any slippery blocks)
-     */
-    public Status getStatusAndUpdateFriction() {
-        if (this.isInWater()) {
-            return Status.IN_WATER;
-        } else {
-
-            AABB aabb = this.getBoundingBox();
-            AABB aabb1 = new AABB(aabb.minX, aabb.minY - 0.001D, aabb.minZ, aabb.maxX, aabb.minY, aabb.maxZ);
-            int i = Mth.floor(aabb1.minX) - 1;
-            int j = Mth.ceil(aabb1.maxX) + 1;
-            int k = Mth.floor(aabb1.minY) - 1;
-            int l = Mth.ceil(aabb1.maxY) + 1;
-            int i1 = Mth.floor(aabb1.minZ) - 1;
-            int j1 = Mth.ceil(aabb1.maxZ) + 1;
-            VoxelShape voxelshape = Shapes.create(aabb1);
-            float cumulativeFriction = 0.0F;
-            int blockCount = 0;
-            BlockPos.MutableBlockPos mutable = new BlockPos.MutableBlockPos();
-            boolean onSnow = false;
-            boolean onSnowLayer = false;
-            for (int l1 = i; l1 < j; ++l1) {
-                for (int i2 = i1; i2 < j1; ++i2) {
-                    int j2 = (l1 != i && l1 != j - 1 ? 0 : 1) + (i2 != i1 && i2 != j1 - 1 ? 0 : 1);
-                    if (j2 != 2) {
-                        for (int k2 = k; k2 < l; ++k2) {
-                            if (j2 <= 0 || k2 != k && k2 != l - 1) {
-                                mutable.set(l1, k2, i2);
-                                final double snowFriction = ModConfigs.SNOW_FRICTION.get();
-                                BlockState above = this.level.getBlockState(mutable.above());
-                                if (above.getBlock() instanceof SnowLayerBlock ||
-                                        (above.hasProperty(SnowLayerBlock.LAYERS) && above.is(ModTags.SLED_SNOW))) {
-                                    onSnowLayer = true;
-                                    cumulativeFriction += snowFriction;
-                                    ++blockCount;
-                                    continue;
-                                }
-                                BlockState blockstate = this.level.getBlockState(mutable);
-                                if (blockstate.is(ModTags.SLED_SNOW)) {
-                                    onSnow = true;
-                                    cumulativeFriction += snowFriction;
-                                    ++blockCount;
-                                } else if (blockstate.is(ModTags.SLED_SAND)) {
-                                    //sand friction
-                                    cumulativeFriction += ModConfigs.SAND_FRICTION.get();
-                                    ++blockCount;
-                                } else if (Shapes.joinIsNotEmpty(blockstate.getCollisionShape(this.level, mutable).move(l1, k2, i2), voxelshape, BooleanOp.AND)) {
-                                    //decreases friction for blocks and ice in particular
-                                    float fr = ForgeHelper.getFriction(blockstate, this.level, mutable, this);
-                                    if (fr > 0.9) fr *= ModConfigs.ICE_FRICTION_MULTIPLIER.get();
-                                    cumulativeFriction += fr;
-                                    ++blockCount;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            if (cumulativeFriction <= 0) {
-                return Status.IN_AIR;
-            }
-
-            float friction = cumulativeFriction / blockCount;
-            if (this.onGround) {
-                //alters friction when on slope
-                double slopeFriction = Mth.clamp(this.getXRot(), -45, 45) / 45f;
-                friction += ModConfigs.SLOPE_FRICTION_INCREASE.get() * slopeFriction;
-            }
-
-            this.landFriction = Math.min(0.9995f, friction);
-            if (onSnowLayer) return Status.ON_SNOW_LAYER;
-            if (onSnow) return Status.ON_SNOW;
-            return Status.ON_LAND;
-        }
-    }
-
 
     private void applyFriction() {
         double gravity = this.isNoGravity() ? 0.0D : (double) -0.04F;
 
         float invFriction = 0.05F;
 
-        switch (this.status) {
+        switch (this.groundStatus) {
             case IN_AIR -> invFriction = 0.9F;
             case IN_WATER -> invFriction = 0.45f;
             case ON_SNOW, ON_SNOW_LAYER, ON_LAND -> {
@@ -910,7 +831,7 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
         Vec3 movement = this.getDeltaMovement();
 
         //alters friction when not facing the right way. allows braking
-        if (this.status.touchingGround()) {
+        if (this.groundStatus.touchingGround()) {
             //max friction decrement cause by misaligned speed vector
             double inc = 0.825;
             if (this.inputUp || this.inputDown || movement.lengthSqr() > 0.001) {
@@ -928,7 +849,7 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
         this.setDeltaMovement(movement.x * invFriction, movement.y + gravity, movement.z * invFriction);
         //rotation friction
         //increase rotation friction when going forward. Turning is hard!
-        this.deltaRotation *= Math.min(invFriction, (this.inputUp ? ModConfigs.ROTATION_FRICTION_ON_W.get() : ModConfigs.ROTATION_FRICTION.get()));
+        this.deltaRotation *= Math.min(invFriction, (this.inputUp ? CommonConfigs.ROTATION_FRICTION_ON_W.get() : CommonConfigs.ROTATION_FRICTION.get()));
     }
 
     private void controlSled() {
@@ -938,12 +859,12 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
 
             boolean canSteer = !(this.inputRight && this.inputLeft) && this.inputUp;
             boolean hasWolf = this.hasWolf();
-            final double steerFactor = hasWolf ? ModConfigs.STEER_FACTOR_WOLF.get() : ModConfigs.STEER_FACTOR.get();
+            final double steerFactor = hasWolf ? CommonConfigs.STEER_FACTOR_WOLF.get() : CommonConfigs.STEER_FACTOR.get();
 
             if (this.inputLeft) {
                 --this.deltaRotation;
                 //crappy steering
-                if (this.status.touchingGround() && canSteer) {
+                if (this.groundStatus.touchingGround() && canSteer) {
                     Vec3 v = new Vec3(0, 0, 1);
                     v = v.yRot((float) ((-this.getYRot()) / 180 * Math.PI));
 
@@ -957,7 +878,7 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
             if (this.inputRight) {
                 ++this.deltaRotation;
                 //steering
-                if (this.status.touchingGround() && canSteer) {
+                if (this.groundStatus.touchingGround() && canSteer) {
                     Vec3 v = new Vec3(0, 0, 1);
                     v = v.yRot((float) ((-this.getYRot()) / 180 * Math.PI));
 
@@ -970,20 +891,20 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
 
             //side acceleration
             if (this.inputRight != this.inputLeft && !this.inputUp && !this.inputDown) {
-                powah += ModConfigs.SIDE_ACCELERATION.get();
+                powah += CommonConfigs.SIDE_ACCELERATION.get();
             }
 
             this.setYRot(this.getYRot() + this.deltaRotation);
             if (this.inputUp) {
-                if (this.status.onSnow()) {
-                    double acceleration = hasWolf ? ModConfigs.FORWARD_ACCELERATION_WOLF.get() : ModConfigs.FORWARD_ACCELERATION.get();
+                if (this.groundStatus.onSnow()) {
+                    double acceleration = hasWolf ? CommonConfigs.FORWARD_ACCELERATION_WOLF.get() : CommonConfigs.FORWARD_ACCELERATION.get();
                     powah += acceleration;//0.04F;
-                } else powah += ModConfigs.FORWARD_ACCELERATION_WHEN_NOT_ON_SNOW.get();
+                } else powah += CommonConfigs.FORWARD_ACCELERATION_WHEN_NOT_ON_SNOW.get();
             }
 
             //brake straight when pressing down
             if (this.inputDown) {
-                powah -= ModConfigs.BACKWARDS_ACCELERATION.get();
+                powah -= CommonConfigs.BACKWARDS_ACCELERATION.get();
             }
 
 
@@ -1008,7 +929,7 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
     protected void checkFallDamage(double pY, boolean pOnGround, BlockState pState, BlockPos pPos) {
 
         if (this.level.isClientSide && this.fallDistance > 0.5 && this.onGround) {
-            if (this.status.onSnow()) {
+            if (this.groundStatus.onSnow()) {
                 float p = Mth.clamp(this.fallDistance * 4f, 5, 20);
                 Vec3 front = this.position().add(this.getLookAngle().scale(0.8f));
                 Vec3 mov = this.getDeltaMovement().scale(1.1);
@@ -1101,20 +1022,20 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
         return null;
     }
 
-    //this is only caled by one player on server so any state change needs to be notified
+    //this is only called by one player on server so any state change needs to be notified
     @Override
     public InteractionResult interact(Player player, InteractionHand pHand) {
         if (!player.isSecondaryUseActive()) {
             ItemStack stack = player.getItemInHand(pHand);
-
-
+            //carpet
             if (stack.is(ItemTags.WOOL_CARPETS) && this.getSeatType() == null) {
-                this.playSound(SoundEvents.ARMOR_EQUIP_LEATHER, 0.5F, 1.0F);
-
-                //will crash with modded carpets. save actial item isntead. depends on implementation if we render carper or not
-                this.setSeatType(ModRegistry.CARPETS.get().inverse().get(stack.getItem()));
-                stack.shrink(1);
-                return InteractionResult.sidedSuccess(player.level.isClientSide);
+                DyeColor col = BlocksColorAPI.getColor(stack.getItem());
+                if (col != null) {
+                    this.playSound(SoundEvents.ARMOR_EQUIP_LEATHER, 0.5F, 1.0F);
+                    this.setSeatType(col);
+                    stack.shrink(1);
+                    return InteractionResult.sidedSuccess(player.level.isClientSide);
+                }
             } else if (this.tryAddingChest(stack) != null) {
                 return InteractionResult.sidedSuccess(player.level.isClientSide);
             }
@@ -1306,7 +1227,6 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
                     entity.setYRot(entity.getYRot() + this.deltaRotation);
                     entity.setYHeadRot(entity.getYHeadRot() + this.deltaRotation);
                     this.clampRotation(entity);
-
                 }
                 Vec3 vec3 = (new Vec3(zPos, 0.0D, 0.0D)).yRot(-this.getYRot() * ((float) Math.PI / 180F) - ((float) Math.PI / 2F));
                 entity.setPos(this.getX() + vec3.x, this.getY() + yPos, this.getZ() + vec3.z);
@@ -1399,23 +1319,6 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
         return true;
     }
 
-
-    public enum Status {
-        ON_SNOW,
-        ON_SNOW_LAYER,
-        ON_LAND,
-        IN_WATER,
-        IN_AIR;
-
-        public boolean touchingGround() {
-            return this != IN_AIR && this != IN_WATER;
-        }
-
-        public boolean onSnow() {
-            return this == ON_SNOW || this == ON_SNOW_LAYER;
-        }
-    }
-
     //wolf towing (god help me)
 
     public boolean isMyWolfEntity(Entity entity) {
@@ -1430,8 +1333,6 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
         return entity.getType().is(ModTags.WOLVES) && entity instanceof Animal && entity.getBbWidth() < 1.1;
     }
 
-    private float wolfAnimationSpeed = 0;
-    private float wolfAnimationPosition = 0;
     @Nullable
     private Animal wolf = null;
     @Nullable

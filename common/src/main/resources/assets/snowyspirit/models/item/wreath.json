@@ -2,6 +2,6 @@
 {
   "parent": "item/generated",
   "textures": {
-    "layer0": "snowyspirit:blocks/wreath"
+    "layer0": "snowyspirit:block/wreath"
   }
 }

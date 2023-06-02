@@ -2,7 +2,7 @@
   "credit": "Made with Blockbench",
   "parent": "item/generated",
   "textures": {
-    "layer0": "snowyspirit:items/gingerbread_cookie_0"
+    "layer0": "snowyspirit:item/gingerbread_cookie_0"
   },
   "overrides": [
     {

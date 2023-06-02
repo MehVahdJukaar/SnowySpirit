@@ -2,8 +2,8 @@
 	"credit": "Made with Blockbench",
 	"parent": "block/block",
 	"textures": {
-		"particle": "snowyspirit:blocks/gumdrop_blue",
-		"texture": "snowyspirit:blocks/gumdrop_blue"
+		"particle": "snowyspirit:block/gumdrop_blue",
+		"texture": "snowyspirit:block/gumdrop_blue"
 	},
 	"elements": [
 		{

@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:block/cross",
   "textures": {
-    "cross": "snowyspirit:blocks/wild_ginger"
+    "cross": "snowyspirit:block/wild_ginger"
   }
 }

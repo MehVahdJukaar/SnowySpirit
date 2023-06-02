@@ -2,6 +2,6 @@
 {
   "parent": "snowyspirit:block/ginger_crate",
   "textures": {
-    "layer0": "snowyspirit:items/ginger_crate"
+    "layer0": "snowyspirit:item/ginger_crate"
   }
 }

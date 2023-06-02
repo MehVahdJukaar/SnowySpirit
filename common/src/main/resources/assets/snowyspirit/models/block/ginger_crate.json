@@ -2,7 +2,7 @@
   "parent": "minecraft:block/cube_bottom_top",
   "textures": {
     "bottom": "farmersdelight:block/crate_bottom",
-    "side": "snowyspirit:blocks/ginger_crate_side",
-    "top": "snowyspirit:blocks/ginger_crate_top"
+    "side": "snowyspirit:block/ginger_crate_side",
+    "top": "snowyspirit:block/ginger_crate_top"
   }
 }

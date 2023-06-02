@@ -1,6 +1,6 @@
 {
   "parent": "snowyspirit:block/gumdrop_pressed",
   "textures": {
-    "particle": "snowyspirit:blocks/gumdrop_light_blue"
+    "particle": "snowyspirit:block/gumdrop_light_blue"
   }
 }

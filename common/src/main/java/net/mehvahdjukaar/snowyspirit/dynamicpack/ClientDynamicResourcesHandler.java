@@ -15,7 +15,7 @@ import net.mehvahdjukaar.moonlight.api.resources.textures.TextureImage;
 import net.mehvahdjukaar.moonlight.api.util.Utils;
 import net.mehvahdjukaar.moonlight.api.util.math.colors.HSVColor;
 import net.mehvahdjukaar.snowyspirit.SnowySpirit;
-import net.mehvahdjukaar.snowyspirit.configs.ModConfigs;
+import net.mehvahdjukaar.snowyspirit.configs.CommonConfigs;
 import net.mehvahdjukaar.snowyspirit.reg.ModRegistry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -35,7 +35,7 @@ public class ClientDynamicResourcesHandler extends DynClientResourcesGenerator {
 
     public ClientDynamicResourcesHandler() {
         super(new DynamicTexturePack(SnowySpirit.res("generated_pack")));
-        this.dynamicPack.setGenerateDebugResources(PlatHelper.isDev() || ModConfigs.DEBUG_RESOURCES.get());
+        this.dynamicPack.setGenerateDebugResources(PlatHelper.isDev() || CommonConfigs.DEBUG_RESOURCES.get());
     }
 
     private static final Map<DyeColor, float[]> COLORS = new EnumMap<>(DyeColor.class);
@@ -137,16 +137,16 @@ public class ClientDynamicResourcesHandler extends DynClientResourcesGenerator {
         }
 
         //item textures
-        try (TextureImage template = TextureImage.open(manager, SnowySpirit.res("items/sleds/sled_oak"));
-             TextureImage boatMask = TextureImage.open(manager, SnowySpirit.res("items/sleds/boat_mask"));
-             TextureImage sledMask = TextureImage.open(manager, SnowySpirit.res("items/sleds/sled_mask"))) {
+        try (TextureImage template = TextureImage.open(manager, SnowySpirit.res("item/sleds/sled_oak"));
+             TextureImage boatMask = TextureImage.open(manager, SnowySpirit.res("item/sleds/boat_mask"));
+             TextureImage sledMask = TextureImage.open(manager, SnowySpirit.res("item/sleds/sled_mask"))) {
 
             Palette palette = Palette.fromImage(template, sledMask);
             Respriter respriter = Respriter.ofPalette(template, palette);
 
             ModRegistry.SLED_ITEMS.forEach((wood, sled) -> {
                 //if (wood.isVanilla()) continue;
-                ResourceLocation textureRes = SnowySpirit.res("items/sleds/" + Utils.getID(sled).getPath());
+                ResourceLocation textureRes = SnowySpirit.res("item/sleds/" + Utils.getID(sled).getPath());
                 if (this.alreadyHasTextureAtLocation(manager, textureRes)) return;
 
                 TextureImage newImage = null;

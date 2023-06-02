@@ -2,6 +2,6 @@
 {
   "parent": "item/handheld",
   "textures": {
-    "layer0": "snowyspirit:items/candy_cane"
+    "layer0": "snowyspirit:item/candy_cane"
   }
 }

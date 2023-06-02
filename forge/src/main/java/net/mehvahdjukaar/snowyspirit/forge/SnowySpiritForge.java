@@ -33,7 +33,7 @@ public class SnowySpiritForge {
 
         SnowySpirit.commonInit();
 
-        if (PlatHelper.getEnv().isClient()) {
+        if (PlatHelper.getPhysicalSide().isClient()) {
             ClientRegistry.init();
         }
 

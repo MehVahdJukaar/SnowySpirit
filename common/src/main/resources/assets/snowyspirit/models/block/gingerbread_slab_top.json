@@ -1,8 +1,8 @@
 {
 	"parent": "minecraft:block/slab_top",
 	"textures": {
-		"bottom": "snowyspirit:blocks/gingerbread_block",
-		"top": "snowyspirit:blocks/gingerbread_block",
-		"side": "snowyspirit:blocks/gingerbread_block"
+		"bottom": "snowyspirit:block/gingerbread_block",
+		"top": "snowyspirit:block/gingerbread_block",
+		"side": "snowyspirit:block/gingerbread_block"
 	}
 }

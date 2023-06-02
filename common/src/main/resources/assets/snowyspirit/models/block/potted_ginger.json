@@ -1,6 +1,6 @@
 {
 	"parent": "minecraft:block/flower_pot_cross",
 	"textures": {
-		"plant": "snowyspirit:blocks/ginger_pot"
+		"plant": "snowyspirit:block/ginger_pot"
 	}
 }

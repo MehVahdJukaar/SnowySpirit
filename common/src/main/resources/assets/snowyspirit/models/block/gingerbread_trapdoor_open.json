@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:block/template_trapdoor_open",
   "textures": {
-    "texture": "snowyspirit:blocks/gingerbread_trapdoor"
+    "texture": "snowyspirit:block/gingerbread_trapdoor"
   }
 }

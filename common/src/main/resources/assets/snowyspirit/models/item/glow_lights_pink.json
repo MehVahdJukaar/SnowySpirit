@@ -2,6 +2,6 @@
 {
   "parent": "item/generated",
   "textures": {
-    "layer0": "snowyspirit:items/lights_pink"
+    "layer0": "snowyspirit:item/lights_pink"
   }
 }

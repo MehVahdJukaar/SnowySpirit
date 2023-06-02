@@ -2,8 +2,8 @@
 	"credit": "Made with Blockbench",
 	"ambientocclusion": false,
 	"textures": {
-		"particle": "snowyspirit:blocks/wreath",
-		"vine": "snowyspirit:blocks/wreath"
+		"particle": "snowyspirit:block/wreath",
+		"vine": "snowyspirit:block/wreath"
 	},
 	"elements": [
 		{

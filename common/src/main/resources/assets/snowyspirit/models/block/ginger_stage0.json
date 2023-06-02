@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:block/crop",
   "textures": {
-    "crop": "snowyspirit:blocks/ginger_stage0"
+    "crop": "snowyspirit:block/ginger_stage0"
   }
 }
