@@ -14,10 +14,8 @@ import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
@@ -29,7 +27,6 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix3f;
 import org.joml.Matrix4f;
-import org.joml.Vector3f;
 
 import java.util.Map;
 import java.util.stream.Stream;
@@ -72,8 +69,10 @@ public class SledEntityRenderer extends EntityRenderer<SledEntity> {
             damage = 0.0F;
         }
 
+        float zRot = 0;
         if (hurtTme > 0.0F) {
-            poseStack.mulPose(Axis.ZP.rotationDegrees(Mth.sin(hurtTme) * hurtTme * damage / 10.0F * (float) sled.getHurtDir()));
+            zRot = Mth.sin(hurtTme) * hurtTme * damage / 10.0F * (float) sled.getHurtDir();
+            poseStack.mulPose(Axis.ZP.rotationDegrees(zRot));
         }
 
         poseStack.pushPose();
@@ -99,7 +98,11 @@ public class SledEntityRenderer extends EntityRenderer<SledEntity> {
 
         poseStack.popPose();
 
-        this.renderLeash(sled, partialTicks, poseStack, bufferSource, (float) ((90 + yRot) * Math.PI / 180), (float) (xRot * Math.PI / 180), dy);
+        this.renderLeash(sled, partialTicks, poseStack, bufferSource,
+                (float) Math.toRadians(90 + yRot),
+                (float) Math.toRadians(xRot),
+                (float) Math.toRadians(zRot),
+                dy);
 
         super.render(sled, yRot, partialTicks, poseStack, bufferSource, light);
 
@@ -120,7 +123,7 @@ public class SledEntityRenderer extends EntityRenderer<SledEntity> {
                 .move(-pEntity.getX(), -pEntity.getY(), -pEntity.getZ());
         LevelRenderer.renderLineBox(pMatrixStack, pBuffer, aabb, 1.0F, 0, 0, 1.0F);
 
-        if (pEntity.hasWolf()) {
+        if (pEntity.hasPuller()) {
             aabb = pEntity.pullerAABB.move(-pEntity.getX(), -pEntity.getY(), -pEntity.getZ());
             LevelRenderer.renderLineBox(pMatrixStack, pBuffer, aabb, 0, 1, 0, 1.0F);
         }
@@ -169,8 +172,8 @@ public class SledEntityRenderer extends EntityRenderer<SledEntity> {
 
 
     private void renderLeash(SledEntity sled, float pPartialTicks, PoseStack poseStack, MultiBufferSource pBuffer,
-                             float yRot, float xRot, double addY) {
-        Animal wolf = sled.getWolf();
+                             float yRot, float xRot, float zRot, double addY) {
+        Animal wolf = sled.getSledPuller();
         if (wolf != null) {
             boolean bear = Utils.getID(wolf.getType()).getPath().equals("grizzly_bear");
             Vec3 wolfPos = wolf.getRopeHoldPosition(pPartialTicks).add(0, wolf.isBaby() ? 0.1 : 0.25, 0);
@@ -179,15 +182,24 @@ public class SledEntityRenderer extends EntityRenderer<SledEntity> {
             Vec3 sledOffset = new Vec3(0.4125f, 0, 0.95f);
             Vec3 ropeOffset = new Vec3(bbw, 0, 0);
 
+            //yaw
             float cos = Mth.cos(yRot);
             float sin = Mth.sin(yRot);
 
+            //slope
             float pCos = Mth.cos(xRot);
             float pSin = Mth.sin(xRot);
+
+
+            //wobble
+            float wSin = Mth.sin(zRot);
 
             double sledX = Mth.lerp(pPartialTicks, sled.xo, sled.getX());
             double sledY = Mth.lerp(pPartialTicks, sled.yo, sled.getY());
             double sledZ = Mth.lerp(pPartialTicks, sled.zo, sled.getZ());
+
+            BlockPos sledEyePos = BlockPos.containing(sled.getEyePosition(pPartialTicks));
+            BlockPos wolfEyePos = BlockPos.containing(wolf.getEyePosition(pPartialTicks));
 
             for (int rope = -1; rope <= 1; rope += 2) {
                 VertexConsumer vertexconsumer = pBuffer.getBuffer(RenderType.leash());
@@ -198,7 +210,8 @@ public class SledEntityRenderer extends EntityRenderer<SledEntity> {
                 double wolfOffsetZ = sin * ropeOffset.z - cos * ropeOffset.x * rope;
                 double offsetX = (cos * sledOffset.z + sin * sledOffset.x * rope) * pCos;
                 double offsetZ = (sin * sledOffset.z - cos * sledOffset.x * rope) * pCos;
-                double offsetY = -pSin * sledOffset.length() + 0.25 + addY;
+                double offsetY = -pSin * sledOffset.length() + 0.25 + addY -
+                        sledOffset.x * wSin * rope;
                 double pX = sledX + offsetX;
                 double pY = sledY + offsetY;
                 double pZ = sledZ + offsetZ;
@@ -211,22 +224,30 @@ public class SledEntityRenderer extends EntityRenderer<SledEntity> {
 
                 Matrix4f matrix4f = poseStack.last().pose();
                 float f4 = Mth.invSqrt(deltaX * deltaX + deltaZ * deltaZ) * width / 2.0F;
-                float f5 = deltaZ * f4;
+                //id what these are for but something with angle
+                float mathZ = deltaZ * f4;
 
-                float f6 = deltaX * f4;
-                BlockPos blockpos = BlockPos.containing(sled.getEyePosition(pPartialTicks));
-                BlockPos blockpos1 = BlockPos.containing(wolf.getEyePosition(pPartialTicks));
-                int i = this.getBlockLightLevel(sled, blockpos);
-                int j = sled.level.getBrightness(LightLayer.BLOCK, blockpos1);
-                int k = sled.level.getBrightness(LightLayer.SKY, blockpos);
-                int l = sled.level.getBrightness(LightLayer.SKY, blockpos1);
+                float mathX = deltaX * f4;
 
-                for (int i1 = 0; i1 <= 24; ++i1) {
-                    addVertexPair(vertexconsumer, matrix4f, deltaX, deltaY, deltaZ, i, j, k, l, 0.025F, 0.025F, f5, f6, i1, false);
+                int blockLight0 = this.getBlockLightLevel(sled, sledEyePos);
+                int blockLight1 = wolf.isOnFire() ? 15 : wolf.level.getBrightness(LightLayer.BLOCK, wolfEyePos);
+                int skyLight0 = sled.level.getBrightness(LightLayer.SKY, sledEyePos);
+                int skyLight1 = sled.level.getBrightness(LightLayer.SKY, wolfEyePos);
+
+                //each lead is composed of 2 strips
+                int maxSegments = 12;
+                for (int index = 0; index <= maxSegments; ++index) {
+                    addVertexPair(vertexconsumer, matrix4f, deltaX, deltaY, deltaZ,
+                            blockLight0, blockLight1, skyLight0, skyLight1,
+                            0.025F, 0.025F, mathZ, mathX, index,
+                            false, maxSegments);
                 }
 
-                for (int j1 = 24; j1 >= 0; --j1) {
-                    addVertexPair(vertexconsumer, matrix4f, deltaX, deltaY, deltaZ, i, j, k, l, 0.025F, 0.0F, f5, f6, j1, true);
+                for (int index = maxSegments; index >= 0; --index) {
+                    addVertexPair(vertexconsumer, matrix4f, deltaX, deltaY, deltaZ,
+                            blockLight0, blockLight1, skyLight0, skyLight1,
+                            0.025F, 0.0F, mathZ, mathX, index,
+                            true, maxSegments);
                 }
 
                 poseStack.popPose();
@@ -239,20 +260,29 @@ public class SledEntityRenderer extends EntityRenderer<SledEntity> {
     }
 
     //stolen from leash renderer
-    private static void addVertexPair(VertexConsumer vertexConsumer, Matrix4f matrix4f, float v, float v1, float v2, int i1, int i2, int i3, int i4, float v3, float v4, float v5, float v6, int i5, boolean b) {
-        float f =  i5 / 24.0F;
-        int i = (int) Mth.lerp(f,  i1,  i2);
-        int j = (int) Mth.lerp(f,  i3,  i4);
-        int k = LightTexture.pack(i, j);
-        float f1 = i5 % 2 == (b ? 1 : 0) ? 0.7F : 1.0F;
-        float f2 = 0.5F * f1;
-        float f3 = 0.4F * f1;
-        float f4 = 0.3F * f1;
-        float f5 = v * f;
-        float f6 = v1 > 0.0F ? v1 * f * f : v1 - v1 * (1.0F - f) * (1.0F - f);
-        float f7 = v2 * f;
-        vertexConsumer.vertex(matrix4f, f5 - v5, f6 + v4, f7 + v6).color(f2, f3, f4, 1.0F).uv2(k).endVertex();
-        vertexConsumer.vertex(matrix4f, f5 + v5, f6 + v3 - v4, f7 - v6).color(f2, f3, f4, 1.0F).uv2(k).endVertex();
+    private static void addVertexPair(VertexConsumer vertexConsumer, Matrix4f matrix4f,
+                                      float startX, float startY, float startZ,
+                                      int blockLight0, int blockLight1, int skyLight0, int skyLight1,
+                                      float y0, float y1,
+                                      float dx, float dz, int index,
+                                      boolean flippedColors, int maxSegments) {
+        float segment = index / (float) maxSegments;
+        int i = (int) Mth.lerp(segment, blockLight0, blockLight1);
+        int j = (int) Mth.lerp(segment, skyLight0, skyLight1);
+        int light = LightTexture.pack(i, j);
+        float darker = index % 2 == (flippedColors ? 1 : 0) ? 0.7F : 1.0F;
+        //hardcoded colors 0.0
+        float red = 0.5F * darker;
+        float green = 0.4F * darker;
+        float blue = 0.3F * darker;
+        float sx = startX * segment;
+        //parable here
+        float sy = startY > 0.0F ? startY * segment * segment : startY - startY * (1.0F - segment) * (1.0F - segment);
+        float sz = startZ * segment;
+        vertexConsumer.vertex(matrix4f, sx - dx, sy + y1, sz + dz)
+                .color(red, green, blue, 1.0F).uv2(light).endVertex();
+        vertexConsumer.vertex(matrix4f, sx + dx, sy + y0 - y1, sz - dz)
+                .color(red, green, blue, 1.0F).uv2(light).endVertex();
     }
 
 }

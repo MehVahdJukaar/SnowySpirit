@@ -60,7 +60,7 @@
         {
           "type": "minecraft:item",
           "weight": 25,
-          "name": "snowyspirit:winter_disc"
+          "name": "snowyspirit:music_disc_winter"
         },
         {
           "type": "minecraft:item",

@@ -31,7 +31,7 @@ public abstract class LivingEntityRendererMixin<T extends LivingEntity, M extend
     private boolean isPassenger(LivingEntity instance) {
         Entity vehicle = instance.getVehicle();
         if (vehicle instanceof SledEntity sledEntity) {
-            if (sledEntity.isMyWolfEntity(instance)) return false;
+            if (sledEntity.isMyPuller(instance)) return false;
         }
         return instance.isPassenger();
     }
