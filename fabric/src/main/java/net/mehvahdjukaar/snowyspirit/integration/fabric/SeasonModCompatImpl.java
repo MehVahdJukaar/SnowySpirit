@@ -1,7 +1,6 @@
 package net.mehvahdjukaar.snowyspirit.integration.fabric;
 
 import io.github.lucaargolo.seasons.FabricSeasons;
-import io.github.lucaargolo.seasons.item.SeasonCalendarItem;
 import io.github.lucaargolo.seasons.utils.Season;
 import net.mehvahdjukaar.moonlight.api.platform.configs.ConfigBuilder;
 import net.minecraft.world.level.Level;

@@ -18,7 +18,5 @@ public class FDCompatImpl {
             "ginger_crate", () ->
                     new Block(BlockBehaviour.Properties.of(Material.WOOD)
                             .strength(2.0F, 3.0F)
-                            .sound(SoundType.WOOD)),
-            FarmersDelightMod.ITEM_GROUP
-    );
+                            .sound(SoundType.WOOD)));
 }

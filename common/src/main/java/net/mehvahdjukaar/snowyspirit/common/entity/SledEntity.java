@@ -60,7 +60,6 @@ import org.jetbrains.annotations.NotNull;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import java.util.function.Supplier;
 
 public class SledEntity extends Entity implements IControllableVehicle, IExtraClientSpawnData {
@@ -99,6 +98,12 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
     //friction
     private float landFriction;
     private GroundStatus groundStatus;
+
+    //cached references. both updated every tick
+    @Nullable
+    private Animal sledPuller = null;
+    @Nullable
+    private ContainerHolderEntity chest = null;
 
     public SledEntity(EntityType<? extends SledEntity> entityType, Level level) {
         super(entityType, level);
@@ -451,7 +456,7 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
     public void tick() {
 
         if (this.chest != null && chest.isRemoved()) this.chest = null;
-        this.updateSledPuller();
+        this.updatePuller();
 
         if (this.getHurtTime() > 0) {
             this.setHurtTime(this.getHurtTime() - 1);
@@ -1034,7 +1039,7 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
                     //discards non-owned animals
                     boolean owned = (found instanceof TamableAnimal ta && ta.getOwner() == player) ||
                             found instanceof Fox fox && fox.trusts(player.getUUID());
-                    if (owned && this.tryAddingSledPuller(found)) {
+                    if (owned && this.tryConnectingPuller(found)) {
                         this.playSound(SoundEvents.LEASH_KNOT_PLACE, 1.0F, 1.0F);
                         return InteractionResult.sidedSuccess(player.level.isClientSide);
                     }
@@ -1097,7 +1102,7 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
             if (ind != -1) {
                 if (this.getPassengers().size() > ind) {
                     Entity wolf = this.getPassengers().get(ind);
-                    this.tryAddingSledPuller(wolf);
+                    this.tryConnectingPuller(wolf);
                 }
             }
         }
@@ -1223,16 +1228,15 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
 
     @Override
     public void ejectPassengers() {
-        if (this.sledPuller != null) this.ejectPuller();
-        if (this.chest != null) this.removeChest();
+        if (this.sledPuller != null) this.disconnectPuller();
+        this.chest = null;
         super.ejectPassengers();
-        updatePullerIndex();
     }
 
     @Override
     protected void removePassenger(Entity pPassenger) {
-        if (this.sledPuller == pPassenger) this.ejectPuller();
-        if (this.chest == pPassenger) this.removeChest();
+        if (this.sledPuller == pPassenger) this.disconnectPuller();
+        if (this.chest == pPassenger) this.chest = null;
         super.removePassenger(pPassenger);
         updatePullerIndex();
     }
@@ -1268,15 +1272,28 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
         return entity == this.chest;
     }
 
+    public boolean hasChest() {
+        return this.chest != null;
+    }
+
     //wolf towing (god help me)
+
+    public boolean hasPuller() {
+        return this.sledPuller != null;
+    }
 
     public boolean isMyPuller(Entity entity) {
         return entity == this.sledPuller;
     }
 
+    @Nullable
+    public Animal getSledPuller() {
+        return sledPuller;
+    }
+
     //on server checks if this entity is a valid wold. on client its lenient and simply casts to animal
     //only called when adding from leash as this can fail
-    public boolean tryAddingSledPuller(Entity entity) {
+    public boolean tryConnectingPuller(Entity entity) {
         if (entity instanceof Animal wolf) {
             if (entity.level.isClientSide) {
                 this.sledPuller = wolf;
@@ -1299,7 +1316,7 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
         return false;
     }
 
-    public void updateSledPuller() {
+    public void updatePuller() {
         int ind = this.getPullerIndex();
 
         //validate
@@ -1334,28 +1351,7 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
         }
     }
 
-
-    @Nullable
-    private Animal sledPuller = null;
-    @Nullable
-    private ContainerHolderEntity chest = null;
-
-    public boolean hasPuller() {
-        return this.sledPuller != null;
-    }
-
-    public boolean hasChest() {
-        return this.chest != null;
-    }
-
-    public void removeChest() {
-        if (!this.level.isClientSide) {
-            this.chest = null;
-        }
-        //only reset here cause it is called on client only side sometimes
-    }
-
-    public void ejectPuller() {
+    public void disconnectPuller() {
         if (this.sledPuller != null) {
             if (!this.level.isClientSide) {
                 this.setPullerIndex(-1);
@@ -1378,11 +1374,6 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
                 this.setPullerIndex(this.getPassengers().indexOf(p));
             }
         }
-    }
-
-    @Nullable
-    public Animal getSledPuller() {
-        return sledPuller;
     }
 
     //i need this because wolf does update its own...
@@ -1413,7 +1404,6 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
             }
         }
     }
-
 
     //chest madness
     private boolean canAddChest() {

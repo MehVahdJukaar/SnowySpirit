@@ -1,5 +1,4 @@
-- Improved ginger loot table
-- Fixed missing glow light particle texture
-- Fixed gingerbread vertical slab model
-- Fixed some incorrect configs
-- Added some client configs to alter glow particles. These give you the choice to choose between 3 render modes
+- updated to 1.19.4
+- improved sled wolf handling logic
+- wold leads are now with shorter segments and stay visually attached to a sled when this one is punched
+- removed vertical slabs

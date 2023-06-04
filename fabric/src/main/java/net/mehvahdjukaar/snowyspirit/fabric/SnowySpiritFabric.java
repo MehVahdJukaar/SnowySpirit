@@ -6,12 +6,12 @@ import net.fabricmc.fabric.api.biome.v1.BiomeSelectors;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents;
 import net.mehvahdjukaar.moonlight.api.platform.ClientHelper;
 import net.mehvahdjukaar.moonlight.api.platform.PlatHelper;
-import net.mehvahdjukaar.moonlight.fabric.FabricSetupCallbacks;
 import net.mehvahdjukaar.snowyspirit.SnowySpirit;
 import net.mehvahdjukaar.snowyspirit.reg.ClientRegistry;
 import net.mehvahdjukaar.snowyspirit.reg.ModSetup;
 import net.mehvahdjukaar.snowyspirit.reg.ModTags;
-import net.mehvahdjukaar.snowyspirit.reg.ModWorldgenRegistry;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -30,7 +30,7 @@ public class SnowySpiritFabric implements ModInitializer {
         PlatHelper.addCommonSetup(SnowySpiritFabric::commonSetup);
 
 
-        if (PlatHelper.getEnv().isClient()) {
+        if (PlatHelper.getPhysicalSide().isClient()) {
             ClientHelper.addClientSetup(SnowySpiritFabric::initClient);
         }
     }
@@ -46,11 +46,11 @@ public class SnowySpiritFabric implements ModInitializer {
 
         BiomeModifications.addFeature(BiomeSelectors.tag(ModTags.HAS_GINGER),
                 GenerationStep.Decoration.VEGETAL_DECORATION,
-                ModWorldgenRegistry.WILD_GINGER.getHolder().unwrapKey().get());
+                ResourceKey.create(Registries.PLACED_FEATURE, SnowySpirit.res("wild_ginger")));
 
         BiomeModifications.addFeature(BiomeSelectors.tag(ModTags.HAS_GINGER_DENSE),
                 GenerationStep.Decoration.VEGETAL_DECORATION,
-                ModWorldgenRegistry.WILD_GINGER_DENSE.getHolder().unwrapKey().get());
+                ResourceKey.create(Registries.PLACED_FEATURE, SnowySpirit.res("wild_ginger_dense")));
     }
 
 
