@@ -93,7 +93,7 @@ public class ClientDynamicResourcesHandler extends DynClientResourcesGenerator {
     }
 
     @Override
-    public void generateStaticAssetsOnStartup(ResourceManager manager) {
+    public void regenerateDynamicAssets(ResourceManager manager) {
         StaticResource itemModel = StaticResource.getOrLog(manager,
                 ResType.ITEM_MODELS.getPath(SnowySpirit.res("sled_oak")));
 
@@ -105,10 +105,7 @@ public class ClientDynamicResourcesHandler extends DynClientResourcesGenerator {
                 getLogger().error("Failed to generate Sled item model for {} : {}", sled, ex);
             }
         });
-    }
 
-    @Override
-    public void regenerateDynamicAssets(ResourceManager manager) {
         //entity textures
         try (TextureImage template = TextureImage.open(manager, SnowySpirit.res("entity/sled/oak"))) {
 

@@ -73,4 +73,14 @@ public class SnowGlobeBlock extends WaterBlock {
             pLevel.setBlock(pPos, pState.setValue(SNOWING, false), 3);
         }
     }
+
+    @Override
+    public boolean hasAnalogOutputSignal(BlockState state) {
+        return true;
+    }
+
+    @Override
+    public int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos) {
+        return state.getValue(SNOWING) ? 15 : 0;
+    }
 }

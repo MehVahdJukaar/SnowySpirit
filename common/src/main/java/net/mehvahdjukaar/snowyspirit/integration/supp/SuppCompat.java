@@ -24,7 +24,6 @@ public class SuppCompat {
         return new SackContainerMenu(id, inventory, entity);
     }
 
-    //TODO: add
     public static void triggerSweetTooth(Level level, LivingEntity entity) {
         CandyItem.increaseSweetTooth(level, entity, 8 * 20);
     }

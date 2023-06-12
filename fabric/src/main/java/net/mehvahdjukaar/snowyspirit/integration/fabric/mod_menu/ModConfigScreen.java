@@ -9,6 +9,7 @@ import net.mehvahdjukaar.snowyspirit.configs.CommonConfigs;
 import net.mehvahdjukaar.snowyspirit.reg.ModRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
@@ -47,13 +48,13 @@ public class ModConfigScreen extends FabricConfigListScreen {
     }
 
     @Override
-    public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTicks) {
-        super.render(poseStack, mouseX, mouseY, partialTicks);
+    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
+        super.render(graphics, mouseX, mouseY, partialTicks);
 
         var level = Minecraft.getInstance().level;
         if (level != null && SnowySpirit.isChristmasSeason(level)) {
             int x = (int) (this.width * 0.93f);
-            this.itemRenderer.renderAndDecorateFakeItem(poseStack, Items.SNOWBALL.getDefaultInstance(), x, 16);
+            graphics.renderFakeItem(Items.SNOWBALL.getDefaultInstance(), x, 16);
         }
     }
 

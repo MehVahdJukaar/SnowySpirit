@@ -160,7 +160,7 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
     //all of this to sync that damn wolf
     @Override
     public void readSpawnData(FriendlyByteBuf additionalData) {
-        if (level.isClientSide) {
+        if (level().isClientSide) {
             SledSoundInstance.playAt(this);
         }
     }
@@ -214,26 +214,29 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
     public boolean hurt(DamageSource source, float amount) {
         if (this.isInvulnerableTo(source)) {
             return false;
-        } else if (!this.level.isClientSide && !this.isRemoved()) {
-            this.setHurtDir(-this.getHurtDir());
-            this.setHurtTime(10);
-            this.setDamage(this.getDamage() + amount * 10.0F);
-            this.markHurt();
-            this.gameEvent(GameEvent.ENTITY_DAMAGE, source.getEntity());
-            boolean isCreative = source.getEntity() instanceof Player player && player.getAbilities().instabuild;
-            if (isCreative || this.getDamage() > 40.0F) {
-                if (!isCreative && this.level.getGameRules().getBoolean(GameRules.RULE_DOENTITYDROPS)) {
-                    this.spawnAtLocation(this.getSledItem());
-                    DyeColor seat = this.getSeatType();
-                    if (seat != null) {
-                        Item carpet = BlocksColorAPI.getColoredItem("carpet", seat);
-                        if (carpet != null) this.spawnAtLocation(carpet);
+        } else {
+            Level level = this.level();
+            if (!level.isClientSide && !this.isRemoved()) {
+                this.setHurtDir(-this.getHurtDir());
+                this.setHurtTime(10);
+                this.setDamage(this.getDamage() + amount * 10.0F);
+                this.markHurt();
+                this.gameEvent(GameEvent.ENTITY_DAMAGE, source.getEntity());
+                boolean isCreative = source.getEntity() instanceof Player player && player.getAbilities().instabuild;
+                if (isCreative || this.getDamage() > 40.0F) {
+                    if (!isCreative && level.getGameRules().getBoolean(GameRules.RULE_DOENTITYDROPS)) {
+                        this.spawnAtLocation(this.getSledItem());
+                        DyeColor seat = this.getSeatType();
+                        if (seat != null) {
+                            Item carpet = BlocksColorAPI.getColoredItem("carpet", seat);
+                            if (carpet != null) this.spawnAtLocation(carpet);
+                        }
+                        if (this.hasPuller()) {
+                            this.spawnAtLocation(Items.LEAD);
+                        }
                     }
-                    if (this.hasPuller()) {
-                        this.spawnAtLocation(Items.LEAD);
-                    }
+                    this.discard();
                 }
-                this.discard();
             }
         }
         return true;
@@ -347,16 +350,16 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
         this.projectedPos = Vec3.ZERO;
 
         //considered on ground even when in air but with block below
-        if (!this.onGround && isMoving) {
+        if (!this.onGround() && isMoving) {
             float belowCheck = -1.25f;
             Vec3 blockBelow = this.calculateSlopePosition(new Vec3(0, belowCheck, 0), this.getBoundingBox(), this::makeBoundingBox, -1);
             if (blockBelow.y > belowCheck + 0.01) {
-                this.onGround = true;
+                this.setOnGround(true);
             }
         }
 
 
-        if (this.onGround) {
+        if (this.onGround()) {
 
             //this.projectedPos = this.calculateSlopePosition(this.getLookAngle().scale(this.getDeltaMovement().length()).scale(6));
 
@@ -485,7 +488,7 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
         this.boost = false;
         //slope deceleration/ acceleration
         //check if on next pos is down or up and if has block relatively near below (ie on ground but with more leeway)
-        if (this.projectedPos.y != 0 && this.onGround) {
+        if (this.projectedPos.y != 0 && this.onGround()) {
             double k = Mth.clamp(this.projectedPos.y, -1, 1);
             if (k > 0) {
                 //decelerate uphill if doesnt have wolf
@@ -501,10 +504,11 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
 
         boolean controlledByLocalInstance = this.isControlledByLocalInstance();
         //local player controlling code
+        Level level = this.level();
         if (controlledByLocalInstance) {
 
             this.applyFriction();
-            if (this.level.isClientSide) {
+            if (level.isClientSide) {
                 this.controlSled();
             }
 
@@ -518,11 +522,11 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
 
         //interact with nearby entities and adds passengers
 
-        List<Entity> list = this.level.getEntities(this, this.getBoundingBox().inflate(0.15F, 0.01F, 0.15F),
+        List<Entity> list = level.getEntities(this, this.getBoundingBox().inflate(0.15F, 0.01F, 0.15F),
                 EntitySelector.pushableBy(this));
 
         if (!list.isEmpty()) {
-            boolean notLocalPlayerControlled = !this.level.isClientSide && !(this.getControllingPassenger() instanceof Player);
+            boolean notLocalPlayerControlled = !level.isClientSide && !(this.getControllingPassenger() instanceof Player);
 
             for (Entity entity : list) {
                 if (!entity.hasPassenger(this)) {
@@ -544,7 +548,7 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
 
         //spawn particles
 
-        if (this.level.isClientSide) {
+        if (level.isClientSide) {
 
             //if it's local player use current movement. otherwise send packet to server which will update all other clients to have syncedDeltaMovement
             if (controlledByLocalInstance) {
@@ -580,22 +584,23 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
         AABB aabb = this.getBoundingBox();
         BlockPos blockpos = BlockPos.containing(aabb.minX + 0.001D, aabb.minY + 0.001D, aabb.minZ + 0.001D);
         BlockPos blockpos1 = BlockPos.containing(aabb.maxX - 0.001D, aabb.maxY - 0.001D, aabb.maxZ - 0.001D);
-        if (this.level.hasChunksAt(blockpos, blockpos1)) {
+        Level level = this.level();
+        if (level.hasChunksAt(blockpos, blockpos1)) {
             BlockPos.MutableBlockPos blockPos = new BlockPos.MutableBlockPos();
 
             for (int i = blockpos.getX(); i <= blockpos1.getX(); ++i) {
                 for (int j = blockpos.getY(); j <= blockpos1.getY(); ++j) {
                     for (int k = blockpos.getZ(); k <= blockpos1.getZ(); ++k) {
                         blockPos.set(i, j, k);
-                        BlockState blockstate = this.level.getBlockState(blockPos);
+                        BlockState blockstate = level.getBlockState(blockPos);
                         if (!(blockstate.getBlock() instanceof PowderSnowBlock)) {
                             try {
-                                blockstate.entityInside(this.level, blockPos, this);
+                                blockstate.entityInside(level, blockPos, this);
                                 this.onInsideBlock(blockstate);
                             } catch (Exception throwable) {
                                 CrashReport crashreport = CrashReport.forThrowable(throwable, "Colliding entity with block");
                                 CrashReportCategory crashreportcategory = crashreport.addCategory("Block being collided with");
-                                CrashReportCategory.populateBlockDetails(crashreportcategory, this.level, blockPos, blockstate);
+                                CrashReportCategory.populateBlockDetails(crashreportcategory, level, blockPos, blockstate);
                                 throw new ReportedException(crashreport);
                             }
                         }
@@ -607,12 +612,12 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
 
 
     private void spawnTrailParticles(Vec3 movement, double horizontalSpeed) {
-        if (this.groundStatus.onSnow() && this.onGround) {
+        if (this.groundStatus.onSnow() && this.onGround()) {
             float xRot = this.getXRot();
             float yRot = this.getYRot();
             Vec3 left = null;
             Vec3 right = null;
-
+            Level level = level();
             if (this.random.nextFloat() * 0.16f < horizontalSpeed) {
                 float up = (float) Math.min(horizontalSpeed * 0.6, 0.3);
                 Vec3 a = this.calculateViewVector(xRot, yRot + 24);
@@ -698,14 +703,15 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
     @Override
     public Vec3 collide(Vec3 pVec) {
         AABB aabb = this.getBoundingBox();
-        List<VoxelShape> list = new ArrayList<>(this.level.getEntityCollisions(this, aabb.expandTowards(pVec)));
+        Level level = this.level();
+        List<VoxelShape> list = new ArrayList<>(level.getEntityCollisions(this, aabb.expandTowards(pVec)));
 
         double lengthSqr = pVec.lengthSqr();
 
         //todo: maye re enable. this pretty much disable collisions with wolf at all times since it causes desync and glitchynes when going uphill
         //if (this.hasWolf() && lengthSqr < 0.08) list.add(Shapes.create(this.pullerAABB));
 
-        Vec3 vec3 = lengthSqr == 0.0D ? pVec : collideBoundingBox(this, pVec, aabb, this.level, list);
+        Vec3 vec3 = lengthSqr == 0.0D ? pVec : collideBoundingBox(this, pVec, aabb, level, list);
         Vec3 vec31 = maybeClimbUp(pVec, aabb, list, vec3);
         if (vec31 != null) return vec31;
 
@@ -718,20 +724,21 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
         boolean restrictedX = originalMot.x != horizonalMot.x;
         boolean restrictedY = originalMot.y != horizonalMot.y;
         boolean restrictedZ = originalMot.z != horizonalMot.z;
-        boolean onGround = this.onGround || restrictedY && originalMot.y < 0.0D;
+        boolean onGround = this.onGround() || restrictedY && originalMot.y < 0.0D;
         float maxUpStep = this.maxUpStep();
         if (maxUpStep > 0.0F && onGround && (restrictedX || restrictedZ)) {
-            Vec3 vec31 = collideBoundingBox(this, new Vec3(originalMot.x, maxUpStep, originalMot.z), aabb, this.level, voxelShapes);
-            Vec3 vec32 = collideBoundingBox(this, new Vec3(0.0D, maxUpStep, 0.0D), aabb.expandTowards(originalMot.x, 0.0D, originalMot.z), this.level, voxelShapes);
+            Level level = this.level();
+            Vec3 vec31 = collideBoundingBox(this, new Vec3(originalMot.x, maxUpStep, originalMot.z), aabb, level, voxelShapes);
+            Vec3 vec32 = collideBoundingBox(this, new Vec3(0.0D, maxUpStep, 0.0D), aabb.expandTowards(originalMot.x, 0.0D, originalMot.z), level, voxelShapes);
             if (vec32.y < maxUpStep) {
-                Vec3 vec33 = collideBoundingBox(this, new Vec3(originalMot.x, 0.0D, originalMot.z), aabb.move(vec32), this.level, voxelShapes).add(vec32);
+                Vec3 vec33 = collideBoundingBox(this, new Vec3(originalMot.x, 0.0D, originalMot.z), aabb.move(vec32), level, voxelShapes).add(vec32);
                 if (vec33.horizontalDistanceSqr() > vec31.horizontalDistanceSqr()) {
                     vec31 = vec33;
                 }
             }
 
             if (vec31.horizontalDistanceSqr() > horizonalMot.horizontalDistanceSqr()) {
-                return vec31.add(collideBoundingBox(this, new Vec3(0.0D, -vec31.y + originalMot.y, 0.0D), aabb.move(vec31), this.level, voxelShapes));
+                return vec31.add(collideBoundingBox(this, new Vec3(0.0D, -vec31.y + originalMot.y, 0.0D), aabb.move(vec31), level, voxelShapes));
             }
         }
         return null;
@@ -741,8 +748,9 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
      * Modified version of collide. calculates another collision for projected bb to calculate slope
      */
     private Vec3 calculateSlopePosition(Vec3 pVec, AABB aabb, Supplier<AABB> aabbResetter, float maxDownStep) {
-        List<VoxelShape> list = this.level.getEntityCollisions(this, aabb.expandTowards(pVec));
-        Vec3 vec3 = pVec.lengthSqr() == 0.0D ? pVec : collideBoundingBox(this, pVec, aabb, this.level, list);
+        Level level = this.level();
+        List<VoxelShape> list = level.getEntityCollisions(this, aabb.expandTowards(pVec));
+        Vec3 vec3 = pVec.lengthSqr() == 0.0D ? pVec : collideBoundingBox(this, pVec, aabb, level, list);
         Vec3 vec31 = maybeClimbUp(pVec, aabb, list, vec3);
         if (vec31 != null) return vec31;
         //hack to get down pos
@@ -751,7 +759,7 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
         this.setPosRaw(newPos.x, newPos.y, newPos.z);
         AABB aa = aabbResetter.get();
         this.setBoundingBox(aa);
-        Vec3 down = collideBoundingBox(this, new Vec3(0, maxDownStep, 0), aa, this.level, list); //getAABB
+        Vec3 down = collideBoundingBox(this, new Vec3(0, maxDownStep, 0), aa, level, list); //getAABB
         this.setPos(cached);
         return vec3.add(down);
     }
@@ -899,7 +907,8 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
     @Override
     protected void checkFallDamage(double pY, boolean pOnGround, BlockState pState, BlockPos pPos) {
 
-        if (this.level.isClientSide && this.fallDistance > 0.5 && this.onGround) {
+        Level level = this.level();
+        if (level.isClientSide && this.fallDistance > 0.5 && this.onGround()) {
             if (this.groundStatus.onSnow()) {
                 float p = Mth.clamp(this.fallDistance * 4f, 5, 20);
                 Vec3 front = this.position().add(this.getLookAngle().scale(0.8f));
@@ -994,6 +1003,7 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
     @Nullable
     public ContainerHolderEntity tryAddingChest(ItemStack stack) {
         if (ContainerHolderEntity.isValidContainer(stack) && this.canAddChest()) {
+            Level level = level();
             ContainerHolderEntity container = new ContainerHolderEntity(level, this, stack.split(1));
             level.addFreshEntity(container);
             return container;
@@ -1008,19 +1018,19 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
         if (!player.isSecondaryUseActive()) {
             ItemStack stack = player.getItemInHand(pHand);
             //carpet
+            Level level = player.level();
             if (stack.is(ItemTags.WOOL_CARPETS) && this.getSeatType() == null) {
                 DyeColor col = BlocksColorAPI.getColor(stack.getItem());
                 if (col != null) {
                     this.playSound(SoundEvents.ARMOR_EQUIP_LEATHER, 0.5F, 1.0F);
                     this.setSeatType(col);
                     stack.shrink(1);
-                    return InteractionResult.sidedSuccess(player.level.isClientSide);
+                    return InteractionResult.sidedSuccess(level.isClientSide);
                 }
             } else if (this.tryAddingChest(stack) != null) {
-                return InteractionResult.sidedSuccess(player.level.isClientSide);
+                return InteractionResult.sidedSuccess(level.isClientSide);
             }
             if (!this.hasPuller()) {
-                Level level = player.level;
                 double radius = 7.0D;
                 double x = player.getX();
                 double y = player.getY();
@@ -1041,12 +1051,12 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
                             found instanceof Fox fox && fox.trusts(player.getUUID());
                     if (owned && this.tryConnectingPuller(found)) {
                         this.playSound(SoundEvents.LEASH_KNOT_PLACE, 1.0F, 1.0F);
-                        return InteractionResult.sidedSuccess(player.level.isClientSide);
+                        return InteractionResult.sidedSuccess(level.isClientSide);
                     }
                     return InteractionResult.FAIL;
                 }
             }
-            if (!this.level.isClientSide) {
+            if (!level.isClientSide) {
                 return player.startRiding(this) ? InteractionResult.CONSUME : InteractionResult.PASS;
             } else {
                 return InteractionResult.SUCCESS;
@@ -1096,7 +1106,7 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
     @Override
     public void onSyncedDataUpdated(EntityDataAccessor<?> key) {
         super.onSyncedDataUpdated(key);
-        if (level.isClientSide && DATA_WOLF_INDEX.equals(key)) {
+        if (level().isClientSide && DATA_WOLF_INDEX.equals(key)) {
             int ind = getPullerIndex();
             //on client accepts possible wolf. update immediately, prevents 1 tick delay since we update on tick
             if (ind != -1) {
@@ -1109,37 +1119,37 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
     }
 
     @Override
-    public void positionRider(Entity entity) {
-        if (this.hasPassenger(entity)) {
+    protected void positionRider(Entity passenger, MoveFunction setPos) {
+        if (this.hasPassenger(passenger)) {
 
             //can only have 1 chest so the rider that is chest is THE chest
-            if (this.chest == null && entity instanceof ContainerHolderEntity container) {
+            if (this.chest == null && passenger instanceof ContainerHolderEntity container) {
                 this.chest = container;
             }
 
-            if (this.isMyPuller(entity)) {
-                Animal animal = (Animal) entity;
-                entity.setYRot(entity.getYRot() + this.deltaRotation);
-                this.clampRotation(entity);
-                entity.setYBodyRot(animal.yBodyRot + this.deltaRotation * 10);
-                entity.setYHeadRot(animal.yBodyRot);
+            if (this.isMyPuller(passenger)) {
+                Animal animal = (Animal) passenger;
+                passenger.setYRot(passenger.getYRot() + this.deltaRotation);
+                this.clampRotation(passenger);
+                passenger.setYBodyRot(animal.yBodyRot + this.deltaRotation * 10);
+                passenger.setYHeadRot(animal.yBodyRot);
                 //powder snow check here
-                entity.setPos(this.getX() + pullerPos.x, this.getY() + pullerPos.y, this.getZ() + pullerPos.z);
+                setPos.accept(passenger, this.getX() + pullerPos.x, this.getY() + pullerPos.y, this.getZ() + pullerPos.z);
 
                 this.updatePullerAnimations();
             } else {
                 float zPos = 0.0F;
-                float yPos = (float) ((this.isRemoved() ? 0.01 : this.getPassengersRidingOffset()) + entity.getMyRidingOffset());
+                float yPos = (float) ((this.isRemoved() ? 0.01 : this.getPassengersRidingOffset()) + passenger.getMyRidingOffset());
 
                 boolean isMoreThanOneOnBoard = false;
-                if (this.isChestEntity(entity)) {
+                if (this.isChestEntity(passenger)) {
 
-                    entity.xRotO = this.xRotO;
-                    entity.setXRot(this.getXRot());
-                    entity.yRotO = this.yRotO;
-                    entity.setYRot(this.getYRot());
+                    passenger.xRotO = this.xRotO;
+                    passenger.setXRot(this.getXRot());
+                    passenger.yRotO = this.yRotO;
+                    passenger.setYRot(this.getYRot());
 
-                    //entity.yRotO = this.yRotO;
+                    //passenger.yRotO = this.yRotO;
                     zPos = -0.4f;
                     yPos += 0.3;
                     float cos = Mth.sin((float) (this.getXRot() * Math.PI / 180f));
@@ -1152,7 +1162,7 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
                     if (isMoreThanOneOnBoard) {
                         int i = 0;
                         for (Entity p : this.getPassengers()) {
-                            if (p == entity) break;
+                            if (p == passenger) break;
                             if (!isMyPuller(p) && !isChestEntity(p)) i++;
                         }
 
@@ -1165,24 +1175,24 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
                         yPos -= cos * zPos;
                     }
 
-                    if (entity instanceof Animal) {
+                    if (passenger instanceof Animal) {
                         if (isMoreThanOneOnBoard) {
                             zPos += 0.2D;
                         }
                         yPos += 0.125;
                     }
-                    entity.setYRot(entity.getYRot() + this.deltaRotation);
-                    entity.setYHeadRot(entity.getYHeadRot() + this.deltaRotation);
-                    this.clampRotation(entity);
+                    passenger.setYRot(passenger.getYRot() + this.deltaRotation);
+                    passenger.setYHeadRot(passenger.getYHeadRot() + this.deltaRotation);
+                    this.clampRotation(passenger);
                 }
                 Vec3 vec3 = (new Vec3(zPos, 0.0D, 0.0D)).yRot(-this.getYRot() * ((float) Math.PI / 180F) - ((float) Math.PI / 2F));
-                entity.setPos(this.getX() + vec3.x, this.getY() + yPos, this.getZ() + vec3.z);
+                setPos.accept(passenger,this.getX() + vec3.x, this.getY() + yPos, this.getZ() + vec3.z);
 
 
-                if (entity instanceof Animal animal && isMoreThanOneOnBoard) {
-                    int yRot = entity.getId() % 2 == 0 ? 90 : 270;
-                    entity.setYBodyRot(animal.yBodyRot + yRot);
-                    entity.setYHeadRot(entity.getYHeadRot() + yRot);
+                if (passenger instanceof Animal animal && isMoreThanOneOnBoard) {
+                    int yRot = passenger.getId() % 2 == 0 ? 90 : 270;
+                    passenger.setYBodyRot(animal.yBodyRot + yRot);
+                    passenger.setYHeadRot(passenger.getYHeadRot() + yRot);
                 }
             }
         }
@@ -1197,26 +1207,27 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
 
     @Override
     public Vec3 getDismountLocationForPassenger(LivingEntity entity) {
-        Vec3 vec3 = getCollisionHorizontalEscapeVector(this.getBbWidth() * Mth.SQRT_OF_TWO, (double) entity.getBbWidth(), entity.getYRot());
+        Vec3 vec3 = getCollisionHorizontalEscapeVector(this.getBbWidth() * Mth.SQRT_OF_TWO, entity.getBbWidth(), entity.getYRot());
         double d0 = this.getX() + vec3.x;
         double d1 = this.getZ() + vec3.z;
         BlockPos blockpos = BlockPos.containing(d0, this.getBoundingBox().maxY, d1);
         BlockPos below = blockpos.below();
-        if (!this.level.isWaterAt(below)) {
+        Level level = this.level();
+        if (!level.isWaterAt(below)) {
             List<Vec3> list = Lists.newArrayList();
-            double d2 = this.level.getBlockFloorHeight(blockpos);
+            double d2 = level.getBlockFloorHeight(blockpos);
             if (DismountHelper.isBlockFloorValid(d2)) {
                 list.add(new Vec3(d0, blockpos.getY() + d2, d1));
             }
 
-            double d3 = this.level.getBlockFloorHeight(below);
+            double d3 = level.getBlockFloorHeight(below);
             if (DismountHelper.isBlockFloorValid(d3)) {
                 list.add(new Vec3(d0, below.getY() + d3, d1));
             }
 
             for (Pose pose : entity.getDismountPoses()) {
                 for (Vec3 vec31 : list) {
-                    if (DismountHelper.canDismountTo(this.level, vec31, entity, pose)) {
+                    if (DismountHelper.canDismountTo(level, vec31, entity, pose)) {
                         entity.setPose(pose);
                         return vec31;
                     }
@@ -1295,7 +1306,7 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
     //only called when adding from leash as this can fail
     public boolean tryConnectingPuller(Entity entity) {
         if (entity instanceof Animal wolf) {
-            if (entity.level.isClientSide) {
+            if (entity.level().isClientSide) {
                 this.sledPuller = wolf;
                 return true;
             } else if (entity.getType().is(ModTags.WOLVES) && entity.getBbWidth() < 1.1) {
@@ -1345,7 +1356,7 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
             //if this is false it means pullers is yet to be received
         } else if (ind >= 0 && this.getPassengers().size() > ind) {
             Entity wolf = this.getPassengers().get(ind);
-            if(wolf instanceof Animal a){
+            if (wolf instanceof Animal a) {
                 this.sledPuller = a;
             }
         }
@@ -1353,7 +1364,7 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
 
     public void disconnectPuller() {
         if (this.sledPuller != null) {
-            if (!this.level.isClientSide) {
+            if (!this.level().isClientSide) {
                 this.setPullerIndex(-1);
                 if (this.sledPuller instanceof TamableAnimal tamableAnimal) {
                     tamableAnimal.setInSittingPose(false);
@@ -1367,10 +1378,10 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
         }
     }
 
-    protected void updatePullerIndex(){
+    protected void updatePullerIndex() {
         //fixes up wolf index if passenger list changed
-        for(var p : this.getPassengers()){
-            if(p == sledPuller){
+        for (var p : this.getPassengers()) {
+            if (p == sledPuller) {
                 this.setPullerIndex(this.getPassengers().indexOf(p));
             }
         }
@@ -1378,6 +1389,7 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
 
     //i need this because wolf does update its own...
     private final WalkAnimationState internalPullerAnimation = new WalkAnimationState();
+
     protected void updatePullerAnimations() {
         if (this.sledPuller != null) {
             double travelX = sledPuller.getX() - sledPuller.xo;

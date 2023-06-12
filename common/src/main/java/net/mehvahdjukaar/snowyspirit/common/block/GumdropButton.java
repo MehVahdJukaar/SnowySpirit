@@ -28,8 +28,6 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.gameevent.GameEvent;
-import net.minecraft.world.level.material.Material;
-import net.minecraft.world.level.material.MaterialColor;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -58,8 +56,12 @@ public class GumdropButton extends DirectionalBlock {
     public final DyeColor color;
 
     public GumdropButton(DyeColor color) {
-        super(Properties.of(Material.CLAY, MaterialColor.byId(color.getId() + 14))
-                .sound(SoundType.SLIME_BLOCK).noCollission());
+        super(Properties.of()
+                .instabreak()
+                .noOcclusion()
+                .mapColor(color)
+                .sound(SoundType.SLIME_BLOCK)
+                .noCollission());
         this.color = color;
         this.registerDefaultState(this.stateDefinition.any()
                 .setValue(FACING, Direction.NORTH).setValue(POWERED, false));

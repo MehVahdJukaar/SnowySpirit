@@ -20,7 +20,7 @@ public class SledSoundInstance extends AbstractTickableSoundInstance {
     private int ticksOnSnow = 0;
 
     public SledSoundInstance(SledEntity sledEntity, boolean isSnow) {
-        super(isSnow ? ModSounds.SLED_SOUND_SNOW.get() : ModSounds.SLED_SOUND.get(), SoundSource.PLAYERS, sledEntity.level.getRandom());
+        super(isSnow ? ModSounds.SLED_SOUND_SNOW.get() : ModSounds.SLED_SOUND.get(), SoundSource.PLAYERS, sledEntity.level().getRandom());
         this.sled = sledEntity;
         this.looping = true;
         this.delay = 0;

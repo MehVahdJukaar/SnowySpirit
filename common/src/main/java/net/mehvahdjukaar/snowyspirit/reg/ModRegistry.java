@@ -29,8 +29,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.properties.BlockSetType;
-import net.minecraft.world.level.material.Material;
-import net.minecraft.world.level.material.MaterialColor;
+import net.minecraft.world.level.material.MapColor;
 
 import java.util.*;
 import java.util.function.Function;
@@ -70,7 +69,8 @@ public class ModRegistry {
     public static final Map<WoodType, SledItem> SLED_ITEMS = new LinkedHashMap<>();
 
     public static final Supplier<Block> CANDY_CANE_BLOCK = regWithItem("candy_cane_block", () ->
-            new RotatedPillarBlock(BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_PINK)
+            new RotatedPillarBlock(BlockBehaviour.Properties.copy(Blocks.CALCITE)
+                    .mapColor(MapColor.COLOR_PINK)
                     .requiresCorrectToolForDrops().strength(1.5F).sound(SoundType.CALCITE)));
 
     public static final String CANDY_CANE_NAME = "candy_cane";
@@ -91,7 +91,8 @@ public class ModRegistry {
                     .rarity(Rarity.RARE).stacksTo(1), 350));
 
     public static final Supplier<Block> GINGERBREAD_BLOCK = regWithItem("gingerbread", () ->
-            new Block(BlockBehaviour.Properties.of(Material.STONE, MaterialColor.TERRACOTTA_ORANGE)
+            new Block(BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.TERRACOTTA_ORANGE)
                     .sound(SoundType.WOOD).strength(1F)));
 
     //slab
@@ -119,7 +120,11 @@ public class ModRegistry {
 
     public static final String GINGER_NAME = "ginger";
     public static final Supplier<Block> GINGER_CROP = regBlock(GINGER_NAME, () ->
-            new GingerBlock(BlockBehaviour.Properties.of(Material.PLANT).noCollission().randomTicks().instabreak().sound(SoundType.CROP)));
+            new GingerBlock(BlockBehaviour.Properties.copy(Blocks.WHEAT)
+                    .noCollission()
+                    .randomTicks()
+                    .instabreak()
+            ));
     public static final Supplier<Item> GINGER_FLOWER = regItem("ginger_flower",
             () -> new ItemNameBlockItem(GINGER_CROP.get(), new Item.Properties()));
     public static final Supplier<Item> GINGER = regItem("ginger",
@@ -164,13 +169,19 @@ public class ModRegistry {
 
     public static final String WREATH_NAME = "wreath";
     public static final Supplier<Block> WREATH = regWithItem(WREATH_NAME, () ->
-            new WreathBlock(BlockBehaviour.Properties.of(Material.PLANT, MaterialColor.COLOR_GREEN)
+            new WreathBlock(BlockBehaviour.Properties.of()
+                    .ignitedByLava()
+                    .noOcclusion()
+                    .mapColor(MapColor.COLOR_GREEN)
                     .sound(SoundType.VINE).strength(0.1f).noCollission()));
 
 
     public static final String SNOW_GLOBE_NAME = "snow_globe";
     public static final Supplier<Block> SNOW_GLOBE = regWithItem(SNOW_GLOBE_NAME, () ->
-            new SnowGlobeBlock(BlockBehaviour.Properties.of(Material.STONE).strength(0.5f)));
+            new SnowGlobeBlock(BlockBehaviour.Properties.copy(Blocks.STONE)
+                    .sound(SoundType.GLASS)
+                    .mapColor(MapColor.NONE)
+                    .strength(0.5f)));
 
 
     public static <T extends Item> Supplier<T> regItem(String name, Supplier<T> sup) {

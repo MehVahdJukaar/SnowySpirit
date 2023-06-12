@@ -14,6 +14,7 @@ import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.entity.BoatRenderer;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -22,6 +23,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -36,12 +38,14 @@ public class SledEntityRenderer extends EntityRenderer<SledEntity> {
     private final Map<WoodType, ResourceLocation> textures;
     private final Map<DyeColor, ResourceLocation> quiltTextures;
     private final SledModel<SledEntity> model;
+    private final SledModel<SledEntity> modelBamboo;
     private final QuiltModel<SledEntity> quiltModel;
 
     public SledEntityRenderer(EntityRendererProvider.Context context) {
         super(context);
         this.shadowRadius = 0.8F;
         this.model = new SledModel<>(context.bakeLayer(ClientRegistry.SLED_MODEL));
+        this.modelBamboo = new SledModel<>(context.bakeLayer(ClientRegistry.SLED_MODEL_BAMBOO));
         this.quiltModel = new QuiltModel<>(context.bakeLayer(ClientRegistry.QUILT_MODEL));
         this.textures = WoodTypeRegistry.getTypes().stream().collect(ImmutableMap.toImmutableMap((e) -> e,
                 (t) -> SnowySpirit.res("textures/entity/sled/" + t.getTexturePath() + ".png")));
@@ -86,9 +90,9 @@ public class SledEntityRenderer extends EntityRenderer<SledEntity> {
 
         poseStack.scale(-1.0F, -1.0F, 1.0F);
 
-
         VertexConsumer vertexconsumer = bufferSource.getBuffer(model.renderType(resourcelocation));
-        model.renderToBuffer(poseStack, vertexconsumer, light, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
+        var mod = resourcelocation.getPath().equals("textures/entity/sled/bamboo.png") ? modelBamboo : model;
+        mod.renderToBuffer(poseStack, vertexconsumer, light, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
 
         DyeColor color = sled.getSeatType();
         if (color != null) {
@@ -133,7 +137,7 @@ public class SledEntityRenderer extends EntityRenderer<SledEntity> {
         Matrix4f matrix4f = pMatrixStack.last().pose();
         Matrix3f matrix3f = pMatrixStack.last().normal();
         float mult = 6;
-        float eye = (float) (pEntity.getEyeHeight() + 1 + pEntity.cachedAdditionalY);
+        float eye = (pEntity.getEyeHeight() + 1 + pEntity.cachedAdditionalY);
         pBuffer.vertex(matrix4f, 0.0F, eye, 0.0F)
                 .color(0, 255, 0, 255)
                 .normal(matrix3f, (float) movement.x, (float) movement.y, (float) movement.z).endVertex();
@@ -230,9 +234,10 @@ public class SledEntityRenderer extends EntityRenderer<SledEntity> {
                 float mathX = deltaX * f4;
 
                 int blockLight0 = this.getBlockLightLevel(sled, sledEyePos);
-                int blockLight1 = wolf.isOnFire() ? 15 : wolf.level.getBrightness(LightLayer.BLOCK, wolfEyePos);
-                int skyLight0 = sled.level.getBrightness(LightLayer.SKY, sledEyePos);
-                int skyLight1 = sled.level.getBrightness(LightLayer.SKY, wolfEyePos);
+                Level level = wolf.level();
+                int blockLight1 = wolf.isOnFire() ? 15 : level.getBrightness(LightLayer.BLOCK, wolfEyePos);
+                int skyLight0 = level.getBrightness(LightLayer.SKY, sledEyePos);
+                int skyLight1 = level.getBrightness(LightLayer.SKY, wolfEyePos);
 
                 //each lead is composed of 2 strips
                 int maxSegments = 12;

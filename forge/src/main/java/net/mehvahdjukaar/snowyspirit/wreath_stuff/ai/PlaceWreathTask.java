@@ -47,7 +47,7 @@ public class PlaceWreathTask extends Behavior<Villager> {
     protected boolean checkExtraStartConditions(ServerLevel pLevel, Villager pOwner) {
         if (cooldown-- > 0) return false;
         if (pOwner.isBaby()) return false;
-        if(!SnowySpirit.isChristmasSeason(pOwner.level)) return false;
+        if(!SnowySpirit.isChristmasSeason(pOwner.level())) return false;
         //doesn't always start and gets put on cooldown
         if (!ForgeEventFactory.getMobGriefingEvent(pLevel, pOwner)) {
             cooldown = 20 * 60;

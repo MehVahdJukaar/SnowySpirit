@@ -47,7 +47,7 @@ public class ClientEvents {
     public static void renderWreaths(RenderLevelStageEvent event) {
         if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_CUTOUT_BLOCKS) {
             Minecraft mc = Minecraft.getInstance();
-            Level level = mc.player.level;
+            Level level = mc.player.level();
             PoseStack poseStack = event.getPoseStack();
             Vec3 cameraPos = mc.gameRenderer.getMainCamera().getPosition();
             var capability = ModCapabilities.get(level, ModCapabilities.WREATH_CAPABILITY);

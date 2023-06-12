@@ -41,7 +41,7 @@ public enum GroundStatus {
         if (sled.isInWater()) {
             return IN_WATER.withFriction(1);
         } else {
-            Level level = sled.level;
+            Level level = sled.level();
             //boat code here
             AABB aabb = sled.getBoundingBox();
             AABB aabb1 = new AABB(aabb.minX, aabb.minY - 0.001D, aabb.minZ, aabb.maxX, aabb.minY, aabb.maxZ);
@@ -99,7 +99,7 @@ public enum GroundStatus {
             }
 
             float friction = cumulativeFriction / blockCount;
-            if (sled.isOnGround()) {
+            if (sled.onGround()) {
                 //alters friction when on slope
                 double slopeFriction = Mth.clamp(sled.getXRot(), -45, 45) / 45f;
                 friction += CommonConfigs.SLOPE_FRICTION_INCREASE.get() * slopeFriction;

@@ -2,9 +2,9 @@ package net.mehvahdjukaar.snowyspirit.common.ai;
 
 import com.mojang.datafixers.util.Pair;
 import dev.architectury.injectables.annotations.ExpectPlatform;
+import net.mehvahdjukaar.moonlight.api.entity.VillagerAIHooks;
 import net.mehvahdjukaar.moonlight.api.events.IVillagerBrainEvent;
 import net.mehvahdjukaar.moonlight.api.events.MoonlightEventsHelper;
-import net.mehvahdjukaar.moonlight.api.util.VillagerAIManager;
 import net.mehvahdjukaar.snowyspirit.SnowySpirit;
 import net.mehvahdjukaar.snowyspirit.integration.supp.PlacePresentTask;
 import net.mehvahdjukaar.snowyspirit.reg.ModMemoryModules;
@@ -20,13 +20,13 @@ public class WinterVillagerAI {
 
         MoonlightEventsHelper.addListener(WinterVillagerAI::onVillagerBrainInitialize, IVillagerBrainEvent.class);
 
-        VillagerAIManager.registerMemory(ModMemoryModules.PLACED_PRESENT.get());
-        VillagerAIManager.registerMemory(ModMemoryModules.WREATH_POS.get());
+        VillagerAIHooks.registerMemory(ModMemoryModules.PLACED_PRESENT.get());
+        VillagerAIHooks.registerMemory(ModMemoryModules.WREATH_POS.get());
     }
 
     public static void onVillagerBrainInitialize(IVillagerBrainEvent event) {
         Villager villager = event.getVillager();
-        if (SnowySpirit.isChristmasSeason(villager.level)) {
+        if (SnowySpirit.isChristmasSeason(villager.level())) {
             if (villager.isBaby()) {
                 var t = villager.getVillagerData().getType();
                 if (t == VillagerType.SNOW || t == VillagerType.TAIGA) {

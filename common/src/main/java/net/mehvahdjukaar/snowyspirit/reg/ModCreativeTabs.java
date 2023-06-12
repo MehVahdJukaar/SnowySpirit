@@ -1,11 +1,13 @@
 package net.mehvahdjukaar.snowyspirit.reg;
 
+import net.mehvahdjukaar.moonlight.api.misc.RegSupplier;
 import net.mehvahdjukaar.moonlight.api.platform.RegHelper;
 import net.mehvahdjukaar.moonlight.api.set.wood.WoodTypeRegistry;
 import net.mehvahdjukaar.snowyspirit.SnowySpirit;
 import net.mehvahdjukaar.snowyspirit.configs.CommonConfigs;
 import net.mehvahdjukaar.snowyspirit.integration.supp.SuppCompat;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.*;
@@ -17,7 +19,7 @@ import java.util.function.Supplier;
 
 public class ModCreativeTabs {
 
-    public static final Supplier<CreativeModeTab> MOD_TAB = !CommonConfigs.MOD_TAB.get() ? null :
+    public static final RegSupplier<CreativeModeTab> MOD_TAB = !CommonConfigs.MOD_TAB.get() ? null :
             RegHelper.registerCreativeModeTab(SnowySpirit.res(SnowySpirit.MOD_ID), builder ->
                     builder.title(Component.translatable("itemGroup.snowyspirit")).icon(
                             () -> ModRegistry.SLED_ITEMS.get(WoodTypeRegistry.OAK_TYPE).getDefaultInstance()));
@@ -102,41 +104,48 @@ public class ModCreativeTabs {
     }
 
 
-    private static void after(RegHelper.ItemToTabEvent event, TagKey<Item> target, CreativeModeTab tab, String key, Supplier<?>... items) {
+    private static void after(RegHelper.ItemToTabEvent event, TagKey<Item> target,
+                              ResourceKey<CreativeModeTab>  tab, String key, Supplier<?>... items) {
         after(event, i -> i.is(target), tab, key, items);
     }
 
-    private static void after(RegHelper.ItemToTabEvent event, Item target, CreativeModeTab tab, String key, Supplier<?>... items) {
+    private static void after(RegHelper.ItemToTabEvent event, Item target,
+                              ResourceKey<CreativeModeTab>  tab, String key, Supplier<?>... items) {
         after(event, i -> i.is(target), tab, key, items);
     }
 
-    private static void after(RegHelper.ItemToTabEvent event, Predicate<ItemStack> targetPred, CreativeModeTab tab, String key, Supplier<?>... items) {
+    private static void after(RegHelper.ItemToTabEvent event, Predicate<ItemStack> targetPred,
+
+                              ResourceKey<CreativeModeTab> tab, String key, Supplier<?>... items) {
         if (CommonConfigs.isEnabled(key)) {
-            if (MOD_TAB != null) tab = MOD_TAB.get();
+            if (MOD_TAB != null) tab = MOD_TAB.getHolder().unwrapKey().get();
             ItemLike[] entries = Arrays.stream(items).map((s -> (ItemLike) (s.get()))).toArray(ItemLike[]::new);
             event.addAfter(tab, targetPred, entries);
         }
     }
 
-    private static void before(RegHelper.ItemToTabEvent event, TagKey<Item> target, CreativeModeTab tab, String key, Supplier<?>... items) {
+    private static void before(RegHelper.ItemToTabEvent event, TagKey<Item> target,
+                               ResourceKey<CreativeModeTab>  tab, String key, Supplier<?>... items) {
         before(event, i -> i.is(target), tab, key, items);
     }
 
-    private static void before(RegHelper.ItemToTabEvent event, Item target, CreativeModeTab tab, String key, Supplier<?>... items) {
+    private static void before(RegHelper.ItemToTabEvent event, Item target, ResourceKey<CreativeModeTab> tab, String key, Supplier<?>... items) {
         before(event, i -> i.is(target), tab, key, items);
     }
 
-    private static void before(RegHelper.ItemToTabEvent event, Predicate<ItemStack> targetPred, CreativeModeTab tab, String key, Supplier<?>... items) {
+    private static void before(RegHelper.ItemToTabEvent event, Predicate<ItemStack> targetPred,
+                               ResourceKey<CreativeModeTab>  tab, String key, Supplier<?>... items) {
         if (CommonConfigs.isEnabled(key)) {
-            if (MOD_TAB != null) tab = MOD_TAB.get();
+            if (MOD_TAB != null) tab = MOD_TAB.getHolder().unwrapKey().get();
             ItemLike[] entries = Arrays.stream(items).map(s -> (ItemLike) s.get()).toArray(ItemLike[]::new);
             event.addBefore(tab, targetPred, entries);
         }
     }
 
-    private static void add(RegHelper.ItemToTabEvent event, CreativeModeTab tab, String key, Supplier<?>... items) {
+    private static void add(RegHelper.ItemToTabEvent event,
+                            ResourceKey<CreativeModeTab>  tab, String key, Supplier<?>... items) {
         if (CommonConfigs.isEnabled(key)) {
-            if (MOD_TAB != null) tab = MOD_TAB.get();
+            if (MOD_TAB != null) tab = MOD_TAB.getHolder().unwrapKey().get();
             ItemLike[] entries = Arrays.stream(items).map((s -> (ItemLike) (s.get()))).toArray(ItemLike[]::new);
             event.add(tab, entries);
         }

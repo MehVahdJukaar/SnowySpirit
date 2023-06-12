@@ -40,9 +40,9 @@ public class ThrowSnowballsTask extends Behavior<Villager> {
     @Override
     protected boolean checkExtraStartConditions(ServerLevel pLevel, Villager pOwner) {
         if (cooldown-- > 0) return false;
-        if(!SnowySpirit.isChristmasSeason(pOwner.level)) return false;
+        if (!SnowySpirit.isChristmasSeason(pLevel)) return false;
         LivingEntity livingentity = this.getLookTarget(pOwner);
-
+        if (livingentity == null) return false;
         return BehaviorUtils.canSee(pOwner, livingentity) && livingentity.distanceToSqr(pOwner.getX(), pOwner.getY(), pOwner.getZ()) < maxRange * maxRange;
     }
 
@@ -82,7 +82,7 @@ public class ThrowSnowballsTask extends Behavior<Villager> {
             double d1 = target.getX() - pOwner.getX();
             double d2 = d0 - egg.getY();
             double d3 = target.getZ() - pOwner.getZ();
-            double distFactor = Math.sqrt(d1 * d1 + d3 * d3) * (double) 0.2F;
+            double distFactor = Math.sqrt(d1 * d1 + d3 * d3) * 0.2F;
             egg.shoot(d1, (d2 + distFactor) * 0.5, d3, 1.1F, 8);
             pLevel.playSound(null, pOwner.getX(), pOwner.getY(), pOwner.getZ(), SoundEvents.SNOWBALL_THROW, SoundSource.NEUTRAL, 0.5F, 0.4F / (pLevel.getRandom().nextFloat() * 0.4F + 0.8F));
             pLevel.addFreshEntity(egg);
@@ -101,8 +101,8 @@ public class ThrowSnowballsTask extends Behavior<Villager> {
     }
 
 
-    private static void displayAsHeldItem(Villager self, ItemStack p_182372_) {
-        self.setItemSlot(EquipmentSlot.MAINHAND, p_182372_);
+    private static void displayAsHeldItem(Villager self, ItemStack stack) {
+        self.setItemSlot(EquipmentSlot.MAINHAND, stack);
         self.setDropChance(EquipmentSlot.MAINHAND, 0.0F);
     }
 

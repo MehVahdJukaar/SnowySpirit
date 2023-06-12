@@ -41,13 +41,13 @@ issueTrackerURL = "https://github.com/MehVahdJukaar/christmas/issues"
 [[dependencies.snowyspirit]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.19,1.20)"
+    versionRange="[1.20,1.21)"
     ordering="NONE"
     side="BOTH"
 
 [[dependencies.snowyspirit]]
     modId="moonlight"
     mandatory=true
-    versionRange="[1.19-2.0.16,)"
+    versionRange="[1.20-2.5.3,)"
     ordering="NONE"
     side="BOTH"

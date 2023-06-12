@@ -38,9 +38,11 @@ import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.ShulkerBoxBlock;
+import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
@@ -171,7 +173,7 @@ public class ContainerHolderEntity extends Entity implements Container, MenuProv
      */
     @Override
     public boolean hurt(DamageSource pSource, float pAmount) {
-        if (!this.level.isClientSide && !this.isRemoved()) {
+        if (!this.level().isClientSide && !this.isRemoved()) {
             if (this.isInvulnerableTo(pSource)) {
                 return false;
             } else {
@@ -194,8 +196,9 @@ public class ContainerHolderEntity extends Entity implements Container, MenuProv
     }
 
     public void destroy(DamageSource pSource) {
-        if (this.level.getGameRules().getBoolean(GameRules.RULE_DOENTITYDROPS)) {
-            if (!this.level.isClientSide) {
+        Level level = this.level();
+        if (level.getGameRules().getBoolean(GameRules.RULE_DOENTITYDROPS)) {
+            if (!level.isClientSide) {
                 Entity entity = pSource.getDirectEntity();
                 if (entity != null && entity.getType() == EntityType.PLAYER) {
                     PiglinAi.angerNearbyPiglins((Player) entity, true);
@@ -216,7 +219,7 @@ public class ContainerHolderEntity extends Entity implements Container, MenuProv
             ContainerHelper.saveAllItems(tag, this.itemStacks, false);
             stack.addTagElement("BlockEntityTag", tag);
         } else {
-            Containers.dropContents(this.level, this, this);
+            Containers.dropContents(this.level(), this, this);
         }
         this.spawnAtLocation(stack);
     }
@@ -254,7 +257,7 @@ public class ContainerHolderEntity extends Entity implements Container, MenuProv
                 this.setDamage(this.getDamage() - 1.0F);
             }
 
-            this.checkOutOfWorld();
+            this.checkBelowWorld();
             this.handleNetherPortal();
 
 
@@ -411,8 +414,8 @@ public class ContainerHolderEntity extends Entity implements Container, MenuProv
 
     @Override
     public void remove(Entity.RemovalReason pReason) {
-        if (!this.level.isClientSide && pReason.shouldDestroy()) {
-            if (this.level.getGameRules().getBoolean(GameRules.RULE_DOENTITYDROPS)) {
+        if (!this.level().isClientSide && pReason.shouldDestroy()) {
+            if (this.level().getGameRules().getBoolean(GameRules.RULE_DOENTITYDROPS)) {
                 this.spawnDrops();
             }
         }
@@ -424,7 +427,7 @@ public class ContainerHolderEntity extends Entity implements Container, MenuProv
         InteractionResult ret = super.interact(pPlayer, pHand);
         if (ret.consumesAction()) return ret;
         pPlayer.openMenu(this);
-        if (!pPlayer.level.isClientSide) {
+        if (!pPlayer.level().isClientSide) {
             this.gameEvent(GameEvent.CONTAINER_OPEN, pPlayer);
             PiglinAi.angerNearbyPiglins(pPlayer, true);
             return InteractionResult.CONSUME;
@@ -449,15 +452,16 @@ public class ContainerHolderEntity extends Entity implements Container, MenuProv
      * Adds loot to the minecart's contents.
      */
     public void unpackLootTable(@Nullable Player pPlayer) {
-        if (this.lootTable != null && this.level.getServer() != null) {
-            LootTable loottable = this.level.getServer().getLootTables().get(this.lootTable);
+        Level level = this.level();
+        if (this.lootTable != null && level.getServer() != null) {
+            LootTable loottable = level.getServer().getLootData().getLootTable(this.lootTable);
             if (pPlayer instanceof ServerPlayer serverPlayer) {
                 CriteriaTriggers.GENERATE_LOOT.trigger( serverPlayer, this.lootTable);
             }
 
             this.lootTable = null;
-            LootContext.Builder builder = (new LootContext.Builder((ServerLevel) this.level))
-                    .withParameter(LootContextParams.ORIGIN, this.position()).withOptionalRandomSeed(this.lootTableSeed);
+            LootParams.Builder builder = (new LootParams.Builder((ServerLevel) level))
+                    .withParameter(LootContextParams.ORIGIN, this.position());
 
             if(PlatHelper.getPlatform().isForge()) {
                 // Forge: add this entity to loot context, however, currently Vanilla uses 'this' for the player creating the chests. So we take over 'killer_entity' for this.
@@ -467,7 +471,7 @@ public class ContainerHolderEntity extends Entity implements Container, MenuProv
                 builder.withLuck(pPlayer.getLuck()).withParameter(LootContextParams.THIS_ENTITY, pPlayer);
             }
 
-            loottable.fill(this, builder.create(LootContextParamSets.CHEST));
+            loottable.fill(this, builder.create(LootContextParamSets.CHEST), lootTableSeed);
         }
     }
 

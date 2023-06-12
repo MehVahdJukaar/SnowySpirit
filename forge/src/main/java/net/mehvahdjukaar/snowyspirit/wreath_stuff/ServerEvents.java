@@ -61,7 +61,7 @@ public class ServerEvents {
     @SubscribeEvent
     public static void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {
         ServerPlayer player = (ServerPlayer) event.getEntity();
-        ServerLevel level = player.getLevel();
+        ServerLevel level = (ServerLevel) player.level();
         WreathCapability cap = ModCapabilities.get(level, ModCapabilities.WREATH_CAPABILITY);
         if (cap != null)
             NetworkHandler.CHANNEL.sendToClientPlayer(player,
@@ -71,7 +71,7 @@ public class ServerEvents {
     @SubscribeEvent
     public static void onDimensionChanged(PlayerEvent.PlayerChangedDimensionEvent event) {
         ServerPlayer player = (ServerPlayer) event.getEntity();
-        ServerLevel level = player.getLevel();
+        ServerLevel level = (ServerLevel) player.level();
         WreathCapability cap = ModCapabilities.get(level, ModCapabilities.WREATH_CAPABILITY);
         if (cap != null)
             NetworkHandler.CHANNEL.sendToClientPlayer(player,

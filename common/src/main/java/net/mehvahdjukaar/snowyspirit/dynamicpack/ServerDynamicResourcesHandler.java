@@ -39,6 +39,10 @@ public class ServerDynamicResourcesHandler extends DynServerResourcesGenerator {
     @Override
     public void regenerateDynamicAssets(ResourceManager resourceManager) {
 
+        SimpleTagBuilder builder = SimpleTagBuilder.of(SnowySpirit.res("sleds"));
+        builder.addEntries(ModRegistry.SLED_ITEMS.values());
+        dynamicPack.addTag(builder, Registries.ITEM);
+
         IRecipeTemplate<?> template = RPUtils.readRecipeAsTemplate(resourceManager,
                 ResType.RECIPES.getPath(SnowySpirit.res("sled_oak")));
 
@@ -51,13 +55,6 @@ public class ServerDynamicResourcesHandler extends DynServerResourcesGenerator {
                 this.dynamicPack.addRecipe(newR);
             }
         });
-    }
-
-    @Override
-    public void generateStaticAssetsOnStartup(ResourceManager manager) {
-        SimpleTagBuilder builder = SimpleTagBuilder.of(SnowySpirit.res("sleds"));
-        builder.addEntries(ModRegistry.SLED_ITEMS.values());
-        dynamicPack.addTag(builder, Registries.ITEM);
     }
 
 

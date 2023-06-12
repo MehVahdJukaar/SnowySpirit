@@ -57,17 +57,17 @@ public class PlacePresentTask extends Behavior<Villager> {
 
 
     @Override
-    protected boolean checkExtraStartConditions(ServerLevel pLevel, Villager pOwner) {
+    protected boolean checkExtraStartConditions(ServerLevel level, Villager pOwner) {
         if (cooldown-- > 0) return false;
         if (pOwner.isBaby()) return false;
-        if (!SnowySpirit.isChristmasSeason(pOwner.level)) return false;
+        if (!SnowySpirit.isChristmasSeason(level)) return false;
         //doesn't always start and gets put on cooldown
-        if (!PlatHelper.isMobGriefingOn(pLevel, pOwner) || pLevel.random.nextInt(5) != 0) {
+        if (!PlatHelper.isMobGriefingOn(level, pOwner) || level.random.nextInt(5) != 0) {
             cooldown = 20 * 50;
             return false;
         }
         var meeting = pOwner.getBrain().getMemory(MemoryModuleType.MEETING_POINT);
-        if (meeting.isEmpty() || pOwner.level.dimension() != meeting.get().dimension() || meeting.get().pos().distSqr(pOwner.blockPosition()) > 15 * 15) {
+        if (meeting.isEmpty() || level.dimension() != meeting.get().dimension() || meeting.get().pos().distSqr(pOwner.blockPosition()) > 15 * 15) {
             cooldown = 20 * 20;
             return false;
         }
@@ -153,7 +153,7 @@ public class PlacePresentTask extends Behavior<Villager> {
     public static boolean isValidPlacementSpot(ServerLevel serverLevel, BlockPos pos) {
         if (serverLevel.canSeeSky(pos) && (double) serverLevel.getHeightmapPos(Heightmap.Types.MOTION_BLOCKING, pos).getY() >= serverLevel.getSeaLevel() - 10) {
             BlockState state = serverLevel.getBlockState(pos);
-            if (state.getMaterial().isReplaceable() && state.getFluidState().isEmpty()) {
+            if (state.canBeReplaced() && state.getFluidState().isEmpty()) {
 
                 BlockState below = serverLevel.getBlockState(pos.below());
                 return below.isFaceSturdy(serverLevel, pos, Direction.UP) || below.is(BlockTags.DIRT);

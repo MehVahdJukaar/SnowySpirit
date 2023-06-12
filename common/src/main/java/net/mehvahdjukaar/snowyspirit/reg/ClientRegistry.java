@@ -22,6 +22,7 @@ import java.util.function.Supplier;
 public class ClientRegistry {
 
     public static final ModelLayerLocation SLED_MODEL = loc("sled");
+    public static final ModelLayerLocation SLED_MODEL_BAMBOO = loc("sled_bamboo");
     public static final ModelLayerLocation QUILT_MODEL = loc("quilt");
 
     private static ModelLayerLocation loc(String name) {
@@ -65,7 +66,8 @@ public class ClientRegistry {
     }
 
     private static void registerModelLayers(ClientHelper.ModelLayerEvent event) {
-        event.register(SLED_MODEL, SledModel::createBodyLayer);
+        event.register(SLED_MODEL, SledModel::createMesh);
+        event.register(SLED_MODEL_BAMBOO, SledModel::createBambooMesh);
         event.register(QUILT_MODEL, QuiltModel::createBodyLayer);
     }
 

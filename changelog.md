@@ -1,4 +1,2 @@
-- updated to 1.19.4
-- improved sled wolf handling logic
-- wold leads are now with shorter segments and stay visually attached to a sled when this one is punched
-- removed vertical slabs
+- added custom sled models and textures for bamboo wood. Thanks to AlleCraft
+- snow globe now has comparator output
