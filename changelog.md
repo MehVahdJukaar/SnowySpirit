@@ -1,2 +1,1 @@
-- added custom sled models and textures for bamboo wood. Thanks to AlleCraft
-- snow globe now has comparator output
+- fixed some tags
