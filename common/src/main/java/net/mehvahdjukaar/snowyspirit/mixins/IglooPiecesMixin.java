@@ -64,7 +64,9 @@ public abstract class IglooPiecesMixin extends TemplateStructurePiece {
                     if (server == null) return;
                     server.executeIfPossible(() -> {
                         SledEntity sledEntity = new SledEntity(level, blockPos.getX() + 0.5, blockPos.getY() + 0.5, blockPos.getZ());
-                        ContainerHolderEntity c = sledEntity.tryAddingChest(Items.CHEST.getDefaultInstance());
+                        Item chest = PlatformHelpsr.isModLoaded("quark") ? Registry.ITEMS.get(new ResourceLocation("quark:spruce_chest") :
+                            Items.CHEST;
+                        ContainerHolderEntity c = sledEntity.tryAddingChest(chest.getDefaultInstance());
                         if (c != null) {
                             c.setLootTable(SnowySpirit.res("chests/igloo_sled"), level.random.nextLong());
                         }
