@@ -5,6 +5,7 @@
     {"item": "minecraft:glowstone_dust"},
     {"tag": "forge:dyes/cyan"},
     {"item": "amethyst"},
+    {"item": "amethyst"},
     {"tag": "forge:string"}
   ],
   "result": {
