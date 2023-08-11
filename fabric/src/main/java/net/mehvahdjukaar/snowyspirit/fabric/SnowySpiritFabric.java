@@ -28,22 +28,10 @@ public class SnowySpiritFabric implements ModInitializer {
         SnowySpirit.commonInit();
 
         PlatHelper.addCommonSetup(SnowySpiritFabric::commonSetup);
-
-
-        if (PlatHelper.getPhysicalSide().isClient()) {
-            ClientHelper.addClientSetup(SnowySpiritFabric::initClient);
-        }
     }
 
-    private static void initClient() {
-        ClientRegistry.init();
-        ClientRegistry.setup();
-
-    }
 
     private static void commonSetup() {
-        ModSetup.setup();
-
         BiomeModifications.addFeature(BiomeSelectors.tag(ModTags.HAS_GINGER),
                 GenerationStep.Decoration.VEGETAL_DECORATION,
                 ResourceKey.create(Registries.PLACED_FEATURE, SnowySpirit.res("wild_ginger")));

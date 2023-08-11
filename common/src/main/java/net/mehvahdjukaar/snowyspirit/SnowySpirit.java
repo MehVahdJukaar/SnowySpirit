@@ -1,8 +1,10 @@
 package net.mehvahdjukaar.snowyspirit;
 
 
+import net.mehvahdjukaar.moonlight.api.platform.ClientHelper;
 import net.mehvahdjukaar.moonlight.api.platform.PlatHelper;
 import net.mehvahdjukaar.moonlight.api.platform.RegHelper;
+import net.mehvahdjukaar.snowyspirit.common.items.SledItem;
 import net.mehvahdjukaar.snowyspirit.common.network.NetworkHandler;
 import net.mehvahdjukaar.snowyspirit.configs.ClientConfigs;
 import net.mehvahdjukaar.snowyspirit.configs.CommonConfigs;
@@ -10,11 +12,13 @@ import net.mehvahdjukaar.snowyspirit.dynamicpack.ClientDynamicResourcesHandler;
 import net.mehvahdjukaar.snowyspirit.dynamicpack.ServerDynamicResourcesHandler;
 import net.mehvahdjukaar.snowyspirit.integration.FDCompat;
 import net.mehvahdjukaar.snowyspirit.integration.SeasonModCompat;
-import net.mehvahdjukaar.snowyspirit.reg.ModCreativeTabs;
-import net.mehvahdjukaar.snowyspirit.reg.ModMemoryModules;
-import net.mehvahdjukaar.snowyspirit.reg.ModRegistry;
-import net.mehvahdjukaar.snowyspirit.reg.ModSounds;
+import net.mehvahdjukaar.snowyspirit.reg.*;
+import net.mehvahdjukaar.supplementaries.common.block.tiles.SackBlockTile;
+import net.mehvahdjukaar.supplementaries.common.inventories.SackContainerMenu;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.Container;
+import net.minecraft.world.entity.vehicle.Boat;
+import net.minecraft.world.item.BoatItem;
 import net.minecraft.world.level.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -54,13 +58,18 @@ public class SnowySpirit {
 
         ServerDynamicResourcesHandler.INSTANCE.register();
 
+        PlatHelper.addCommonSetup(ModSetup::setup);
+
         if (PlatHelper.getPhysicalSide().isClient()) {
             ClientConfigs.init();
 
             ClientDynamicResourcesHandler.INSTANCE.register();
+
+            ClientRegistry.init();
+
+            ClientHelper.addClientSetup(ClientRegistry::setup);
         }
     }
-    //snow globe item texture
     //Do this shit next christmas
     //sleds loose their chest
     //TODO: add advancements

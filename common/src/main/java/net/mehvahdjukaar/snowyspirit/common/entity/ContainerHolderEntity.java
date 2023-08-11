@@ -4,11 +4,10 @@ import dev.architectury.injectables.annotations.PlatformOnly;
 import net.mehvahdjukaar.moonlight.api.entity.IExtraClientSpawnData;
 import net.mehvahdjukaar.moonlight.api.platform.PlatHelper;
 import net.mehvahdjukaar.snowyspirit.SnowySpirit;
-import net.mehvahdjukaar.snowyspirit.reg.ModRegistry;
 import net.mehvahdjukaar.snowyspirit.integration.supp.SuppCompat;
+import net.mehvahdjukaar.snowyspirit.reg.ModRegistry;
 import net.mehvahdjukaar.snowyspirit.reg.ModTags;
-import net.minecraft.advancements.CriteriaTriggers;
-import net.minecraft.core.NonNullList;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -18,16 +17,16 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.*;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityDimensions;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.monster.piglin.PiglinAi;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.vehicle.Minecart;
-import net.minecraft.world.entity.vehicle.MinecartChest;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ChestMenu;
 import net.minecraft.world.inventory.ShulkerBoxMenu;
@@ -36,30 +35,27 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.ShulkerBoxBlock;
-import net.minecraft.world.level.block.entity.ChestBlockEntity;
+import net.minecraft.world.level.block.entity.BaseContainerBlockEntity;
+import net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
-import net.minecraft.world.level.storage.loot.LootContext;
-import net.minecraft.world.level.storage.loot.LootParams;
-import net.minecraft.world.level.storage.loot.LootTable;
-import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
-import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.HitResult;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
-
-public class ContainerHolderEntity extends Entity implements Container, MenuProvider, IExtraClientSpawnData {
+public class ContainerHolderEntity extends Entity implements Container, IExtraClientSpawnData, MenuProvider {
     private static final EntityDataAccessor<Integer> DATA_ID_HURT = SynchedEntityData.defineId(ContainerHolderEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Float> DATA_ID_DAMAGE = SynchedEntityData.defineId(ContainerHolderEntity.class, EntityDataSerializers.FLOAT);
-
-    private static final int CONTAINER_SIZE = 27;
 
     private ItemStack containerStack = ItemStack.EMPTY;
 
     //for client
     private BlockState displayState = Blocks.AIR.defaultBlockState();
+
+    private BaseContainerBlockEntity innerBlockEntity;
 
     public ContainerHolderEntity(EntityType<?> type, Level level) {
         super(type, level);
@@ -72,9 +68,8 @@ public class ContainerHolderEntity extends Entity implements Container, MenuProv
         this.setPos(sled.position());
         if (this.startRiding(sled)) {
             //this causes issues
-            // sled.positionRider(this);
+            sled.positionRider(this);
         }
-
     }
 
     public BlockState getDisplayState() {
@@ -86,9 +81,20 @@ public class ContainerHolderEntity extends Entity implements Container, MenuProv
         if (this.containerStack.getItem() instanceof BlockItem blockItem) {
             this.displayState = blockItem.getBlock().defaultBlockState();
         }
-        if(isContainerWithNBT(stack) && stack.hasTag()){
+        if (stack.getItem() instanceof BlockItem bi) {
+            Block block = bi.getBlock();
+
+            if (block instanceof EntityBlock eb && eb.newBlockEntity(BlockPos.ZERO, block.defaultBlockState()) instanceof BaseContainerBlockEntity c) {
+                innerBlockEntity = c;
+                innerBlockEntity.setLevel(level());
+            }
+        }
+        if (innerBlockEntity == null) {
+            throw new IllegalStateException("block {} does not provide a valid container block entity");
+        }
+        if (isContainerWithNBT(stack) && stack.hasTag()) {
             CompoundTag tag = stack.getTagElement("BlockEntityTag");
-            if(tag != null) ContainerHelper.loadAllItems(tag, itemStacks);
+            if (tag != null) innerBlockEntity.load(tag);
         }
     }
 
@@ -108,33 +114,17 @@ public class ContainerHolderEntity extends Entity implements Container, MenuProv
     }
 
     @Override
-    protected void readAdditionalSaveData(CompoundTag pCompound) {
-        this.containerStack = ItemStack.of(pCompound.getCompound("ContainerItem"));
-        if (this.containerStack.getItem() instanceof BlockItem blockItem) {
-            this.displayState = blockItem.getBlock().defaultBlockState();
-        }
-
-        this.itemStacks = NonNullList.withSize(this.getContainerSize(), ItemStack.EMPTY);
-        if (pCompound.contains("LootTable", 8)) {
-            this.lootTable = new ResourceLocation(pCompound.getString("LootTable"));
-            this.lootTableSeed = pCompound.getLong("LootTableSeed");
-        } else {
-            ContainerHelper.loadAllItems(pCompound, this.itemStacks);
-        }
+    protected void readAdditionalSaveData(CompoundTag tag) {
+        this.setContainerItem(ItemStack.of(tag.getCompound("ContainerItem")));
+        if (innerBlockEntity == null) {
+            int aaa = 1;
+        } else innerBlockEntity.load(tag);
     }
 
     @Override
-    protected void addAdditionalSaveData(CompoundTag pCompound) {
-        pCompound.put("ContainerItem", this.containerStack.save(new CompoundTag()));
-
-        if (this.lootTable != null) {
-            pCompound.putString("LootTable", this.lootTable.toString());
-            if (this.lootTableSeed != 0L) {
-                pCompound.putLong("LootTableSeed", this.lootTableSeed);
-            }
-        } else {
-            ContainerHelper.saveAllItems(pCompound, this.itemStacks);
-        }
+    protected void addAdditionalSaveData(CompoundTag tag) {
+        tag.put("ContainerItem", this.containerStack.save(new CompoundTag()));
+        tag.merge(innerBlockEntity.saveWithoutMetadata());
     }
 
     @Override
@@ -215,11 +205,9 @@ public class ContainerHolderEntity extends Entity implements Container, MenuProv
         }
         //sacks and shulker. kind of ugly here
         if (isContainerWithNBT(this.containerStack)) {
-            CompoundTag tag = new CompoundTag();
-            ContainerHelper.saveAllItems(tag, this.itemStacks, false);
-            stack.addTagElement("BlockEntityTag", tag);
+            stack.addTagElement("BlockEntityTag", innerBlockEntity.saveWithoutMetadata());
         } else {
-            Containers.dropContents(this.level(), this, this);
+            Containers.dropContents(this.level(), this, innerBlockEntity);
         }
         this.spawnAtLocation(stack);
     }
@@ -308,108 +296,10 @@ public class ContainerHolderEntity extends Entity implements Container, MenuProv
         return this.containerStack.copy();
     }
 
-    //container
-
-    private NonNullList<ItemStack> itemStacks = NonNullList.withSize(36, ItemStack.EMPTY);
-    @Nullable
-    private ResourceLocation lootTable;
-    private long lootTableSeed;
-
-
-    @Override
-    public boolean isEmpty() {
-        for (ItemStack itemstack : this.itemStacks) {
-            if (!itemstack.isEmpty()) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /**
-     * Returns the stack in the given slot.
-     */
-    @Override
-    public ItemStack getItem(int pIndex) {
-        this.unpackLootTable(null);
-        return this.itemStacks.get(pIndex);
-    }
-
-    /**
-     * Removes up to a specified number of items from an inventory slot and returns them in a new stack.
-     */
-    @Override
-    public ItemStack removeItem(int pIndex, int pCount) {
-        this.unpackLootTable(null);
-        return ContainerHelper.removeItem(this.itemStacks, pIndex, pCount);
-    }
-
-    /**
-     * Removes a stack from the given slot and returns it.
-     */
-    @Override
-    public ItemStack removeItemNoUpdate(int pIndex) {
-        this.unpackLootTable(null);
-        ItemStack itemstack = this.itemStacks.get(pIndex);
-        if (itemstack.isEmpty()) {
-            return ItemStack.EMPTY;
-        } else {
-            this.itemStacks.set(pIndex, ItemStack.EMPTY);
-            return itemstack;
-        }
-    }
-
-    /**
-     * Sets the given item stack to the specified slot in the inventory (can be crafting or armor sections).
-     */
-    @Override
-    public void setItem(int pIndex, ItemStack pStack) {
-        this.unpackLootTable(null);
-        this.itemStacks.set(pIndex, pStack);
-        if (!pStack.isEmpty() && pStack.getCount() > this.getMaxStackSize()) {
-            pStack.setCount(this.getMaxStackSize());
-        }
-    }
-
-    @Override
-    public SlotAccess getSlot(final int pSlot) {
-        return pSlot >= 0 && pSlot < this.getContainerSize() ? new SlotAccess() {
-            public ItemStack get() {
-                return ContainerHolderEntity.this.getItem(pSlot);
-            }
-
-            @Override
-            public boolean set(ItemStack carried) {
-                ContainerHolderEntity.this.setItem(pSlot, carried);
-                return true;
-            }
-        } : super.getSlot(pSlot);
-    }
-
     @Override
     public Component getDisplayName() {
         return Component.translatable("message.snowyspirit.container_entity_name",
                 this.containerStack.getItem().getDescription().getString());
-    }
-
-    /**
-     * For tile entities, ensures the chunk containing the tile entity is saved to disk later - the game won't think it
-     * hasn't changed and skip it.
-     */
-    @Override
-    public void setChanged() {
-    }
-
-    /**
-     * Don't rename this method to canInteractWith due to conflicts with Container
-     */
-    @Override
-    public boolean stillValid(Player pPlayer) {
-        if (this.isRemoved()) {
-            return false;
-        } else {
-            return pPlayer.distanceToSqr(this) <= 64.0D;
-        }
     }
 
     @Override
@@ -426,8 +316,11 @@ public class ContainerHolderEntity extends Entity implements Container, MenuProv
     public InteractionResult interact(Player pPlayer, InteractionHand pHand) {
         InteractionResult ret = super.interact(pPlayer, pHand);
         if (ret.consumesAction()) return ret;
-        pPlayer.openMenu(this);
         if (!pPlayer.level().isClientSide) {
+            PlatHelper.openCustomMenu((ServerPlayer) pPlayer, this, b -> {
+                b.writeBoolean(false);
+                b.writeVarInt(this.getId());
+            });
             this.gameEvent(GameEvent.CONTAINER_OPEN, pPlayer);
             PiglinAi.angerNearbyPiglins(pPlayer, true);
             return InteractionResult.CONSUME;
@@ -442,81 +335,15 @@ public class ContainerHolderEntity extends Entity implements Container, MenuProv
      * from 0 to 1. How much should it slow down the sled
      */
     public float getWeightFromItems() {
-        if (this.lootTable == null) {
-            return AbstractContainerMenu.getRedstoneSignalFromContainer(this) / 15f;
-        }
-        return 0;
+        return AbstractContainerMenu.getRedstoneSignalFromContainer(innerBlockEntity) / 15f;
     }
-
-    /**
-     * Adds loot to the minecart's contents.
-     */
-    public void unpackLootTable(@Nullable Player pPlayer) {
-        Level level = this.level();
-        if (this.lootTable != null && level.getServer() != null) {
-            LootTable loottable = level.getServer().getLootData().getLootTable(this.lootTable);
-            if (pPlayer instanceof ServerPlayer serverPlayer) {
-                CriteriaTriggers.GENERATE_LOOT.trigger( serverPlayer, this.lootTable);
-            }
-
-            this.lootTable = null;
-            LootParams.Builder builder = (new LootParams.Builder((ServerLevel) level))
-                    .withParameter(LootContextParams.ORIGIN, this.position());
-
-            if(PlatHelper.getPlatform().isForge()) {
-                // Forge: add this entity to loot context, however, currently Vanilla uses 'this' for the player creating the chests. So we take over 'killer_entity' for this.
-                builder.withParameter(LootContextParams.KILLER_ENTITY, this);
-            }
-            if (pPlayer != null) {
-                builder.withLuck(pPlayer.getLuck()).withParameter(LootContextParams.THIS_ENTITY, pPlayer);
-            }
-
-            loottable.fill(this, builder.create(LootContextParamSets.CHEST), lootTableSeed);
-        }
-    }
-
-    @Override
-    public void clearContent() {
-        this.unpackLootTable(null);
-        this.itemStacks.clear();
-    }
-
-    public void setLootTable(ResourceLocation pLootTable, long pLootTableSeed) {
-        this.lootTable = pLootTable;
-        this.lootTableSeed = pLootTableSeed;
-    }
-
-    @Nullable
-    public AbstractContainerMenu createMenu(int pContainerId, Inventory pInventory, Player pPlayer) {
-        if (this.lootTable != null && pPlayer.isSpectator()) {
-            return null;
-        } else {
-            this.unpackLootTable(pInventory.player);
-            return this.createMenu(pContainerId, pInventory);
-        }
-    }
-
-    @Override
-    public int getContainerSize() {
-        return CONTAINER_SIZE;
-    }
-
-    public AbstractContainerMenu createMenu(int id, Inventory pPlayerInventory) {
-        if (isSack(containerStack.getItem())) {
-            return SuppCompat.createSackMenu(id, pPlayerInventory, this);
-        } else if (!isNormalContainer(containerStack)) {
-            return new ShulkerBoxMenu(id, pPlayerInventory, this);
-        }
-        return ChestMenu.threeRows(id, pPlayerInventory, this);
-    }
-
 
     public static boolean isValidContainer(ItemStack stack) {
         return isNormalContainer(stack) || isContainerWithNBT(stack);
     }
 
     private static boolean isNormalContainer(ItemStack stack) {
-        return stack.is(ModTags.VALID_CONTAINERS);
+        return stack.is(ModTags.VALID_CONTAINERS) && stack.getItem() instanceof BlockItem;
     }
 
     private static boolean isContainerWithNBT(ItemStack stack) {
@@ -532,4 +359,73 @@ public class ContainerHolderEntity extends Entity implements Container, MenuProv
         return SnowySpirit.SUPPLEMENTARIES_INSTALLED && SuppCompat.isSack(i);
     }
 
+
+    //just delegates to inner container
+    @Override
+    public int getContainerSize() {
+        return innerBlockEntity.getContainerSize();
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return innerBlockEntity.isEmpty();
+    }
+
+    @Override
+    public ItemStack getItem(int slot) {
+        return innerBlockEntity.getItem(slot);
+    }
+
+    @Override
+    public ItemStack removeItem(int slot, int amount) {
+        return innerBlockEntity.removeItem(slot, amount);
+    }
+
+    @Override
+    public ItemStack removeItemNoUpdate(int slot) {
+        return innerBlockEntity.removeItemNoUpdate(slot);
+    }
+
+    @Override
+    public void setItem(int slot, ItemStack stack) {
+        innerBlockEntity.setItem(slot, stack);
+    }
+
+    @Override
+    public void setChanged() {
+    }
+
+    //just for this..
+    @Override
+    public boolean stillValid(Player player) {
+        if (this.isRemoved()) {
+            return false;
+        } else {
+            return player.distanceToSqr(this) <= 64.0D;
+        }
+    }
+
+    @Override
+    public void clearContent() {
+        innerBlockEntity.clearContent();
+    }
+
+    public void setLootTable(ResourceLocation res, long seed) {
+        if (innerBlockEntity instanceof RandomizableContainerBlockEntity r) {
+            r.setLootTable(res, seed);
+        }
+    }
+
+    @Nullable
+    @Override
+    public AbstractContainerMenu createMenu(int id, Inventory pPlayerInventory, Player player) {
+        //hardcoded since we need to pass this, not the tile...
+        if (isSack(containerStack.getItem())) {
+            return SuppCompat.createSackMenu(id, pPlayerInventory, this);
+        } else if (!isNormalContainer(containerStack)) {
+            return new ShulkerBoxMenu(id, pPlayerInventory, this);
+        }
+        return ChestMenu.threeRows(id, pPlayerInventory, this);
+
+    }
 }

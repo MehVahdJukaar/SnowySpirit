@@ -30,7 +30,7 @@ public class ContainerHolderEntityRenderer<T extends ContainerHolderEntity> exte
     public void render(T entity, float yRot, float partialTicks, PoseStack poseStack, MultiBufferSource pBuffer, int pPackedLight) {
 
         Entity vehicle = entity.getVehicle();
-        if(entity.tickCount<2 || vehicle == null || (vehicle.isControlledByLocalInstance()
+        if( vehicle == null || (vehicle.isControlledByLocalInstance()
                 && Minecraft.getInstance().options.getCameraType().isFirstPerson())) return;
 
         poseStack.pushPose();

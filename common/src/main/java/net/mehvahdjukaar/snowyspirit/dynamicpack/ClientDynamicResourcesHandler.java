@@ -18,6 +18,8 @@ import net.mehvahdjukaar.snowyspirit.SnowySpirit;
 import net.mehvahdjukaar.snowyspirit.configs.CommonConfigs;
 import net.mehvahdjukaar.snowyspirit.reg.ModRegistry;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.MultiPackResourceManager;
+import net.minecraft.server.packs.resources.ReloadableResourceManager;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.DyeColor;
@@ -123,14 +125,14 @@ public class ClientDynamicResourcesHandler extends DynClientResourcesGenerator {
                     var targetPalette = Palette.fromImage(plankTexture);
                     TextureImage newImage = respriter.recolor(targetPalette);
                     //TextureImage newImage = respriter.recolorWithAnimationOf(plankTexture);
-                    dynamicPack.addAndCloseTexture(textureRes, newImage);
+                    dynamicPack.addAndCloseTexture(textureRes, newImage, false);
 
                 } catch (Exception ex) {
-                    getLogger().error("Failed to generate Sign Post item texture for for {} : {}", sled, ex);
+                    getLogger().error("Failed to generate sled entity texture for for {} : {}", sled, ex);
                 }
             });
         } catch (Exception ex) {
-            getLogger().error("Could not generate any Sled entity texture : ", ex);
+            getLogger().error("Could not generate any sled entity texture : ", ex);
         }
 
         //item textures
@@ -167,7 +169,7 @@ public class ClientDynamicResourcesHandler extends DynClientResourcesGenerator {
                         newImage = respriter.recolor(targetPalette);
 
                     } catch (Exception ex) {
-                        getLogger().error("Failed to generate Sign Post item texture for for {} : {}", sled, ex);
+                        getLogger().error("Failed to generate sled item texture for for {} : {}", sled, ex);
                     }
                 }
                 if (newImage != null) {

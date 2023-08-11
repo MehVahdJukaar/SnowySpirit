@@ -6,6 +6,7 @@ import net.mehvahdjukaar.supplementaries.common.items.CandyItem;
 import net.mehvahdjukaar.supplementaries.common.items.SackItem;
 import net.mehvahdjukaar.supplementaries.configs.CommonConfigs;
 import net.mehvahdjukaar.supplementaries.reg.ModRegistry;
+import net.minecraft.world.Container;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -20,8 +21,8 @@ public class SuppCompat {
         return i instanceof SackItem;
     }
 
-    public static AbstractContainerMenu createSackMenu(int id, Inventory inventory, ContainerHolderEntity entity) {
-        return new SackContainerMenu(id, inventory, entity);
+    public static AbstractContainerMenu createSackMenu(int id, Inventory inventory, Container container) {
+        return new SackContainerMenu(id, inventory, container);
     }
 
     public static void triggerSweetTooth(Level level, LivingEntity entity) {

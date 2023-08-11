@@ -3,6 +3,7 @@ package net.mehvahdjukaar.snowyspirit.client;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import net.mehvahdjukaar.moonlight.api.client.util.ParticleUtil;
+import net.mehvahdjukaar.moonlight.api.platform.PlatHelper;
 import net.mehvahdjukaar.moonlight.api.util.math.MthUtils;
 import net.mehvahdjukaar.snowyspirit.configs.ClientConfigs;
 import net.minecraft.client.Camera;
@@ -140,9 +141,12 @@ public class GlowLightParticle extends TextureSheetParticle {
                 .endVertex();
     }
 
+    private static final ParticleRenderType RENDER_TYPE = PlatHelper.getPlatform().isForge() ?
+            ParticleUtil.ADDITIVE_TRANSLUCENCY_RENDER_TYPE : ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT;
+
     @Override
     public ParticleRenderType getRenderType() {
-        return ParticleUtil.ADDITIVE_TRANSLUCENCY_RENDER_TYPE;
+        return RENDER_TYPE;
     }
 
     @Override

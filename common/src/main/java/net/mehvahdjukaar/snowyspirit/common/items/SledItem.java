@@ -35,8 +35,8 @@ public class SledItem extends WoodBasedItem {
     @Override
     public InteractionResultHolder<ItemStack> use(Level pLevel, Player pPlayer, InteractionHand pHand) {
         ItemStack itemstack = pPlayer.getItemInHand(pHand);
-        HitResult hitresult = getPlayerPOVHitResult(pLevel, pPlayer, ClipContext.Fluid.ANY);
-        if (hitresult.getType() == HitResult.Type.MISS) {
+        HitResult hit = getPlayerPOVHitResult(pLevel, pPlayer, ClipContext.Fluid.ANY);
+        if (hit.getType() == HitResult.Type.MISS) {
             return InteractionResultHolder.pass(itemstack);
         } else {
             Vec3 vec3 = pPlayer.getViewVector(1.0F);
@@ -52,16 +52,16 @@ public class SledItem extends WoodBasedItem {
                 }
             }
 
-            if (hitresult.getType() == HitResult.Type.BLOCK) {
-                SledEntity boat = new SledEntity(pLevel, hitresult.getLocation().x, hitresult.getLocation().y, hitresult.getLocation().z);
-                boat.setWoodType(this.getBlockType());
-                boat.setYRot(pPlayer.getYRot());
-                if (!pLevel.noCollision(boat, boat.getBoundingBox())) {
+            if (hit.getType() == HitResult.Type.BLOCK) {
+                SledEntity sledEntity = new SledEntity(pLevel, hit.getLocation().x, hit.getLocation().y, hit.getLocation().z);
+                sledEntity.setWoodType(this.getBlockType());
+                sledEntity.setYRot(pPlayer.getYRot());
+                if (!pLevel.noCollision(sledEntity, sledEntity.getBoundingBox())) {
                     return InteractionResultHolder.fail(itemstack);
                 } else {
                     if (!pLevel.isClientSide) {
-                        pLevel.addFreshEntity(boat);
-                        pLevel.gameEvent(pPlayer, GameEvent.ENTITY_PLACE, BlockPos.containing(hitresult.getLocation()));
+                        pLevel.addFreshEntity(sledEntity);
+                        pLevel.gameEvent(pPlayer, GameEvent.ENTITY_PLACE, BlockPos.containing(hit.getLocation()));
                         if (!pPlayer.getAbilities().instabuild) {
                             itemstack.shrink(1);
                         }

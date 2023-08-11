@@ -22,13 +22,13 @@ public abstract class SelfContainerHolderEntityMixin extends Entity implements C
 
     // Forge Start
     @Unique
-    private LazyOptional<?> itemHandler = LazyOptional.of(() -> new InvWrapper(this));
+    private LazyOptional<?> snowyspirit_multi$itemHandler = LazyOptional.of(() -> new InvWrapper(this));
 
 
     @Override
     public <T> net.minecraftforge.common.util.LazyOptional<T> getCapability(net.minecraftforge.common.capabilities.Capability<T> capability, @Nullable net.minecraft.core.Direction facing) {
         if (this.isAlive() && capability == ForgeCapabilities.ITEM_HANDLER)
-            return itemHandler.cast();
+            return snowyspirit_multi$itemHandler.cast();
 
         return super.getCapability(capability, facing);
     }
@@ -36,13 +36,13 @@ public abstract class SelfContainerHolderEntityMixin extends Entity implements C
     @Override
     public void invalidateCaps() {
         super.invalidateCaps();
-        this.itemHandler.invalidate();
+        this.snowyspirit_multi$itemHandler.invalidate();
     }
 
     @Override
     public void reviveCaps() {
         super.reviveCaps();
-        this.itemHandler = LazyOptional.of(() -> new InvWrapper(this));
+        this.snowyspirit_multi$itemHandler = LazyOptional.of(() -> new InvWrapper(this));
     }
 
 }

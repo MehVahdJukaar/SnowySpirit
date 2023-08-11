@@ -15,6 +15,8 @@ dependencies {
 
     modImplementation("net.mehvahdjukaar:moonlight:${project.moonlight_version}")
     modImplementation("net.mehvahdjukaar:supplementaries:${project.supplementaries_version}")
+    //modImplementation("curse.maven:supplementaries-412082:4627388")
+
 }
 
 publishing {

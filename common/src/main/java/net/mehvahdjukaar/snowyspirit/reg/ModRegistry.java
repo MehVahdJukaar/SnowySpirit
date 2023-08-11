@@ -31,7 +31,10 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.properties.BlockSetType;
 import net.minecraft.world.level.material.MapColor;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -88,7 +91,7 @@ public class ModRegistry {
     public static final String WINTER_DISC_NAME = "music_disc_winter";
     public static final Supplier<Item> WINTER_DISC = regItem(WINTER_DISC_NAME,
             () -> PlatHelper.newMusicDisc(14, ModSounds.WINTER_MUSIC, new Item.Properties()
-                    .rarity(Rarity.RARE).stacksTo(1), 350));
+                    .rarity(Rarity.RARE).stacksTo(1), 2 * 60 + 41));
 
     public static final Supplier<Block> GINGERBREAD_BLOCK = regWithItem("gingerbread", () ->
             new Block(BlockBehaviour.Properties.of()
@@ -140,7 +143,7 @@ public class ModRegistry {
 
     public static final String GUMDROP_NAME = "gumdrop";
     public static final Map<DyeColor, Supplier<Block>> GUMDROPS_BUTTONS =
-           BlocksColorAPI.SORTED_COLORS.stream().collect(ImmutableMap.toImmutableMap(Function.identity(),
+            BlocksColorAPI.SORTED_COLORS.stream().collect(ImmutableMap.toImmutableMap(Function.identity(),
                     c -> regWithItem(GUMDROP_NAME + "_" + c.getName(), () -> new GumdropButton(c))));
 
     public static final String GLOW_LIGHTS_NAME = "glow_lights";

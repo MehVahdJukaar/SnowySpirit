@@ -14,7 +14,6 @@ import net.minecraft.world.level.block.DispenserBlock;
 
 public class ModSetup {
 
-    public static boolean done = false;
 
     public static void setup() {
         ComposterBlock.COMPOSTABLES.put(ModRegistry.GINGER_FLOWER.get(), 0.3F);
@@ -26,7 +25,6 @@ public class ModSetup {
 
         ModRegistry.SLED_ITEMS.forEach((key, value) ->
                 DispenserBlock.registerBehavior(value, new SledDispenserBehavior(key)));
-        done = true;
     }
 
 
@@ -42,9 +40,9 @@ public class ModSetup {
         public ItemStack execute(BlockSource pSource, ItemStack pStack) {
             Direction direction = pSource.getBlockState().getValue(DispenserBlock.FACING);
             Level level = pSource.getLevel();
-            double d0 = pSource.x() + (double) ((float) direction.getStepX() * 1.2F);
-            double d1 = pSource.y() + (double) ((float) direction.getStepY() * 1.2F);
-            double d2 = pSource.z() + (double) ((float) direction.getStepZ() * 1.2F);
+            double d0 = pSource.x() + (direction.getStepX() * 1.2F);
+            double d1 = pSource.y() + (direction.getStepY() * 1.2F);
+            double d2 = pSource.z() + (direction.getStepZ() * 1.2F);
             BlockPos blockpos = pSource.getPos().relative(direction);
 
             if (!level.getBlockState(blockpos).isAir() || !level.getFluidState(blockpos).isEmpty()) {

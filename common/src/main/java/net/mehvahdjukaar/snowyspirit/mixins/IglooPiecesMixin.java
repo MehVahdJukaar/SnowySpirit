@@ -13,6 +13,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.StructureManager;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
@@ -31,7 +32,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(IglooPieces.IglooPiece.class)
 public abstract class IglooPiecesMixin extends TemplateStructurePiece {
 
-    public IglooPiecesMixin(StructurePieceType structurePieceType, int i, StructureTemplateManager structureTemplateManager, ResourceLocation resourceLocation, String string, StructurePlaceSettings structurePlaceSettings, BlockPos blockPos) {
+    protected IglooPiecesMixin(StructurePieceType structurePieceType, int i, StructureTemplateManager structureTemplateManager, ResourceLocation resourceLocation, String string, StructurePlaceSettings structurePlaceSettings, BlockPos blockPos) {
         super(structurePieceType, i, structureTemplateManager, resourceLocation, string, structurePlaceSettings, blockPos);
     }
 
@@ -66,7 +67,9 @@ public abstract class IglooPiecesMixin extends TemplateStructurePiece {
                         SledEntity sledEntity = new SledEntity(level, blockPos.getX() + 0.5, blockPos.getY() + 0.5, blockPos.getZ());
                         ContainerHolderEntity c = sledEntity.tryAddingChest(Items.CHEST.getDefaultInstance());
                         if (c != null) {
-                            c.setLootTable(SnowySpirit.res("chests/igloo_sled"), level.random.nextLong());
+
+
+                                c.setLootTable(SnowySpirit.res("chests/igloo_sled"), level.random.nextLong());
                         }
                         level.addFreshEntity(sledEntity);
                     });

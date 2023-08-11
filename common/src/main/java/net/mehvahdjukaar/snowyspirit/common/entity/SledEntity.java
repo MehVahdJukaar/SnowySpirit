@@ -42,12 +42,10 @@ import net.minecraft.world.entity.animal.WaterAnimal;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.vehicle.Boat;
 import net.minecraft.world.entity.vehicle.DismountHelper;
-import net.minecraft.world.item.DyeColor;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
+import net.minecraft.world.item.*;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.PowderSnowBlock;
 import net.minecraft.world.level.block.SnowLayerBlock;
 import net.minecraft.world.level.block.state.BlockState;
@@ -155,6 +153,8 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
 
     @Override
     public void writeSpawnData(FriendlyByteBuf buffer) {
+        //fabric is having issues for some reason... sometimes wood is set sometimes not
+        buffer.writeUtf( this.getWoodType().toString());
     }
 
     //all of this to sync that damn wolf
@@ -163,6 +163,7 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
         if (level().isClientSide) {
             SledSoundInstance.playAt(this);
         }
+        this.setWoodType(WoodTypeRegistry.fromNBT(additionalData.readUtf()));
     }
 
     @Override
@@ -1004,8 +1005,11 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
     public ContainerHolderEntity tryAddingChest(ItemStack stack) {
         if (ContainerHolderEntity.isValidContainer(stack) && this.canAddChest()) {
             Level level = level();
-            ContainerHolderEntity container = new ContainerHolderEntity(level, this, stack.split(1));
+            stack = stack.split(1);
+            ContainerHolderEntity container = new ContainerHolderEntity(level, this, stack);
             level.addFreshEntity(container);
+            Block b = ((BlockItem) stack.getItem()).getBlock();
+            this.playSound(b.getSoundType(b.defaultBlockState()).getPlaceSound());
             return container;
         }
         return null;

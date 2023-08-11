@@ -120,6 +120,12 @@ allprojects {
         maven {
             url "https://maven.firstdarkdev.xyz/snapshots"
         }
+        maven {
+            name = 'Ladysnake Mods'
+            url = 'https://maven.ladysnake.org/releases'
+        }
+        maven { url 'https://jitpack.io' }
+
     }
 
     tasks.withType(JavaCompile) {

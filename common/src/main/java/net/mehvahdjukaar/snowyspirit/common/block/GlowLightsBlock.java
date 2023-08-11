@@ -124,12 +124,6 @@ public class GlowLightsBlock extends WaterBlock implements EntityBlock, IColored
         return true;
     }
 
-    @Nullable
-    @Override
-    public Item changeItemColor(@Nullable DyeColor color) {
-        return ModRegistry.GLOW_LIGHTS_ITEMS.get(color).get();
-    }
-
     @Override
     public List<ItemStack> getDrops(BlockState state, LootParams.Builder builder) {
         List<ItemStack> drops = super.getDrops(state, builder);

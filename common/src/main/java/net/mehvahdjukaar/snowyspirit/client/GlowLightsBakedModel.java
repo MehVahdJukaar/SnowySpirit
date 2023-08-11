@@ -1,5 +1,6 @@
 package net.mehvahdjukaar.snowyspirit.client;
 
+import net.mehvahdjukaar.moonlight.api.client.model.BakedQuadBuilder;
 import net.mehvahdjukaar.moonlight.api.client.model.CustomBakedModel;
 import net.mehvahdjukaar.moonlight.api.client.model.ExtraModelData;
 import net.mehvahdjukaar.snowyspirit.common.block.GlowLightsBlock;
@@ -12,6 +13,7 @@ import net.minecraft.client.renderer.block.model.ItemOverrides;
 import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.client.resources.model.ModelState;
 import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.Blocks;
@@ -24,7 +26,7 @@ public class GlowLightsBakedModel implements CustomBakedModel {
     private final BlockModelShaper blockModelShaper;
     private final BakedModel overlay;
 
-    public GlowLightsBakedModel(BakedModel overlay) {
+    public GlowLightsBakedModel(BakedModel overlay, ModelState state) {
         this.overlay = overlay;
         this.blockModelShaper = Minecraft.getInstance().getBlockRenderer().getBlockModelShaper();
     }
@@ -40,7 +42,11 @@ public class GlowLightsBakedModel implements CustomBakedModel {
                 BlockState mimic = extraData.get(GlowLightsBlockTile.MIMIC_KEY);
                 if (mimic != null && !mimic.isAir()) {
                     BakedModel model = blockModelShaper.getBlockModel(mimic);
-                    quads.addAll(model.getQuads(state, side, rand));
+                    var qu = model.getQuads(state, side, rand);
+                   // BakedQuadBuilder builder = BakedQuadBuilder.create();
+                 //   for(var q : qu){
+                    //} //TODO: fabric emissive
+                    quads.addAll(qu);
                 }
             } catch (Exception ignored) {
             }
