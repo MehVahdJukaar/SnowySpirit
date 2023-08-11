@@ -1,12 +1,15 @@
 package net.mehvahdjukaar.snowyspirit.mixins;
 
+import net.mehvahdjukaar.moonlight.api.platform.PlatHelper;
 import net.mehvahdjukaar.snowyspirit.SnowySpirit;
 import net.mehvahdjukaar.snowyspirit.common.entity.ContainerHolderEntity;
 import net.mehvahdjukaar.snowyspirit.common.entity.SledEntity;
 import net.mehvahdjukaar.snowyspirit.configs.CommonConfigs;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
@@ -65,12 +68,10 @@ public abstract class IglooPiecesMixin extends TemplateStructurePiece {
                     if (server == null) return;
                     server.executeIfPossible(() -> {
                         SledEntity sledEntity = new SledEntity(level, blockPos.getX() + 0.5, blockPos.getY() + 0.5, blockPos.getZ());
-                        Item chest = PlatformHelpsr.isModLoaded("quark") ? Registry.ITEMS.get(new ResourceLocation("quark:spruce_chest") :
-                            Items.CHEST;
+                        Item chest = PlatHelper.isModLoaded("quark") ?
+                                BuiltInRegistries.ITEM.get(new ResourceLocation("quark:spruce_chest")) : Items.CHEST;
                         ContainerHolderEntity c = sledEntity.tryAddingChest(chest.getDefaultInstance());
                         if (c != null) {
-
-
                                 c.setLootTable(SnowySpirit.res("chests/igloo_sled"), level.random.nextLong());
                         }
                         level.addFreshEntity(sledEntity);
