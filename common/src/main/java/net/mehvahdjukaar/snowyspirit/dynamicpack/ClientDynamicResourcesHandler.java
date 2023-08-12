@@ -130,6 +130,7 @@ public class ClientDynamicResourcesHandler extends DynClientResourcesProvider {
                     TextureImage newImage = respriter.recolor(targetPalette);
                     //TextureImage newImage = respriter.recolorWithAnimationOf(plankTexture);
                     dynamicPack.addAndCloseTexture(textureRes, newImage);
+                    dynamicPack.persistentResources.add(ResType.TEXTURES.getPath(textureRes));
 
                 } catch (Exception ex) {
                     getLogger().error("Failed to generate Sign Post item texture for for {} : {}", sled, ex);

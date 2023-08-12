@@ -1,5 +1,1 @@
-- Improved ginger loot table
-- Fixed missing glow light particle texture
-- Fixed gingerbread vertical slab model
-- Fixed some incorrect configs
-- Added some client configs to alter glow particles. These give you the choice to choose between 3 render modes
+fixex textures
