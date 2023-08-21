@@ -5,7 +5,7 @@
     {"item": "minecraft:glowstone_dust"},
     {"tag": "forge:dyes/black"},
     {"tag": "forge:string"},
-    {"item": "amethyst"}
+    {"item": "amethyst_shard"}
   ],
   "result": {
     "item": "snowyspirit:glow_lights_black"

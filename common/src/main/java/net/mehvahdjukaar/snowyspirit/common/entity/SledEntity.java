@@ -1313,7 +1313,7 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
             if (entity.level().isClientSide) {
                 this.sledPuller = wolf;
                 return true;
-            } else if (entity.getType().is(ModTags.WOLVES) && entity.getBbWidth() < 1.1) {
+            } else if (entity.getType().is(ModTags.WOLVES) && entity.getBbWidth() < CommonConfigs.MAX_SLED_PULLER_SIZE.get()) {
                 //serverside logic
                 //need to remove leash, or he'll drop it itself
                 wolf.dropLeash(true, false);

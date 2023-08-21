@@ -4,7 +4,7 @@
   "ingredients": [
     {"item": "minecraft:glowstone_dust"},
     {"item": "minecraft:diamond"},
-    {"item": "amethyst"},
+    {"item": "amethyst_shard"},
     {"tag": "forge:string"}
   ],
   "result": {
