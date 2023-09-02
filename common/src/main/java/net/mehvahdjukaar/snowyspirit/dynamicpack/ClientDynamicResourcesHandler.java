@@ -18,13 +18,12 @@ import net.mehvahdjukaar.snowyspirit.SnowySpirit;
 import net.mehvahdjukaar.snowyspirit.configs.CommonConfigs;
 import net.mehvahdjukaar.snowyspirit.reg.ModRegistry;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.packs.resources.MultiPackResourceManager;
-import net.minecraft.server.packs.resources.ReloadableResourceManager;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.EnumMap;
@@ -46,13 +45,18 @@ public class ClientDynamicResourcesHandler extends DynClientResourcesGenerator {
             (c.ordinal() < 16 && c != DyeColor.BROWN && c != DyeColor.BLACK && c != DyeColor.GRAY && c != DyeColor.LIGHT_GRAY)).toList();
 
 
+    @NotNull
     public static float[] getGlowLightColor(DyeColor color, RandomSource randomSource) {
         if (color == null) {
             var c = new HSVColor(randomSource.nextFloat(), 1, 1f, 1).asRGB();
             return new float[]{c.red(), c.green(), c.blue()};
             //color = BRIGHT_COLORS.get(randomSource.nextInt(BRIGHT_COLORS.size()));
         }
-        return COLORS.get(color);
+        var arr = COLORS.get(color);
+        if (arr == null) {
+            throw new Error("Returned null color. How? " + color + " " + COLORS);
+        }
+        return arr;
     }
 
     @Override
@@ -73,7 +77,7 @@ public class ClientDynamicResourcesHandler extends DynClientResourcesGenerator {
                 }
             }
         } catch (Exception e) {
-            int aa = 1;
+            throw new RuntimeException(e);
         }
     }
 

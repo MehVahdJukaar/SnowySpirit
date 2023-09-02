@@ -6,7 +6,7 @@
       "bonus_rolls": 0.0,
       "entries": [
         {
-          "type": "minecraft:item",
+          "type": "moonlight:optional_item",
           "name": "snowyspirit:ginger_crate"
         }
       ],

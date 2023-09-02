@@ -1,4 +1,1 @@
-- fixed sled entity textures not persisting after generating
-- fixed sacks on sleds crashing
-- fixed winter disk duration item property
-- glow lights particles at least do render on fabric but wont have additive translucency
+fixed glow lights recipe
