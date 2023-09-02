@@ -1,1 +1,1 @@
-fixex textures
+fixed loot table
