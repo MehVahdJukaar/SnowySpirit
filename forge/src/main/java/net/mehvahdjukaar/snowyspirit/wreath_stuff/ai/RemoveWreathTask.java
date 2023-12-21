@@ -21,6 +21,7 @@ import net.minecraft.world.level.block.DoorBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraftforge.event.ForgeEventFactory;
+import net.neoforged.neoforge.event.EventHooks;
 
 public class RemoveWreathTask extends Behavior<Villager> {
     private final float speedModifier;
@@ -42,7 +43,7 @@ public class RemoveWreathTask extends Behavior<Villager> {
     protected boolean checkExtraStartConditions(ServerLevel pLevel, Villager pOwner) {
         if (SnowySpirit.isChristmasSeason(pLevel)) return false;
         if (cooldown-- > 0) return false;
-        if (!ForgeEventFactory.getMobGriefingEvent(pLevel, pOwner)) {
+        if (!EventHooks.getMobGriefingEvent(pLevel, pOwner)) {
             cooldown = 20 * 60;
             return false;
         }

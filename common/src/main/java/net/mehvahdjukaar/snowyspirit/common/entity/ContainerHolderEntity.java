@@ -134,7 +134,7 @@ public class ContainerHolderEntity extends Entity implements Container, IExtraCl
     }
 
     @Override
-    public double getMyRidingOffset() {
+    public float getMyRidingOffset(Entity entity) {
         return 0;
     }
 

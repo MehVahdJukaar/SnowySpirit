@@ -2,8 +2,8 @@ package net.mehvahdjukaar.snowyspirit.wreath_stuff.capabilities;
 
 import net.mehvahdjukaar.snowyspirit.SnowySpirit;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.capabilities.*;
-import net.minecraftforge.event.AttachCapabilitiesEvent;
+import net.neoforged.neoforge.capabilities.ICapabilityProvider;
+import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 
 import javax.annotation.Nullable;
 
@@ -24,7 +24,7 @@ public class ModCapabilities {
 
     @SuppressWarnings("ConstantConditions")
     @Nullable
-    public static <T> T get(ICapabilityProvider provider,Capability<T> cap){
+    public static <T> T get(ICapabilityProvider provider, Capability<T> cap){
         return provider.getCapability(cap).orElse(null);
     }
 

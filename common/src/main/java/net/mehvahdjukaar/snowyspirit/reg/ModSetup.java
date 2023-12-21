@@ -4,8 +4,8 @@ import net.mehvahdjukaar.moonlight.api.set.wood.WoodType;
 import net.mehvahdjukaar.snowyspirit.common.ai.WinterVillagerAI;
 import net.mehvahdjukaar.snowyspirit.common.entity.SledEntity;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.BlockSource;
 import net.minecraft.core.Direction;
+import net.minecraft.core.dispenser.BlockSource;
 import net.minecraft.core.dispenser.DefaultDispenseItemBehavior;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -38,12 +38,13 @@ public class ModSetup {
 
         @Override
         public ItemStack execute(BlockSource pSource, ItemStack pStack) {
-            Direction direction = pSource.getBlockState().getValue(DispenserBlock.FACING);
-            Level level = pSource.getLevel();
-            double d0 = pSource.x() + (direction.getStepX() * 1.2F);
-            double d1 = pSource.y() + (direction.getStepY() * 1.2F);
-            double d2 = pSource.z() + (direction.getStepZ() * 1.2F);
-            BlockPos blockpos = pSource.getPos().relative(direction);
+            Direction direction = pSource.state().getValue(DispenserBlock.FACING);
+            Level level = pSource.level();
+            var center = pSource.center();
+            double d0 = center.x() + (direction.getStepX() * 1.2F);
+            double d1 = center.y() + (direction.getStepY() * 1.2F);
+            double d2 = center.z() + (direction.getStepZ() * 1.2F);
+            BlockPos blockpos = pSource.pos().relative(direction);
 
             if (!level.getBlockState(blockpos).isAir() || !level.getFluidState(blockpos).isEmpty()) {
                 return this.defaultDispenseItemBehavior.dispense(pSource, pStack);
@@ -60,7 +61,7 @@ public class ModSetup {
 
         @Override
         protected void playSound(BlockSource pSource) {
-            pSource.getLevel().levelEvent(1000, pSource.getPos(), 0);
+            pSource.level().levelEvent(1000, pSource.pos(), 0);
         }
     }
 }

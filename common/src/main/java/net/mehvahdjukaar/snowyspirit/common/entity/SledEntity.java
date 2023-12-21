@@ -39,6 +39,7 @@ import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.animal.Fox;
 import net.minecraft.world.entity.animal.WaterAnimal;
+import net.minecraft.world.entity.animal.horse.Llama;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.vehicle.Boat;
 import net.minecraft.world.entity.vehicle.DismountHelper;
@@ -54,8 +55,8 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
@@ -269,7 +270,7 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
      * Sets a target for the client to interpolate towards over the next few ticks
      */
     @Override
-    public void lerpTo(double x, double y, double z, float yRot, float xRot, int posRotationIncrements, boolean teleport) {
+    public void lerpTo(double x, double y, double z, float yRot, float xRot, int steps) {
         this.lerpX = x;
         this.lerpY = y;
         this.lerpZ = z;
@@ -1001,6 +1002,11 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
         return 0.2D + this.getAdditionalY() + (this.getSeatType() != null ? 0.0615 : 0);
     }
 
+    @Override
+    public Vec3 getPassengerRidingPosition(Entity entity) {
+        return super.getPassengerRidingPosition(entity);
+    }
+
     @Nullable
     public ContainerHolderEntity tryAddingChest(ItemStack stack) {
         if (ContainerHolderEntity.isValidContainer(stack) && this.canAddChest()) {
@@ -1122,6 +1128,7 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
         }
     }
 
+    //TODO: use attachment point
     @Override
     protected void positionRider(Entity passenger, MoveFunction setPos) {
         if (this.hasPassenger(passenger)) {
@@ -1143,7 +1150,7 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
                 this.updatePullerAnimations();
             } else {
                 float zPos = 0.0F;
-                float yPos = (float) ((this.isRemoved() ? 0.01 : this.getPassengersRidingOffset()) + passenger.getMyRidingOffset());
+                float yPos = (float) ((this.isRemoved() ? 0.01 : this.getPassengersRidingOffset()) + passenger.getMyRidingOffset(this));
 
                 boolean isMoreThanOneOnBoard = false;
                 if (this.isChestEntity(passenger)) {

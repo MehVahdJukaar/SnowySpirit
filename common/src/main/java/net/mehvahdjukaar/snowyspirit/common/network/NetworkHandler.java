@@ -6,15 +6,11 @@ import net.mehvahdjukaar.snowyspirit.SnowySpirit;
 
 public class NetworkHandler {
 
-    public static final ChannelHandler CHANNEL = ChannelHandler.createChannel(SnowySpirit.res("network"));
+    public static final ChannelHandler CHANNEL = ChannelHandler.builder(SnowySpirit.MOD_ID)
+            .register(NetworkDir.PLAY_TO_SERVER, ServerBoundUpdateSledState.class, ServerBoundUpdateSledState::new)
+            .build();
 
-
-    static {
-
-        CHANNEL.register(NetworkDir.PLAY_TO_SERVER, ServerBoundUpdateSledState.class, ServerBoundUpdateSledState::new);
-    }
-
-    public static void init(){
+    public static void init() {
 
     }
 

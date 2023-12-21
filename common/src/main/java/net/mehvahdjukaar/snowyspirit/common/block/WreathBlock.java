@@ -1,6 +1,7 @@
 package net.mehvahdjukaar.snowyspirit.common.block;
 
 
+import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -23,11 +24,16 @@ public class WreathBlock extends HorizontalDirectionalBlock {
     private static final VoxelShape SOUTH_AABB = Block.box(0.0D, 0.0D, 0.0D, 16.0D, 16.0D, 1.0D);
     private static final VoxelShape NORTH_AABB = Block.box(0.0D, 0.0D, 15.0D, 16.0D, 16.0D, 16.0D);
 
+    public static final MapCodec<WreathBlock> CODEC = simpleCodec(WreathBlock::new);
 
     public WreathBlock(Properties properties) {
         super(properties);
     }
 
+    @Override
+    protected MapCodec<? extends HorizontalDirectionalBlock> codec() {
+        return CODEC;
+    }
 
     @Override
     public VoxelShape getShape(BlockState pState, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext) {

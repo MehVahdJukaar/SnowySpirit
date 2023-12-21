@@ -25,6 +25,7 @@ import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.EntityBlock;
@@ -44,7 +45,6 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.List;
@@ -71,7 +71,7 @@ public class GlowLightsBlock extends WaterBlock implements EntityBlock, IColored
     });
 
     public GlowLightsBlock(DyeColor color) {
-        super(Properties.copy(Blocks.OAK_LEAVES)
+        super(Properties.ofFullCopy(Blocks.OAK_LEAVES)
                 .lightLevel(s -> 6));
         this.color = color;
     }
@@ -216,7 +216,7 @@ public class GlowLightsBlock extends WaterBlock implements EntityBlock, IColored
         return super.use(pState, level, pos, pPlayer, pHand, pHit);
     }
 
-    private List<ItemStack> shearAction(@Nullable Player player, @Nonnull ItemStack item, Level world, BlockPos pos, int fortune) {
+    private List<ItemStack> shearAction(@Nullable Player player, ItemStack item, Level world, BlockPos pos, int fortune) {
         if (world.getBlockEntity(pos) instanceof GlowLightsBlockTile tile) {
             if (!world.isClientSide()) {
                 world.setBlockAndUpdate(pos, tile.getHeldBlock());
@@ -227,7 +227,7 @@ public class GlowLightsBlock extends WaterBlock implements EntityBlock, IColored
     }
 
     @Override
-    public ItemStack getCloneItemStack(BlockGetter level, BlockPos pos, BlockState state) {
+    public ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state) {
         return ModRegistry.GLOW_LIGHTS_ITEMS.get(this.color).get().getDefaultInstance();
     }
 

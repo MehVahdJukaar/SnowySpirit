@@ -72,7 +72,7 @@ public class ModRegistry {
     public static final Map<WoodType, SledItem> SLED_ITEMS = new LinkedHashMap<>();
 
     public static final Supplier<Block> CANDY_CANE_BLOCK = regWithItem("candy_cane_block", () ->
-            new RotatedPillarBlock(BlockBehaviour.Properties.copy(Blocks.CALCITE)
+            new RotatedPillarBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.CALCITE)
                     .mapColor(MapColor.COLOR_PINK)
                     .requiresCorrectToolForDrops().strength(1.5F).sound(SoundType.CALCITE)));
 
@@ -100,30 +100,30 @@ public class ModRegistry {
 
     //slab
     public static final Supplier<Block> GINGERBREAD_STAIRS = regWithItem("gingerbread_stairs", () -> new ModStairBlock(
-            GINGERBREAD_BLOCK, BlockBehaviour.Properties.copy(GINGERBREAD_BLOCK.get())));
+            GINGERBREAD_BLOCK, BlockBehaviour.Properties.ofFullCopy(GINGERBREAD_BLOCK.get())));
 
     //slab
     public static final Supplier<Block> GINGERBREAD_SLAB = regWithItem("gingerbread_slab", () -> new SlabBlock(
-            BlockBehaviour.Properties.copy(GINGERBREAD_BLOCK.get())));
+            BlockBehaviour.Properties.ofFullCopy(GINGERBREAD_BLOCK.get())));
 
     public static final Supplier<Block> GINGERBREAD_FROSTED_BLOCK = regWithItem("gingerbread_frosted", () ->
-            new Block(BlockBehaviour.Properties.copy(GINGERBREAD_BLOCK.get())));
+            new Block(BlockBehaviour.Properties.ofFullCopy(GINGERBREAD_BLOCK.get())));
 
     public static final Supplier<Block> GINGERBREAD_DOOR = regWithItem("gingerbread_door", () ->
-            new DoorBlock(BlockBehaviour.Properties.copy(GINGERBREAD_BLOCK.get()), BlockSetType.ACACIA) {
+            new DoorBlock(BlockBehaviour.Properties.ofFullCopy(GINGERBREAD_BLOCK.get()), BlockSetType.ACACIA) {
             });
 
     public static final Supplier<Block> GINGERBREAD_TRAPDOOR = regWithItem("gingerbread_trapdoor", () ->
-            new TrapDoorBlock(BlockBehaviour.Properties.copy(GINGERBREAD_BLOCK.get()), BlockSetType.ACACIA) {
+            new TrapDoorBlock(BlockBehaviour.Properties.ofFullCopy(GINGERBREAD_BLOCK.get()), BlockSetType.ACACIA) {
             });
 
 
     public static final Supplier<Block> GINGER_WILD = regWithItem("wild_ginger", () -> new WildGingerBlock(
-            BlockBehaviour.Properties.copy(Blocks.TALL_GRASS)));
+            BlockBehaviour.Properties.ofFullCopy(Blocks.TALL_GRASS)));
 
     public static final String GINGER_NAME = "ginger";
     public static final Supplier<Block> GINGER_CROP = regBlock(GINGER_NAME, () ->
-            new GingerBlock(BlockBehaviour.Properties.copy(Blocks.WHEAT)
+            new GingerBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.WHEAT)
                     .noCollission()
                     .randomTicks()
                     .instabreak()
@@ -135,7 +135,7 @@ public class ModRegistry {
 
     //pot
     public static final Supplier<Block> GINGER_POT = regBlock("potted_ginger", () -> PlatHelper.newFlowerPot(
-            () -> (FlowerPotBlock) Blocks.FLOWER_POT, GINGER_CROP, BlockBehaviour.Properties.copy(Blocks.FLOWER_POT)));
+            () -> (FlowerPotBlock) Blocks.FLOWER_POT, GINGER_CROP, BlockBehaviour.Properties.ofFullCopy(Blocks.FLOWER_POT)));
 
     public static final Supplier<SimpleParticleType> GLOW_LIGHT_PARTICLE = RegHelper.registerParticle(
             SnowySpirit.res("glow_light"));
@@ -144,7 +144,12 @@ public class ModRegistry {
     public static final String GUMDROP_NAME = "gumdrop";
     public static final Map<DyeColor, Supplier<Block>> GUMDROPS_BUTTONS =
             BlocksColorAPI.SORTED_COLORS.stream().collect(ImmutableMap.toImmutableMap(Function.identity(),
-                    c -> regWithItem(GUMDROP_NAME + "_" + c.getName(), () -> new GumdropButton(c))));
+                    c -> regWithItem(GUMDROP_NAME + "_" + c.getName(), () -> new GumdropButton(
+                            BlockBehaviour.Properties.of()
+                                    .instabreak()
+                                    .noOcclusion()
+                                    .sound(SoundType.SLIME_BLOCK)
+                                    .noCollission(), c))));
 
     public static final String GLOW_LIGHTS_NAME = "glow_lights";
     public static final Map<DyeColor, Supplier<Block>> GLOW_LIGHTS_BLOCKS = Util.make(() -> {
@@ -181,7 +186,7 @@ public class ModRegistry {
 
     public static final String SNOW_GLOBE_NAME = "snow_globe";
     public static final Supplier<Block> SNOW_GLOBE = regWithItem(SNOW_GLOBE_NAME, () ->
-            new SnowGlobeBlock(BlockBehaviour.Properties.copy(Blocks.STONE)
+            new SnowGlobeBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.STONE)
                     .sound(SoundType.GLASS)
                     .mapColor(MapColor.NONE)
                     .strength(0.5f)));

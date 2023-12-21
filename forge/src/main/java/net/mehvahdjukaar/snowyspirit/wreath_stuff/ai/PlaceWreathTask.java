@@ -24,6 +24,7 @@ import net.minecraft.world.level.block.DoorBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraftforge.event.ForgeEventFactory;
+import net.neoforged.neoforge.event.EventHooks;
 
 import javax.annotation.Nullable;
 
@@ -49,7 +50,7 @@ public class PlaceWreathTask extends Behavior<Villager> {
         if (pOwner.isBaby()) return false;
         if(!SnowySpirit.isChristmasSeason(pOwner.level())) return false;
         //doesn't always start and gets put on cooldown
-        if (!ForgeEventFactory.getMobGriefingEvent(pLevel, pOwner)) {
+        if (!EventHooks.getMobGriefingEvent(pLevel, pOwner)) {
             cooldown = 20 * 60;
             return false;
         }

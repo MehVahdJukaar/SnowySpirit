@@ -1,5 +1,7 @@
 package net.mehvahdjukaar.snowyspirit.common.block;
 
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -31,8 +33,8 @@ import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.util.List;
 
 public class GumdropButton extends DirectionalBlock {
@@ -53,18 +55,25 @@ public class GumdropButton extends DirectionalBlock {
     protected static final VoxelShape PRESSED_WEST_AABB = Block.box(14.0D, 5.0D, 5.0D, 16.0D, 11.0D, 11.0D);
     protected static final VoxelShape PRESSED_EAST_AABB = Block.box(0.0D, 5.0D, 5.0D, 2.0D, 11.0D, 11.0D);
 
+    public static final MapCodec<GumdropButton> CODEC = RecordCodecBuilder.mapCodec((i) -> i.group(
+            propertiesCodec(),
+            DyeColor.CODEC.fieldOf("dye_color").forGetter((buttonBlock) -> buttonBlock.color)
+    ).apply(i, GumdropButton::new));
+
     public final DyeColor color;
 
-    public GumdropButton(DyeColor color) {
-        super(Properties.of()
-                .instabreak()
-                .noOcclusion()
-                .mapColor(color)
-                .sound(SoundType.SLIME_BLOCK)
-                .noCollission());
+
+
+    public GumdropButton(Properties properties, DyeColor color) {
+        super(properties.mapColor(color));
         this.color = color;
         this.registerDefaultState(this.stateDefinition.any()
                 .setValue(FACING, Direction.NORTH).setValue(POWERED, false));
+    }
+
+    @Override
+    protected MapCodec<? extends DirectionalBlock> codec() {
+        return CODEC;
     }
 
     @Override

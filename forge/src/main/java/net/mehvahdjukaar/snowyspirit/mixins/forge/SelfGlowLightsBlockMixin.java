@@ -7,6 +7,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.common.IForgeShearable;
+import net.neoforged.neoforge.common.IShearable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
@@ -16,7 +17,7 @@ import javax.annotation.Nonnull;
 import java.util.List;
 
 @Mixin(GlowLightsBlock.class)
-public abstract class SelfGlowLightsBlockMixin extends Block implements IForgeShearable {
+public abstract class SelfGlowLightsBlockMixin extends Block implements IShearable {
 
     protected SelfGlowLightsBlockMixin(Properties arg) {
         super(arg);
