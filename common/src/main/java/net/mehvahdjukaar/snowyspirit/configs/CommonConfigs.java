@@ -116,7 +116,7 @@ public class CommonConfigs {
         builder.pop();
 
         MAX_SLED_PULLER_SIZE = builder.comment("Max allowed size of a sled entity puller. Allowing bigger ones could cause issue as hitbox will clash with sled itself")
-                        .define("max_sled_puller_size", 1.2, 0.1, 3);
+                        .define("max_sled_puller_size", 1.25, 0.1, 3);
 
         builder.pop();
 

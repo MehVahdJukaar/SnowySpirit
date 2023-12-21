@@ -18,6 +18,18 @@
     {
       "id" :"doggytalents:dog",
       "required": false
+    },
+    {
+      "id" :"doggomodoverhauled:doggo",
+      "required": false
+    },
+    {
+      "id" :"environmental:reindeer",
+      "required": false
+    },
+    {
+      "id" :"frozenup:reindeer",
+      "required": false
     }
   ]
 }

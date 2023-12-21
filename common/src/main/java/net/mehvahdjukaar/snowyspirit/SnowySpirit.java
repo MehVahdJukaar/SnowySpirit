@@ -4,7 +4,6 @@ package net.mehvahdjukaar.snowyspirit;
 import net.mehvahdjukaar.moonlight.api.platform.ClientHelper;
 import net.mehvahdjukaar.moonlight.api.platform.PlatHelper;
 import net.mehvahdjukaar.moonlight.api.platform.RegHelper;
-import net.mehvahdjukaar.snowyspirit.common.items.SledItem;
 import net.mehvahdjukaar.snowyspirit.common.network.NetworkHandler;
 import net.mehvahdjukaar.snowyspirit.configs.ClientConfigs;
 import net.mehvahdjukaar.snowyspirit.configs.CommonConfigs;
@@ -13,12 +12,7 @@ import net.mehvahdjukaar.snowyspirit.dynamicpack.ServerDynamicResourcesHandler;
 import net.mehvahdjukaar.snowyspirit.integration.FDCompat;
 import net.mehvahdjukaar.snowyspirit.integration.SeasonModCompat;
 import net.mehvahdjukaar.snowyspirit.reg.*;
-import net.mehvahdjukaar.supplementaries.common.block.tiles.SackBlockTile;
-import net.mehvahdjukaar.supplementaries.common.inventories.SackContainerMenu;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.Container;
-import net.minecraft.world.entity.vehicle.Boat;
-import net.minecraft.world.item.BoatItem;
 import net.minecraft.world.level.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -100,14 +94,40 @@ public class SnowySpirit {
         if (today.before(start) && inv) today = new Date(1, today.getMonth(), today.getDate());
         //TODO: rewrite properly
         //if seasonal use pumpkin placement time window
-        IS_CHRISTMAS_REAL_TIME = today.after(start) && today.before(end);
-
+        IS_CHRISTMAS_REAL_TIME = after(today, start) && before(today, end);
         USES_SEASON_MOD = SEASON_MOD_INSTALLED && CommonConfigs.SEASONS_MOD_COMPAT.get();
 
         if (USES_SEASON_MOD) {
             SeasonModCompat.refresh();
         }
 
+    }
+
+    public static boolean before(Date obj, Date that) {
+        int objYear = obj.getYear();
+        int thatYear = that.getYear();
+        int objMonth = obj.getMonth();
+        int thatMonth = that.getMonth();
+        int objDay = obj.getDate();
+        int thatDay = that.getDate();
+
+        if (objYear < thatYear) {
+            return true;
+        } else if (objYear > thatYear) {
+            return false;
+        } else {
+            if (objMonth < thatMonth) {
+                return true;
+            } else if (objMonth > thatMonth) {
+                return false;
+            } else {
+                return objDay < thatDay;
+            }
+        }
+    }
+
+    public static boolean after(Date obj, Date that) {
+        return !before(obj, that) && !obj.equals(that);
     }
 
     public static boolean isChristmasSeason(Level level) {
