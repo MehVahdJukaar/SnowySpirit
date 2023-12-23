@@ -6,7 +6,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import net.minecraftforge.common.IForgeShearable;
 import net.neoforged.neoforge.common.IShearable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

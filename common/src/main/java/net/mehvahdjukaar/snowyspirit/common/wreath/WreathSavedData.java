@@ -1,7 +1,8 @@
-package net.mehvahdjukaar.snowyspirit.wreath_stuff.capabilities;
+package net.mehvahdjukaar.snowyspirit.common.wreath;
 
 import com.mojang.datafixers.util.Pair;
 import net.mehvahdjukaar.snowyspirit.reg.ModRegistry;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -14,52 +15,50 @@ import net.minecraft.world.level.block.DoorBlock;
 import net.minecraft.world.level.block.LevelEvent;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.DoorHingeSide;
+import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.ICapabilitySerializable;
-import net.minecraftforge.common.util.LazyOptional;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
-//provider & instance. Only one instance is attached to a world at a time
-public class WreathCapability implements ICapabilitySerializable<CompoundTag> {
+public class WreathSavedData extends SavedData {
+    private static final String FILE_ID = "wreaths";
 
-    private final LazyOptional<WreathCapability> lazyOptional = LazyOptional.of(() -> this);
+    public static final SavedData.Factory<WreathSavedData> FACTORY = new SavedData.Factory<>(
+            WreathSavedData::new,
+            (compoundTag) -> {
+                var data = new WreathSavedData();
+                data.load(compoundTag);
+                return data;
+            },
+            null);
 
-    private final Map<BlockPos, WreathData> wreathBlocks = new HashMap<>();
 
-    public void invalidate() {
-        lazyOptional.invalidate();
+    private static final WreathSavedData clientData = new WreathSavedData();
+
+    public static WreathSavedData get(Level level) {
+        if(level instanceof ServerLevel serverLevel){
+            return serverLevel.getDataStorage().computeIfAbsent(FACTORY, FILE_ID);
+        }
+        return clientData;
     }
 
-    @Nonnull
-    @Override
-    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
-        return cap == ModCapabilities.WREATH_CAPABILITY ?
-                lazyOptional.cast() : LazyOptional.empty();
-    }
+    private final Map<BlockPos, Data> wreathBlocks = new HashMap<>();
 
     @Override
-    public CompoundTag serializeNBT() {
-        CompoundTag total = new CompoundTag();
+    public CompoundTag save(CompoundTag tag) {
         int i = 0;
         for (BlockPos pos : wreathBlocks.keySet()) {
             NbtUtils.writeBlockPos(pos);
-            total.put(i + "", NbtUtils.writeBlockPos(pos));
+            tag.put(i + "", NbtUtils.writeBlockPos(pos));
             i++;
         }
-        total.putInt("Count", i);
-        return total;
+        tag.putInt("Count", i);
+        return tag;
     }
 
-    @Override
-    public void deserializeNBT(CompoundTag total) {
+    public void load(CompoundTag total) {
         for (int i = 0; i < total.getInt("Count"); i++) {
             CompoundTag tag = total.getCompound(i + "");
             BlockPos pos = NbtUtils.readBlockPos(tag);
@@ -67,8 +66,8 @@ public class WreathCapability implements ICapabilitySerializable<CompoundTag> {
         }
     }
 
-    public WreathData addWreath(BlockPos pos) {
-        return wreathBlocks.computeIfAbsent(pos, WreathData::new);
+    public Data addWreath(BlockPos pos) {
+        return wreathBlocks.computeIfAbsent(pos, Data::new);
     }
 
     public void removeWreath(BlockPos p, Level level, boolean animationAndDrop) {
@@ -82,7 +81,7 @@ public class WreathCapability implements ICapabilitySerializable<CompoundTag> {
         }
     }
 
-    public Map<BlockPos, WreathData> getWreathBlocks() {
+    public Map<BlockPos, Data> getWreathBlocks() {
         return wreathBlocks;
     }
 
@@ -97,7 +96,7 @@ public class WreathCapability implements ICapabilitySerializable<CompoundTag> {
                 Direction dir = state.getValue(DoorBlock.FACING);
                 boolean open = state.getValue(DoorBlock.OPEN);
                 boolean hinge = state.getValue(DoorBlock.HINGE) == DoorHingeSide.RIGHT;
-                WreathData data = this.addWreath(pos);
+                Data data = this.addWreath(pos);
                 data.face = dir;
                 data.hinge = hinge;
                 data.open = open;
@@ -111,13 +110,13 @@ public class WreathCapability implements ICapabilitySerializable<CompoundTag> {
         }
     }
 
-    private void calculateDoorDimensions(Level level, BlockPos pos, BlockState state, WreathData data) {
+    private void calculateDoorDimensions(Level level, BlockPos pos, BlockState state, Data data) {
         state = state.setValue(DoorBlock.FACING, Direction.NORTH).setValue(DoorBlock.OPEN, Boolean.FALSE)
                 .setValue(DoorBlock.HINGE, DoorHingeSide.RIGHT);
         VoxelShape shape = state.getShape(level, pos);
         AABB bounds = shape.bounds();
         if (bounds.maxX - bounds.minX >= 1) {
-            double front = bounds.minZ -1;
+            double front = bounds.minZ - 1;
             double back = -bounds.maxZ;
             data.closedDimensions = Pair.of((float) front, (float) back);
         }
@@ -125,7 +124,7 @@ public class WreathCapability implements ICapabilitySerializable<CompoundTag> {
         shape = state.getShape(level, pos);
         bounds = shape.bounds();
         if (bounds.maxX - bounds.minX >= 1) {
-            double front = bounds.minZ -1;
+            double front = bounds.minZ - 1;
             double back = -bounds.maxZ;
             data.openDimensions = Pair.of((float) front, (float) back);
         }
@@ -150,7 +149,7 @@ public class WreathCapability implements ICapabilitySerializable<CompoundTag> {
     }
 
 
-    public static class WreathData{
+    public static class Data {
         private Direction face = Direction.NORTH;
         private boolean open = true;
         private boolean hinge = true;
@@ -159,12 +158,14 @@ public class WreathCapability implements ICapabilitySerializable<CompoundTag> {
         private Pair<Float, Float> openDimensions = null;
         private Pair<Float, Float> closedDimensions = null;
 
-        public WreathData(BlockPos pos) {}
+        public Data(BlockPos pos) {
+        }
 
         public Direction getDirection() {
-            if(this.open){
+            if (this.open) {
                 return this.hinge ? face.getCounterClockWise() : face.getClockWise();
-            }return this.face;
+            }
+            return this.face;
         }
 
         public boolean isOpen() {

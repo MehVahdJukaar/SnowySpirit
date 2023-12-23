@@ -25,7 +25,7 @@ public class ModConfigScreen extends FabricConfigListScreen {
                 SnowySpirit.res("textures/blocks/gingerbread_frosted_block.png"),
                 parent, CommonConfigs.SPEC, ClientConfigs.SPEC);
     }
-
+/*
     @Override
     protected void addExtraButtons() {
 
@@ -56,7 +56,7 @@ public class ModConfigScreen extends FabricConfigListScreen {
             int x = (int) (this.width * 0.93f);
             graphics.renderFakeItem(Items.SNOWBALL.getDefaultInstance(), x, 16);
         }
-    }
+    }*/
 
 }
 

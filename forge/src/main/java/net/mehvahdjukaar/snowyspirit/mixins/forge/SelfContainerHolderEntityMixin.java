@@ -5,13 +5,7 @@ import net.minecraft.world.Container;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.items.wrapper.InvWrapper;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Unique;
-
-import javax.annotation.Nullable;
 
 @Mixin(ContainerHolderEntity.class)
 public abstract class SelfContainerHolderEntityMixin extends Entity implements Container {
@@ -20,6 +14,7 @@ public abstract class SelfContainerHolderEntityMixin extends Entity implements C
         super(arg, arg2);
     }
 
+    /*
     // Forge Start
     @Unique
     private LazyOptional<?> snowyspirit_multi$itemHandler = LazyOptional.of(() -> new InvWrapper(this));
@@ -43,6 +38,8 @@ public abstract class SelfContainerHolderEntityMixin extends Entity implements C
     public void reviveCaps() {
         super.reviveCaps();
         this.snowyspirit_multi$itemHandler = LazyOptional.of(() -> new InvWrapper(this));
-    }
+    }*/
+
+    //TODO: readd
 
 }

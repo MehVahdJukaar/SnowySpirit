@@ -9,12 +9,15 @@ import net.mehvahdjukaar.moonlight.api.resources.SimpleTagBuilder;
 import net.mehvahdjukaar.moonlight.api.resources.pack.DynServerResourcesGenerator;
 import net.mehvahdjukaar.moonlight.api.resources.pack.DynamicDataPack;
 import net.mehvahdjukaar.moonlight.api.set.wood.WoodTypeRegistry;
+import net.mehvahdjukaar.moonlight.api.util.Utils;
 import net.mehvahdjukaar.snowyspirit.SnowySpirit;
 import net.mehvahdjukaar.snowyspirit.configs.CommonConfigs;
 import net.mehvahdjukaar.snowyspirit.reg.ModRegistry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.ShapedRecipe;
 import org.apache.logging.log4j.Logger;
 
 public class ServerDynamicResourcesHandler extends DynServerResourcesGenerator {
@@ -51,7 +54,7 @@ public class ServerDynamicResourcesHandler extends DynServerResourcesGenerator {
                 //check for disabled ones. Will actually crash if its null since vanilla recipe builder expects a non-null one
                 Recipe<?> newR = RecipeConverter.createSimilar(recipe,WoodTypeRegistry.OAK_TYPE, w, w.mainChild().asItem(), null);
                 if (newR == null) return;
-                this.dynamicPack.addRecipe(newR);
+                this.dynamicPack.addRecipe(new RecipeHolder<Recipe<?>>( Utils.getID(b),newR));
             }
         });
     }

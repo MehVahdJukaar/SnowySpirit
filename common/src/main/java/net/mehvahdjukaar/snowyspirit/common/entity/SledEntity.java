@@ -997,7 +997,8 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
 
     //----passenger stuff-----
 
-    @Override
+    //TODO: fix
+   // @Override
     public double getPassengersRidingOffset() {
         return 0.2D + this.getAdditionalY() + (this.getSeatType() != null ? 0.0615 : 0);
     }

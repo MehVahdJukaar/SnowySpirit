@@ -57,6 +57,8 @@ public class ModRegistry {
         }
     }
 
+    public static final BlockSetType GINGER_TYPE = BlockSetType.register(new BlockSetType(SnowySpirit.res("ginger").toString()));
+
     public static final String SLED_NAME = "sled";
     public static final Supplier<EntityType<SledEntity>> SLED = regEntity(SLED_NAME,
             () -> EntityType.Builder.<SledEntity>of(SledEntity::new, MobCategory.MISC)
@@ -110,12 +112,10 @@ public class ModRegistry {
             new Block(BlockBehaviour.Properties.ofFullCopy(GINGERBREAD_BLOCK.get())));
 
     public static final Supplier<Block> GINGERBREAD_DOOR = regWithItem("gingerbread_door", () ->
-            new DoorBlock(BlockBehaviour.Properties.ofFullCopy(GINGERBREAD_BLOCK.get()), BlockSetType.ACACIA) {
-            });
+            new DoorBlock(GINGER_TYPE, BlockBehaviour.Properties.ofFullCopy(GINGERBREAD_BLOCK.get())));
 
     public static final Supplier<Block> GINGERBREAD_TRAPDOOR = regWithItem("gingerbread_trapdoor", () ->
-            new TrapDoorBlock(BlockBehaviour.Properties.ofFullCopy(GINGERBREAD_BLOCK.get()), BlockSetType.ACACIA) {
-            });
+            new TrapDoorBlock(GINGER_TYPE, BlockBehaviour.Properties.ofFullCopy(GINGERBREAD_BLOCK.get())));
 
 
     public static final Supplier<Block> GINGER_WILD = regWithItem("wild_ginger", () -> new WildGingerBlock(

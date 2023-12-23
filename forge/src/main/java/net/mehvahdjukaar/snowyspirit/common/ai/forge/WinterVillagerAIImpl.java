@@ -2,8 +2,8 @@ package net.mehvahdjukaar.snowyspirit.common.ai.forge;
 
 import com.mojang.datafixers.util.Pair;
 import net.mehvahdjukaar.moonlight.api.events.IVillagerBrainEvent;
-import net.mehvahdjukaar.snowyspirit.wreath_stuff.ai.PlaceWreathTask;
-import net.mehvahdjukaar.snowyspirit.wreath_stuff.ai.RemoveWreathTask;
+import net.mehvahdjukaar.snowyspirit.common.ai.PlaceWreathTask;
+import net.mehvahdjukaar.snowyspirit.common.ai.RemoveWreathTask;
 import net.minecraft.world.entity.schedule.Activity;
 
 public class WinterVillagerAIImpl {

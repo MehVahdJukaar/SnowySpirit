@@ -1,10 +1,11 @@
-package net.mehvahdjukaar.snowyspirit.wreath_stuff.ai;
+package net.mehvahdjukaar.snowyspirit.common.ai;
 
 
 import com.google.common.collect.ImmutableMap;
+import net.mehvahdjukaar.moonlight.api.platform.PlatHelper;
 import net.mehvahdjukaar.snowyspirit.SnowySpirit;
-import net.mehvahdjukaar.snowyspirit.wreath_stuff.WreathHelper;
-import net.mehvahdjukaar.snowyspirit.wreath_stuff.capabilities.ModCapabilities;
+import net.mehvahdjukaar.snowyspirit.common.wreath.WreathHelper;
+import net.mehvahdjukaar.snowyspirit.common.wreath.WreathSavedData;
 import net.mehvahdjukaar.snowyspirit.reg.ModMemoryModules;
 import net.mehvahdjukaar.snowyspirit.reg.ModRegistry;
 import net.minecraft.core.BlockPos;
@@ -23,10 +24,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.DoorBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
-import net.minecraftforge.event.ForgeEventFactory;
-import net.neoforged.neoforge.event.EventHooks;
-
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public class PlaceWreathTask extends Behavior<Villager> {
     private final float speedModifier;
@@ -50,7 +48,7 @@ public class PlaceWreathTask extends Behavior<Villager> {
         if (pOwner.isBaby()) return false;
         if(!SnowySpirit.isChristmasSeason(pOwner.level())) return false;
         //doesn't always start and gets put on cooldown
-        if (!EventHooks.getMobGriefingEvent(pLevel, pOwner)) {
+        if (!PlatHelper.isMobGriefingOn(pLevel, pOwner)) {
             cooldown = 20 * 60;
             return false;
         }
@@ -131,7 +129,7 @@ public class PlaceWreathTask extends Behavior<Villager> {
         if (state.getBlock() instanceof DoorBlock) {
             boolean lower = state.getValue(DoorBlock.HALF) == DoubleBlockHalf.LOWER;
 
-            var c = ModCapabilities.get(serverLevel, ModCapabilities.WREATH_CAPABILITY);
+            var c = WreathSavedData.get(serverLevel);
             return c != null && (lower ? !c.hasWreath(pos.above()) : !c.hasWreath(pos));
         }
 

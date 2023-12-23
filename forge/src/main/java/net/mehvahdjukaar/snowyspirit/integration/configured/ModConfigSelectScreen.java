@@ -4,7 +4,6 @@ package net.mehvahdjukaar.snowyspirit.integration.configured;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mrcrayfish.configured.client.util.ScreenUtil;
 import net.mehvahdjukaar.moonlight.api.client.gui.LinkButton;
-import net.mehvahdjukaar.moonlight.api.integration.configured.CustomConfigSelectScreen;
 import net.mehvahdjukaar.snowyspirit.SnowySpirit;
 import net.mehvahdjukaar.snowyspirit.configs.ClientConfigs;
 import net.mehvahdjukaar.snowyspirit.configs.CommonConfigs;
@@ -17,7 +16,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Items;
-
+/*
 public class ModConfigSelectScreen extends CustomConfigSelectScreen {
 
 
@@ -69,4 +68,4 @@ public class ModConfigSelectScreen extends CustomConfigSelectScreen {
             }
         }
     }
-}
+}*/

@@ -1,4 +1,4 @@
-package net.mehvahdjukaar.snowyspirit.wreath_stuff.network;
+package net.mehvahdjukaar.snowyspirit.common.network;
 
 import net.mehvahdjukaar.moonlight.api.platform.network.ChannelHandler;
 import net.mehvahdjukaar.moonlight.api.platform.network.Message;

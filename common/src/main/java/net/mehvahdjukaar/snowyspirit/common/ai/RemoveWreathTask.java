@@ -1,10 +1,11 @@
-package net.mehvahdjukaar.snowyspirit.wreath_stuff.ai;
+package net.mehvahdjukaar.snowyspirit.common.ai;
 
 import com.google.common.collect.ImmutableMap;
+import net.mehvahdjukaar.moonlight.api.platform.PlatHelper;
 import net.mehvahdjukaar.snowyspirit.SnowySpirit;
-import net.mehvahdjukaar.snowyspirit.wreath_stuff.capabilities.ModCapabilities;
-import net.mehvahdjukaar.snowyspirit.wreath_stuff.network.ClientBoundSyncWreathMessage;
+import net.mehvahdjukaar.snowyspirit.common.network.ClientBoundSyncWreathMessage;
 import net.mehvahdjukaar.snowyspirit.common.network.NetworkHandler;
+import net.mehvahdjukaar.snowyspirit.common.wreath.WreathSavedData;
 import net.mehvahdjukaar.snowyspirit.reg.ModMemoryModules;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
@@ -20,8 +21,6 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.DoorBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
-import net.minecraftforge.event.ForgeEventFactory;
-import net.neoforged.neoforge.event.EventHooks;
 
 public class RemoveWreathTask extends Behavior<Villager> {
     private final float speedModifier;
@@ -43,7 +42,7 @@ public class RemoveWreathTask extends Behavior<Villager> {
     protected boolean checkExtraStartConditions(ServerLevel pLevel, Villager pOwner) {
         if (SnowySpirit.isChristmasSeason(pLevel)) return false;
         if (cooldown-- > 0) return false;
-        if (!EventHooks.getMobGriefingEvent(pLevel, pOwner)) {
+        if (!PlatHelper.isMobGriefingOn(pLevel, pOwner)) {
             cooldown = 20 * 60;
             return false;
         }
@@ -89,7 +88,7 @@ public class RemoveWreathTask extends Behavior<Villager> {
             BlockState state = level.getBlockState(pos);
             if (state.getBlock() instanceof DoorBlock) {
                 boolean lower = state.getValue(DoorBlock.HALF) == DoubleBlockHalf.LOWER;
-                var c = ModCapabilities.get(level, ModCapabilities.WREATH_CAPABILITY);
+                var c = WreathSavedData.get(level);
 
                 pos = lower ? pos.above() : pos;
                 if (c != null && c.hasWreath(pos)) {

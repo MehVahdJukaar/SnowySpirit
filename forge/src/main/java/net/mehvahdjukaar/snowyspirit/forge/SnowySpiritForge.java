@@ -2,18 +2,23 @@ package net.mehvahdjukaar.snowyspirit.forge;
 
 import net.mehvahdjukaar.moonlight.api.platform.ClientHelper;
 import net.mehvahdjukaar.moonlight.api.platform.PlatHelper;
-import net.mehvahdjukaar.moonlight.api.platform.network.NetworkDir;
 import net.mehvahdjukaar.moonlight.api.util.Utils;
 import net.mehvahdjukaar.snowyspirit.SnowySpirit;
-import net.mehvahdjukaar.snowyspirit.common.network.NetworkHandler;
-import net.mehvahdjukaar.snowyspirit.integration.configured.ModConfigSelectScreen;
+import net.mehvahdjukaar.snowyspirit.common.wreath.ServerEvents;
 import net.mehvahdjukaar.snowyspirit.reg.ModRegistry;
-import net.mehvahdjukaar.snowyspirit.wreath_stuff.network.ClientBoundSyncAllWreaths;
-import net.mehvahdjukaar.snowyspirit.wreath_stuff.network.ClientBoundSyncWreathMessage;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.FlowerPotBlock;
+import net.neoforged.bus.api.EventPriority;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.Mod;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.TickEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 
 /**
  * Author: MehVahdJukaar
@@ -21,28 +26,49 @@ import net.neoforged.fml.common.Mod;
 @Mod(SnowySpirit.MOD_ID)
 public class SnowySpiritForge {
 
-    public SnowySpiritForge() {
+    public SnowySpiritForge(IEventBus busEvent) {
 
         SnowySpirit.commonInit();
 
         if (PlatHelper.getPhysicalSide().isClient()) {
-            ClientHelper.addClientSetup(()->{
+            ClientHelper.addClientSetup(() -> {
                 if (ModList.get().isLoaded("configured")) {
-                    ModConfigSelectScreen.registerConfigScreen(SnowySpirit.MOD_ID, ModConfigSelectScreen::new);
+                    //TODO: add back
+                    //ModConfigSelectScreen.registerConfigScreen(SnowySpirit.MOD_ID, ModConfigSelectScreen::new);
                 }
             });
         }
 
-        PlatHelper.addCommonSetup(()->{
+        NeoForge.EVENT_BUS.register(this);
+        PlatHelper.addCommonSetup(() -> {
             ((FlowerPotBlock) Blocks.FLOWER_POT).addPlant(Utils.getID(ModRegistry.GINGER.get()), ModRegistry.GINGER_POT);
         });
 
-        NetworkHandler.CHANNEL.register(NetworkDir.PLAY_TO_CLIENT,
-                ClientBoundSyncWreathMessage.class,
-                ClientBoundSyncWreathMessage::new);
+    }
 
-        NetworkHandler.CHANNEL.register(NetworkDir.PLAY_TO_CLIENT,
-                ClientBoundSyncAllWreaths.class,
-                ClientBoundSyncAllWreaths::new);
+    @SubscribeEvent(priority = EventPriority.LOW)
+    public void onRightClickBlock(PlayerInteractEvent.RightClickBlock event) {
+        InteractionResult res = ServerEvents.onRightClickBlock(event.getEntity(), event.getLevel(), event.getItemStack(), event.getPos());
+        if (res != InteractionResult.PASS) {
+            event.setCanceled(true);
+            event.setCancellationResult(res);
+        }
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public void tickEvent(TickEvent.LevelTickEvent event) {
+        if (event.phase == TickEvent.Phase.END && event.level instanceof ServerLevel level) {
+            ServerEvents.tickEvent(level);
+        }
+    }
+
+    @SubscribeEvent
+    public void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {
+        ServerEvents.onPlayerLogin(event.getEntity());
+    }
+
+    @SubscribeEvent
+    public void onDimensionChanged(PlayerEvent.PlayerChangedDimensionEvent event) {
+        ServerEvents.onDimensionChanged(event.getEntity());
     }
 }

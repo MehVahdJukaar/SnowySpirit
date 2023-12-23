@@ -65,6 +65,7 @@ subprojects {
                 changelog = changelogText
                 releaseType = 'release'
                 addGameVersion rootProject.minecraft_version
+                if(modLoader == "forge") modLoader = "NeoForge"
                 addGameVersion modLoader.capitalize()
 
                 mainArtifact(tasks.remapJar)

@@ -4,6 +4,7 @@ package net.mehvahdjukaar.snowyspirit;
 import net.mehvahdjukaar.moonlight.api.platform.ClientHelper;
 import net.mehvahdjukaar.moonlight.api.platform.PlatHelper;
 import net.mehvahdjukaar.moonlight.api.platform.RegHelper;
+import net.mehvahdjukaar.moonlight.api.resources.RecipeConverter;
 import net.mehvahdjukaar.snowyspirit.common.network.NetworkHandler;
 import net.mehvahdjukaar.snowyspirit.configs.ClientConfigs;
 import net.mehvahdjukaar.snowyspirit.configs.CommonConfigs;
@@ -60,7 +61,6 @@ public class SnowySpirit {
             ClientDynamicResourcesHandler.INSTANCE.register();
 
             ClientRegistry.init();
-
             ClientHelper.addClientSetup(ClientRegistry::setup);
         }
     }
