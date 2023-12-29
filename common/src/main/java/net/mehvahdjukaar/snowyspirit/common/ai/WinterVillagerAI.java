@@ -48,10 +48,11 @@ public class WinterVillagerAI {
         }
     }
 
-    @ExpectPlatform
-    private static void addRemoveWreath(IVillagerBrainEvent event) {
+    public static void addRemoveWreath(IVillagerBrainEvent event) {
+        event.addTaskToActivity(Activity.IDLE, Pair.of(4, new RemoveWreathTask(0.5f)));
     }
-    @ExpectPlatform
-    private static void addPlaceWreath(IVillagerBrainEvent event) {
+
+    public static void addPlaceWreath(IVillagerBrainEvent event) {
+        event.addTaskToActivity(Activity.IDLE, Pair.of(3, new PlaceWreathTask(0.5f)));
     }
 }
