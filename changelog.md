@@ -1,5 +1,3 @@
-- fixed gingerbread house buttons not rotating properly when placed at an angle
-- fixed eaten gingerbread golem textures not working correctly
-- fixed gingerbread golem loot not dropping
-- fixed gingerbread bite status not saving after reload
-- fixed spawn egg not being in creative tab
+- improved loot table
+- added advancements
+- added gingerbread house map marker (supp compat)
