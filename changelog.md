@@ -1,2 +1,4 @@
-Added gingerbread golems. Created with a pumpkin, some gingerbread and a gumdrop button
-Added gingerbread house, a new rare structure found in cold biomes. Functions like a witch hut
+- fixed gingerbread house buttons not rotating properly when placed at an angle
+- fixed eaten gingerbread golem textures not working correctly
+- fixed gingerbread golem loot not dropping
+- fixed gingerbread bite status not saving after reload
