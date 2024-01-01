@@ -32,7 +32,7 @@ public class GingyFollowOwnerGoal extends Goal {
 
     public GingyFollowOwnerGoal(GingyEntity tamableAnimal, double speedMod, float startDistance, float g, boolean bl) {
         this.tamable = tamableAnimal;
-        this.level = tamableAnimal.level();
+        this.level = tamableAnimal.level;
         this.speedModifier = speedMod;
         this.navigation = tamableAnimal.getNavigation();
         this.startDistance = startDistance;

@@ -1,6 +1,5 @@
 package net.mehvahdjukaar.snowyspirit.common.entity;
 
-import net.mehvahdjukaar.moonlight.api.platform.PlatHelper;
 import net.mehvahdjukaar.moonlight.api.util.Utils;
 import net.mehvahdjukaar.snowyspirit.SnowySpirit;
 import net.mehvahdjukaar.snowyspirit.common.ai.GingyFollowOwnerGoal;
@@ -104,6 +103,12 @@ public class GingyEntity extends AbstractGolem implements OwnableEntity {
     }
 
     @Nullable
+    public LivingEntity getOwner() {
+        UUID uUID = this.getOwnerUUID();
+        return uUID == null ? null : this.level.getPlayerByUUID(uUID);
+    }
+
+    @Nullable
     @Override
     public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType reason, @Nullable SpawnGroupData spawnData, @Nullable CompoundTag dataTag) {
         this.setColor(DyeColor.values()[level.getRandom().nextInt(DyeColor.values().length)]);
@@ -198,7 +203,7 @@ public class GingyEntity extends AbstractGolem implements OwnableEntity {
 
     @Override
     public boolean isAlliedTo(Entity entity) {
-        LivingEntity livingEntity = this.getOwner();
+        Entity livingEntity = this.getOwner();
         if (entity == livingEntity) {
             return true;
         }
@@ -210,7 +215,7 @@ public class GingyEntity extends AbstractGolem implements OwnableEntity {
 
     @Override
     public void die(DamageSource damageSource) {
-        if (!this.level().isClientSide && this.level().getGameRules().getBoolean(GameRules.RULE_SHOWDEATHMESSAGES) && this.getOwner() instanceof ServerPlayer) {
+        if (!this.level.isClientSide && this.level.getGameRules().getBoolean(GameRules.RULE_SHOWDEATHMESSAGES) && this.getOwner() instanceof ServerPlayer) {
             this.getOwner().sendSystemMessage(this.getCombatTracker().getDeathMessage());
         }
 
@@ -236,7 +241,6 @@ public class GingyEntity extends AbstractGolem implements OwnableEntity {
     public InteractionResult mobInteract(Player player, InteractionHand hand) {
         ItemStack itemStack = player.getItemInHand(hand);
         Item item = itemStack.getItem();
-        Level level = level();
 
 
         if (this.isOwnedBy(player)) {
@@ -260,7 +264,7 @@ public class GingyEntity extends AbstractGolem implements OwnableEntity {
             this.addEffect(new MobEffectInstance(MobEffects.POISON, 900));
             if (player.isCreative() || !this.isInvulnerable()) {
                 var oldMov = this.getDeltaMovement();
-                this.hurt(this.damageSources().playerAttack(player), Float.MAX_VALUE);
+                this.hurt(DamageSource.playerAttack(player), Float.MAX_VALUE);
                 this.setDeltaMovement(oldMov);
                 setForwardDeathAnim(true);
             }

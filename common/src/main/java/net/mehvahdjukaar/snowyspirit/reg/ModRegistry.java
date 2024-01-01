@@ -93,7 +93,8 @@ public class ModRegistry {
                     .clientTrackingRange(8));
 
     public static final Supplier<SpawnEggItem> GINGERBREAD_GOLEM_EGG = regItem("gingerbread_golem_spawn_egg",
-            () -> PlatformHelper.newSpawnEgg(GINGERBREAD_GOLEM, 0xb96d15, 0xe6ebe3, new Item.Properties()));
+            () -> PlatformHelper.newSpawnEgg(GINGERBREAD_GOLEM, 0xb96d15, 0xe6ebe3, new Item.Properties()
+                    .tab(CreativeModeTab.TAB_MISC)));
 
     public static final String SLED_NAME = "sled";
     public static final Supplier<EntityType<SledEntity>> SLED = regEntity(SLED_NAME,

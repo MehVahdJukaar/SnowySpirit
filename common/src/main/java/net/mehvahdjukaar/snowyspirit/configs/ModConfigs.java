@@ -5,6 +5,7 @@ import net.mehvahdjukaar.moonlight.api.platform.configs.ConfigSpec;
 import net.mehvahdjukaar.moonlight.api.platform.configs.ConfigType;
 import net.mehvahdjukaar.snowyspirit.SnowySpirit;
 import net.mehvahdjukaar.snowyspirit.integration.SeasonModCompat;
+import net.mehvahdjukaar.snowyspirit.reg.ModRegistry;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -1,16 +1,15 @@
 package net.mehvahdjukaar.snowyspirit.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Axis;
+import com.mojang.math.Vector3f;
 import net.mehvahdjukaar.snowyspirit.SnowySpirit;
 import net.mehvahdjukaar.snowyspirit.common.entity.GingyEntity;
 import net.mehvahdjukaar.snowyspirit.reg.ClientRegistry;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.HumanoidMobRenderer;
+import net.minecraft.client.renderer.entity.IronGolemRenderer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
-import net.minecraft.world.effect.MobEffect;
-import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.item.DyeColor;
 
 import java.util.Arrays;
@@ -49,7 +48,7 @@ public class GingyEntityRenderer extends HumanoidMobRenderer<GingyEntity, GingyM
                 f = 1.0F;
             }
             int deg = entity.isForwardDeathAnim() ? -90 : 90;
-            matrixStack.mulPose(Axis.XP.rotationDegrees(f * deg));
+            matrixStack.mulPose(Vector3f.XP.rotationDegrees(f * deg));
         }
 
         float period = 2.5f * Mth.PI;
@@ -60,8 +59,8 @@ public class GingyEntityRenderer extends HumanoidMobRenderer<GingyEntity, GingyM
             matrixStack.translate(0, -0.25, 0);
         }
         if (!orderedToSit && entity.isAlive()) {
-            limbSwingAmount = entity.walkAnimation.speed(partialTicks);
-            walkAnim = entity.walkAnimation.position(partialTicks);
+            limbSwingAmount = Mth.lerp(partialTicks, entity.animationSpeedOld, entity.animationSpeed);
+            walkAnim = entity.animationPosition - entity.animationSpeed * (1 - partialTicks);
             if (entity.isBaby()) {
                 walkAnim *= 3.0F;
             }
@@ -76,7 +75,7 @@ public class GingyEntityRenderer extends HumanoidMobRenderer<GingyEntity, GingyM
         if (limbSwingAmount > 0.001) {
             float angle = walkAnim * (Mth.TWO_PI / period);
             int sideSwayPower = 20;
-            matrixStack.mulPose(Axis.ZP.rotationDegrees(Mth.cos(angle) * sideSwayPower * limbSwingAmount));
+            matrixStack.mulPose(Vector3f.ZP.rotationDegrees(Mth.cos(angle) * sideSwayPower * limbSwingAmount));
         }
     }
 }
