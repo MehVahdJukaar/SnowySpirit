@@ -22,6 +22,7 @@ public class ClientRegistry {
 
     public static final ModelLayerLocation SLED_MODEL = loc("sled");
     public static final ModelLayerLocation QUILT_MODEL = loc("quilt");
+    public static final ModelLayerLocation GINGY_MODEL = loc("gingy");
 
     private static ModelLayerLocation loc(String name) {
         return new ModelLayerLocation(SnowySpirit.res(name), name);
@@ -61,11 +62,13 @@ public class ClientRegistry {
     private static void registerEntityRenderers(ClientPlatformHelper.EntityRendererEvent event) {
         event.register(ModRegistry.SLED.get(), SledEntityRenderer::new);
         event.register(ModRegistry.CONTAINER_ENTITY.get(), ContainerHolderEntityRenderer::new);
+        event.register(ModRegistry.GINGERBREAD_GOLEM.get(), GingyEntityRenderer::new);
     }
 
     private static void registerModelLayers(ClientPlatformHelper.ModelLayerEvent event) {
         event.register(SLED_MODEL, SledModel::createBodyLayer);
         event.register(QUILT_MODEL, QuiltModel::createBodyLayer);
+        event.register(GINGY_MODEL, GingyModel::createBodyLayer);
     }
 
     private static void registerModelLoaders(ClientPlatformHelper.ModelLoaderEvent event) {
