@@ -1,5 +1,6 @@
 package net.mehvahdjukaar.snowyspirit.common.block;
 
+import net.mehvahdjukaar.snowyspirit.SnowySpirit;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -14,15 +15,13 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.DirectionalBlock;
-import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -65,6 +64,16 @@ public class GumdropButton extends DirectionalBlock {
         this.color = color;
         this.registerDefaultState(this.stateDefinition.any()
                 .setValue(FACING, Direction.NORTH).setValue(POWERED, false));
+    }
+
+    @Override
+    public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
+        super.setPlacedBy(level, pos, state, placer, stack);
+        BlockPos relative = pos.above().relative(state.getValue(FACING).getOpposite());
+        BlockState pumpkin = level.getBlockState(relative);
+        if(pumpkin.getBlock() instanceof CarvedPumpkinBlock){
+            SnowySpirit.trySpawningGingy(pumpkin, level, relative, placer);
+        }
     }
 
     @Override
