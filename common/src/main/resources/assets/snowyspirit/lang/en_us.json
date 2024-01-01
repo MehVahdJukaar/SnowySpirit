@@ -83,7 +83,8 @@
   "block.snowyspirit.potted_ginger": "Potted Ginger",
   "entity.snowyspirit.gingerbread_golem": "Gingerbread Golem",
   "item.snowyspirit.gingerbread_golem_spawn_egg": "Gingerbread Golem Spawn Egg",
-
+  "advancements.husbandry.eat_gingerbread_golem.description": "Take a bite off a Gingerbread Golem",
+  "advancements.husbandry.eat_gingerbread_golem.title": "You're a Monster!",
   "subtitle.snowyspirit.sled": "Sled sliding",
   "block_type.snowyspirit.sled": "Sled"
 }

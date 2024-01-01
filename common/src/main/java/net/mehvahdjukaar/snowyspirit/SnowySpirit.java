@@ -78,6 +78,9 @@ public class SnowySpirit {
         }
     }
     //flute pacifies
+    //you're a monster advancement
+    //sled advancement
+    //map markers
     //Do this shit next christmas
     //sleds loose their chest
     //TODO: add advancements
