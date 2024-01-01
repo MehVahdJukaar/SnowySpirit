@@ -2,3 +2,4 @@
 - fixed eaten gingerbread golem textures not working correctly
 - fixed gingerbread golem loot not dropping
 - fixed gingerbread bite status not saving after reload
+- fixed spawn egg not being in creative tab
