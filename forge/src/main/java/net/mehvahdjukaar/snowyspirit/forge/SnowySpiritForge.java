@@ -5,6 +5,7 @@ import net.mehvahdjukaar.moonlight.api.platform.PlatHelper;
 import net.mehvahdjukaar.moonlight.api.platform.network.NetworkDir;
 import net.mehvahdjukaar.moonlight.api.util.Utils;
 import net.mehvahdjukaar.snowyspirit.SnowySpirit;
+import net.mehvahdjukaar.snowyspirit.common.entity.GolemHelper;
 import net.mehvahdjukaar.snowyspirit.common.network.NetworkHandler;
 import net.mehvahdjukaar.snowyspirit.integration.configured.ModConfigSelectScreen;
 import net.mehvahdjukaar.snowyspirit.reg.ModRegistry;
@@ -56,7 +57,7 @@ public class SnowySpiritForge {
     @SubscribeEvent
     public void onUseBlock(BlockEvent.EntityPlaceEvent event){
         if(event.getPlacedBlock().getBlock() instanceof CarvedPumpkinBlock){
-            SnowySpirit.trySpawningGingy(event.getPlacedBlock(), event.getLevel(), event.getPos(), event.getEntity());
+            GolemHelper.trySpawningGingy(event.getPlacedBlock(), event.getLevel(), event.getPos(), event.getEntity());
         }
 
     }
