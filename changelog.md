@@ -1,3 +1,1 @@
-- improved loot table
-- added advancements
-- added gingerbread house map marker (supp compat)
+added compat with EMF allowing wolves to not sit when pulling a sled

@@ -119,6 +119,8 @@ dependencies {
     modImplementation("curse.maven:serene-seasons-291874:4577617")
     modCompileOnly("curse.maven:biomes-o-plenty-220318:4683058")
     modCompileOnly("curse.maven:terrablender-563928:4647094")
+    modImplementation("curse.maven:entity-model-features-844662:4995898")
+    modImplementation("curse.maven:entity-texture-features-fabric-568563:5000985")
     //modImplementation("curse.maven:selene-499980:4656567")
     modImplementation("net.mehvahdjukaar:moonlight-forge:${project.moonlight_version}")
     //modCompileOnly("net.mehvahdjukaar:supplementaries-forge:${project.supplementaries_version}")
