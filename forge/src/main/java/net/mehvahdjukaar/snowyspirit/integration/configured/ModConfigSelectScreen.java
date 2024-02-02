@@ -2,8 +2,6 @@ package net.mehvahdjukaar.snowyspirit.integration.configured;
 
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mrcrayfish.configured.client.util.ScreenUtil;
-import net.mehvahdjukaar.moonlight.api.client.gui.LinkButton;
 import net.mehvahdjukaar.snowyspirit.SnowySpirit;
 import net.mehvahdjukaar.snowyspirit.configs.ClientConfigs;
 import net.mehvahdjukaar.snowyspirit.configs.CommonConfigs;

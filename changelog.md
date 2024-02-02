@@ -1,1 +1,1 @@
-some fixes
+fixed neoforge not loading the mod

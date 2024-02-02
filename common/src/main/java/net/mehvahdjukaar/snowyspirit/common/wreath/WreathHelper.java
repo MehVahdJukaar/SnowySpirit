@@ -1,7 +1,8 @@
 package net.mehvahdjukaar.snowyspirit.common.wreath;
 
+import net.mehvahdjukaar.moonlight.api.platform.network.NetworkHelper;
 import net.mehvahdjukaar.snowyspirit.common.network.ClientBoundSyncWreathMessage;
-import net.mehvahdjukaar.snowyspirit.common.network.NetworkHandler;
+import net.mehvahdjukaar.snowyspirit.common.network.ModMessages;
 import net.mehvahdjukaar.snowyspirit.reg.ModRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -32,7 +33,7 @@ public class WreathHelper {
                         SoundType soundtype = state.getSoundType();
                         level.playSound(null, p, soundtype.getPlaceSound(), SoundSource.BLOCKS, (soundtype.getVolume() + 1.0F) / 2.0F, soundtype.getPitch() * 0.8F);
                         //send packet to clients
-                        NetworkHandler.CHANNEL.sendToAllClientPlayers(new ClientBoundSyncWreathMessage(p, true));
+                        NetworkHelper.sendToAllClientPlayers(new ClientBoundSyncWreathMessage(p, true));
 
                     }
                     return true;

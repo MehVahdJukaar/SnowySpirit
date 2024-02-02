@@ -2,8 +2,6 @@ package net.mehvahdjukaar.snowyspirit.integration.configured;
 
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mrcrayfish.configured.api.IModConfig;
-import com.mrcrayfish.configured.client.util.ScreenUtil;
 import net.mehvahdjukaar.moonlight.api.set.wood.WoodTypeRegistry;
 import net.mehvahdjukaar.snowyspirit.SnowySpirit;
 import net.mehvahdjukaar.snowyspirit.reg.ModRegistry;

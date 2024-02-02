@@ -1,7 +1,8 @@
 package net.mehvahdjukaar.snowyspirit.common.wreath;
 
+import net.mehvahdjukaar.moonlight.api.platform.network.NetworkHelper;
 import net.mehvahdjukaar.snowyspirit.common.network.ClientBoundSyncAllWreaths;
-import net.mehvahdjukaar.snowyspirit.common.network.NetworkHandler;
+import net.mehvahdjukaar.snowyspirit.common.network.ModMessages;
 import net.mehvahdjukaar.snowyspirit.reg.ModRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -36,7 +37,7 @@ public class ServerEvents {
         ServerLevel level = (ServerLevel) player.level();
         WreathSavedData data = WreathSavedData.get(level);
         if (data != null)
-            NetworkHandler.CHANNEL.sendToClientPlayer((ServerPlayer) player,
+            NetworkHelper.sendToClientPlayer((ServerPlayer) player,
                     new ClientBoundSyncAllWreaths(data.getWreathBlocks().keySet()));
     }
 
@@ -44,7 +45,7 @@ public class ServerEvents {
         ServerLevel level = (ServerLevel) player.level();
         WreathSavedData data = WreathSavedData.get(level);
         if (data != null)
-            NetworkHandler.CHANNEL.sendToClientPlayer((ServerPlayer) player,
+            NetworkHelper.sendToClientPlayer((ServerPlayer) player,
                     new ClientBoundSyncAllWreaths(data.getWreathBlocks().keySet()));
     }
 

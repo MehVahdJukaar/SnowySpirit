@@ -1,7 +1,7 @@
 package net.mehvahdjukaar.snowyspirit.common.network;
 
-import net.mehvahdjukaar.moonlight.api.platform.network.ChannelHandler;
 import net.mehvahdjukaar.moonlight.api.platform.network.Message;
+import net.mehvahdjukaar.moonlight.api.platform.network.NetworkHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 
@@ -24,7 +24,8 @@ public class ClientBoundSyncAllWreaths implements Message {
         this.pos = pos;
     }
 
-    public void writeToBuffer(FriendlyByteBuf buffer) {
+    @Override
+    public void write(FriendlyByteBuf buffer) {
         buffer.writeInt(this.pos.size());
         for (BlockPos p : this.pos) {
             buffer.writeBlockPos(p);
@@ -32,7 +33,7 @@ public class ClientBoundSyncAllWreaths implements Message {
     }
 
     @Override
-    public void handle(ChannelHandler.Context context) {
+    public void handle(NetworkHelper.Context context) {
         ClientReceivers.handleSyncAlWreathsPacket(this);
     }
 }

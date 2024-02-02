@@ -1,17 +1,17 @@
 {
   "schemaVersion": 1,
-  "id": "snowyspirit",
-  "version": "${version}",
-  "name": "Snowy Spirit",
-  "description": "Winter themed mod that adds working sleds and winter related items with related ai tweaks for villagers",
+  "id": "${mod_id}",
+  "version": "${mod_version}",
+  "name": "${mod_name}",
+  "description": "${mod_description}",
   "authors": [
-    "Mehvahdjukaar, Plantkillable"
+    "${mod_authors}"
   ],
   "contact": {
-    "homepage": "https://www.curseforge.com/minecraft/mc-mods/snowy-spirit",
-    "sources": "https://github.com/MehVahdJukaar/SnowySpirit"
+    "homepage": "${mod_homepage}",
+    "sources": "${mod_github}"
   },
-  "license": "ARR",
+  "license": "${mod_license}",
   "icon": "icon.png",
   "environment": "*",
   "entrypoints": {
@@ -28,8 +28,8 @@
   ],
   "depends": {
     "fabric": "*",
-    "minecraft": ">=1.20",
-    "moonlight": ">=1.20-2.5.0"
+    "minecraft": ">=${minecraft_min_version} <${minecraft_max_version}",
+    "moonlight": "*"
   },
   "suggests": {
     "hauntedharvest": "*"

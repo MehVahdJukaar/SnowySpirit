@@ -4,8 +4,7 @@ package net.mehvahdjukaar.snowyspirit;
 import net.mehvahdjukaar.moonlight.api.platform.ClientHelper;
 import net.mehvahdjukaar.moonlight.api.platform.PlatHelper;
 import net.mehvahdjukaar.moonlight.api.platform.RegHelper;
-import net.mehvahdjukaar.moonlight.api.resources.RecipeConverter;
-import net.mehvahdjukaar.snowyspirit.common.network.NetworkHandler;
+import net.mehvahdjukaar.snowyspirit.common.network.ModMessages;
 import net.mehvahdjukaar.snowyspirit.configs.ClientConfigs;
 import net.mehvahdjukaar.snowyspirit.configs.CommonConfigs;
 import net.mehvahdjukaar.snowyspirit.dynamicpack.ClientDynamicResourcesHandler;
@@ -41,7 +40,7 @@ public class SnowySpirit {
     public static void commonInit() {
         CommonConfigs.init();
 
-        NetworkHandler.init();
+        ModMessages.init();
 
         RegHelper.registerSimpleRecipeCondition(SnowySpirit.res("flag"), CommonConfigs::isEnabled);
 

@@ -1,14 +1,16 @@
 package net.mehvahdjukaar.snowyspirit.common.entity;
 
 import com.google.common.collect.Lists;
+import com.google.common.graph.Network;
 import net.mehvahdjukaar.moonlight.api.entity.IControllableVehicle;
 import net.mehvahdjukaar.moonlight.api.entity.IExtraClientSpawnData;
 import net.mehvahdjukaar.moonlight.api.platform.PlatHelper;
+import net.mehvahdjukaar.moonlight.api.platform.network.NetworkHelper;
 import net.mehvahdjukaar.moonlight.api.set.BlocksColorAPI;
 import net.mehvahdjukaar.moonlight.api.set.wood.WoodType;
 import net.mehvahdjukaar.moonlight.api.set.wood.WoodTypeRegistry;
 import net.mehvahdjukaar.snowyspirit.client.SledSoundInstance;
-import net.mehvahdjukaar.snowyspirit.common.network.NetworkHandler;
+import net.mehvahdjukaar.snowyspirit.common.network.ModMessages;
 import net.mehvahdjukaar.snowyspirit.common.network.ServerBoundUpdateSledState;
 import net.mehvahdjukaar.snowyspirit.configs.CommonConfigs;
 import net.mehvahdjukaar.snowyspirit.reg.ModRegistry;
@@ -39,7 +41,6 @@ import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.animal.Fox;
 import net.minecraft.world.entity.animal.WaterAnimal;
-import net.minecraft.world.entity.animal.horse.Llama;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.vehicle.Boat;
 import net.minecraft.world.entity.vehicle.DismountHelper;
@@ -552,15 +553,16 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
 
         if (level.isClientSide) {
 
-            //if it's local player use current movement. otherwise send packet to server which will update all other clients to have syncedDeltaMovement
+            // if it's controlled by local player, use current movement.
+            // otherwise, send a packet to server which will update all other clients to have syncedDeltaMovement
             if (controlledByLocalInstance) {
                 movement = this.getDeltaMovement();
                 double horizontalSpeed = movement.x * movement.x + movement.z * movement.z;
                 if (horizontalSpeed > 0.001) {
-                    //updates same synced data also on client cause u never know
+                    // updates same synced data also on client cause u never know
                     this.setSyncedMovement(movement);
-                    //send cient movement to other clients
-                    NetworkHandler.CHANNEL.sendToServer(new ServerBoundUpdateSledState(movement));
+                    // send client movement to other clients
+                    NetworkHelper.sendToServer(new ServerBoundUpdateSledState(movement));
                     this.spawnTrailParticles(movement, horizontalSpeed);
                 }
             } else {
@@ -568,7 +570,7 @@ public class SledEntity extends Entity implements IControllableVehicle, IExtraCl
                 double horizontalSpeed = movement.x * movement.x + movement.z * movement.z;
                 if (horizontalSpeed > 0.001) {
                     this.spawnTrailParticles(movement, horizontalSpeed);
-                    //reset every tick (this might break)
+                    // reset every tick (this might break)
                     // this.setSyncedMovement(Vec3.ZERO);
                 }
             }

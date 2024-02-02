@@ -1,7 +1,7 @@
 package net.mehvahdjukaar.snowyspirit.integration.fabric.mod_menu;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.mehvahdjukaar.moonlight.api.client.gui.LinkButton;
+import net.mehvahdjukaar.moonlight.api.client.gui.UrlButton;
 import net.mehvahdjukaar.moonlight.api.platform.configs.fabric.FabricConfigListScreen;
 import net.mehvahdjukaar.snowyspirit.SnowySpirit;
 import net.mehvahdjukaar.snowyspirit.configs.ClientConfigs;
@@ -25,26 +25,17 @@ public class ModConfigScreen extends FabricConfigListScreen {
                 SnowySpirit.res("textures/blocks/gingerbread_frosted_block.png"),
                 parent, CommonConfigs.SPEC, ClientConfigs.SPEC);
     }
-/*
+
     @Override
     protected void addExtraButtons() {
-
-        ResourceLocation icons = LinkButton.MISC_ICONS;
 
         int y = this.height - 27;
         int centerX = this.width / 2;
         this.addRenderableWidget(Button.builder(CommonComponents.GUI_BACK, (buttonx) -> {
             this.minecraft.setScreen(this.parent);
         }).bounds(centerX - 45, y, 90, 20).build());
-        this.addRenderableWidget(LinkButton.create(this, centerX - 45 - 22, y, 3, 1, "https://www.patreon.com/user?u=53696377", "Support me on Patreon :D"));
-        this.addRenderableWidget(LinkButton.create(this, centerX - 45 - 44, y, 2, 2, "https://ko-fi.com/mehvahdjukaar", "Donate a Coffee"));
-        this.addRenderableWidget(LinkButton.create(this, centerX - 45 - 66, y, 1, 2, "https://www.curseforge.com/minecraft/mc-mods/snowy-spirit", "CurseForge Page"));
-        this.addRenderableWidget(LinkButton.create(this, centerX - 45 - 88, y, 0, 2, "https://github.com/MehVahdJukaar/SnowySpirit", "Mod Wiki"));
-        this.addRenderableWidget(LinkButton.create(this, centerX + 45 + 2, y, 1, 1, "https://discord.com/invite/qdKRTDf8Cv", "Mod Discord"));
-        this.addRenderableWidget(LinkButton.create(this, centerX + 45 + 2 + 22, y, 0, 1, "https://www.youtube.com/watch?v=LSPNAtAEn28&t=1s", "Youtube Channel"));
-        this.addRenderableWidget(LinkButton.create(this, centerX + 45 + 2 + 44, y, 2, 1, "https://twitter.com/Supplementariez?s=09", "Twitter Page"));
-        this.addRenderableWidget(LinkButton.create(this, centerX + 45 + 2 + 66, y, 3, 2, "https://www.akliz.net/supplementaries", "Need a server? Get one with Akliz"));
 
+        UrlButton.addMyMediaButtons(this,centerX, y,"snowy-spirit", "snowyspirit");
     }
 
     @Override
@@ -56,7 +47,7 @@ public class ModConfigScreen extends FabricConfigListScreen {
             int x = (int) (this.width * 0.93f);
             graphics.renderFakeItem(Items.SNOWBALL.getDefaultInstance(), x, 16);
         }
-    }*/
+    }
 
 }
 

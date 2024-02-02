@@ -162,7 +162,7 @@ public class ClientDynamicResourcesHandler extends DynClientResourcesGenerator {
                         newImage = respriter.recolor(targetPalette);
 
                     } catch (Exception ex) {
-                        getLogger().error("Could not find boat texture for wood type {}. Using plank texture : {}", wood, ex);
+                        getLogger().warn("Could not find boat texture for wood type {}. Using plank texture : {}", wood, ex);
                     }
                 }
                 //if it failed use plank one

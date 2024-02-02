@@ -1,53 +1,48 @@
 
-modLoader="javafml" #mandatory
+modLoader = "javafml"
+loaderVersion = "*"
 
-loaderVersion="[40,)"
+license = "${mod_license}"
+issueTrackerURL = "${mod_github}/issues"
 
-license="All rights reserved"
+[[mixins]]
+config = "${mod_id}.mixins.json"
+[[mixins]]
+config = "${mod_id}-common.mixins.json"
 
-issueTrackerURL = "https://github.com/MehVahdJukaar/snowy-spirit/issues"
-
-
-[[mods]] #mandatory
-    modId="snowyspirit" #mandatory
-
-    version="${version}" #mandatory
-
-    displayName="Snowy Spirit" #mandatory
-
-    displayURL = "https://www.curseforge.com/minecraft/mc-mods/snowy-spirit" #optional
-
-    logoFile="icon.png" #optional
-
-    credits="MehVahdJukaar, Plantkillable" #optional
-
-    authors="MehVahdJukaar" #optional
-
-    description='''
-    Winter themed mod that adds working sleds and winter related items with related ai tweaks for villagers
-    '''
+[[mods]]
+modId = "${mod_id}"
+version = "${mod_version}"
+displayName = "${mod_name}"
+logoFile = "icon.png"
+authors = "${mod_authors}"
+credits = "${mod_credits}"
+description = '''${mod_description}'''
+modUrl = "${mod_homepage}"
+itemIcon="snowyspirit:sled_oak" #catalogue icon
 
 [modproperties.snowyspirit]
-    catalogueItemIcon = "snowyspirit:sled_oak" #catalogue icon
-    configuredBackground = "snowyspirit:textures/blocks/gingerbread_frosted_block.png"
+catalogueItemIcon = "snowyspirit:sled_oak" #catalogue icon
+configuredBackground = "snowyspirit:textures/blocks/gingerbread_frosted_block.png"
 
-[[dependencies.snowyspirit]] #optional
-    modId="forge" #mandatory
-    mandatory=true #mandatory
-    versionRange="[40,)" #mandatory
-    ordering="NONE"
-    side="BOTH"
 
-[[dependencies.snowyspirit]]
-    modId="minecraft"
-    mandatory=true
-    versionRange="[1.20,1.21)"
-    ordering="NONE"
-    side="BOTH"
+[[dependencies.${mod_id}]]
+modId = "neoforge"
+type = "REQUIRED"
+versionRange = "${forge_version_range}"
+ordering = "NONE"
+side = "BOTH"
 
-[[dependencies.snowyspirit]]
-    modId="moonlight"
-    mandatory=true
-    versionRange="[1.20-2.5.3,)"
-    ordering="NONE"
-    side="BOTH"
+[[dependencies.${mod_id}]]
+modId = "minecraft"
+type = "REQUIRED"
+versionRange = "[${minecraft_min_version},${minecraft_max_version})"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.${mod_id}]]
+modId = "moonlight"
+type = "REQUIRED"
+versionRange = "[${moonlight_min_version},)"
+ordering = "NONE"
+side = "BOTH"

@@ -2,9 +2,10 @@ package net.mehvahdjukaar.snowyspirit.common.ai;
 
 import com.google.common.collect.ImmutableMap;
 import net.mehvahdjukaar.moonlight.api.platform.PlatHelper;
+import net.mehvahdjukaar.moonlight.api.platform.network.NetworkHelper;
 import net.mehvahdjukaar.snowyspirit.SnowySpirit;
 import net.mehvahdjukaar.snowyspirit.common.network.ClientBoundSyncWreathMessage;
-import net.mehvahdjukaar.snowyspirit.common.network.NetworkHandler;
+import net.mehvahdjukaar.snowyspirit.common.network.ModMessages;
 import net.mehvahdjukaar.snowyspirit.common.wreath.WreathSavedData;
 import net.mehvahdjukaar.snowyspirit.reg.ModMemoryModules;
 import net.minecraft.core.BlockPos;
@@ -103,7 +104,7 @@ public class RemoveWreathTask extends Behavior<Villager> {
 
                         pOwner.getBrain().eraseMemory(ModMemoryModules.WREATH_POS.get());
                         c.removeWreath(pos, level, true);
-                        NetworkHandler.CHANNEL.sendToAllClientPlayers(new ClientBoundSyncWreathMessage(pos, false));
+                        NetworkHelper.sendToAllClientPlayers(new ClientBoundSyncWreathMessage(pos, false));
                     }
                     return;
                 }
