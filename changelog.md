@@ -1,1 +1,2 @@
-- better configs
+- improved configs further
+- random fixes
