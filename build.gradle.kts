@@ -109,5 +109,6 @@ subprojects {
         maven { url = uri("https://maven.jamieswhiteshirt.com/libs-release") } // Jamie's Mods
         maven { url = uri("https://maven.ryanhcode.dev/releases") }
         maven { url = uri("https://api.modrinth.com/maven") } // Modrinth (Sodium, etc.)
+        maven { url = uri("https://registry.somethingcatchy.net/repository/maven-public/") } // CodecUI
     }
 }

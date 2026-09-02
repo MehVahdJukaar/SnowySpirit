@@ -18,7 +18,7 @@ dependencies {
     modRuntimeOnly("net.mehvahdjukaar:codecui-neoforge:${codecui_version}")
 
     modCompileOnly("net.mehvahdjukaar:supplementaries-neoforge:${supplementaries_version}")
-    modCompileOnly("curse.maven:entity-model-features-844662:8063559")
+    modCompileOnly("curse.maven:entity-model-features-844662:8789172")
 
     modCompileOnly("curse.maven:jei-238222:5846880")
     modCompileOnly("curse.maven:farmers-delight-398521:5772720")

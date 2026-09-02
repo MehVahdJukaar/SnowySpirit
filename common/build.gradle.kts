@@ -17,6 +17,6 @@ dependencies {
     modCompileOnly("net.mehvahdjukaar:supplementaries-neoforge:${supplementaries_version}")
 
     modCompileOnly("curse.maven:farmers-delight-398521:5772720")
-    modCompileOnly("curse.maven:entity-model-features-844662:8063559")
+    modCompileOnly("curse.maven:entity-model-features-844662:8789172")
     modCompileOnly("curse.maven:entity-texture-features-fabric-568563:5000985")
 }

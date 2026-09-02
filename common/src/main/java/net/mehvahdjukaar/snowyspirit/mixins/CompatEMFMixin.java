@@ -8,15 +8,15 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import traben.entity_model_features.models.animation.EMFAnimationEntityContext;
+import traben.entity_model_features.models.animation.math.EMFMath;
 import traben.entity_model_features.utils.EMFEntity;
 
 @Pseudo
-@Mixin(value = EMFAnimationEntityContext.class, remap = false)
+@Mixin(value = EMFMath.class, remap = false)
 public abstract class CompatEMFMixin {
 
     @Shadow
-    public static @Nullable EMFEntity getEMFEntity() {
+    public static @Nullable EMFEntity emfEntity() {
         return null;
     }
 
@@ -24,7 +24,7 @@ public abstract class CompatEMFMixin {
             require = 0,
             at = @At("RETURN"), remap = false)
     private static boolean snowy_spirit$cancelWolfSledSitting(boolean original){
-        if (original && getEMFEntity() instanceof LivingEntity le && le.getVehicle() instanceof SledEntity sledEntity) {
+        if (original && emfEntity() instanceof LivingEntity le && le.getVehicle() instanceof SledEntity sledEntity) {
             if (sledEntity.isMyPuller(le)){
                 return false;
             }
