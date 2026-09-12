@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "snowyspirit:block/wall_glow_lights_green"
+    },
+    "facing=east": {
+      "model": "snowyspirit:block/wall_glow_lights_green",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "snowyspirit:block/wall_glow_lights_green",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "snowyspirit:block/wall_glow_lights_green",
+      "y": 270
+    }
+  }
+}

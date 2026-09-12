@@ -23,6 +23,7 @@ import net.mehvahdjukaar.snowyspirit.common.items.GlowLightsItem;
 import net.mehvahdjukaar.snowyspirit.common.items.SledItem;
 import net.mehvahdjukaar.snowyspirit.common.wreath.ChunksWithWreaths;
 import net.mehvahdjukaar.snowyspirit.common.wreath.WreathData;
+import net.mehvahdjukaar.snowyspirit.integration.supp.SuppCompat;
 import net.minecraft.Util;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.particles.SimpleParticleType;
@@ -215,12 +216,37 @@ public class ModRegistry {
         return m;
     });
 
+    public static final Map<DyeColor, Supplier<Block>> GLOW_LIGHTS_WALL_BLOCKS = Util.make(() -> {
+        var m = new LinkedHashMap<DyeColor, Supplier<Block>>();
+        for (DyeColor c : BlocksColorAPI.SORTED_COLORS) {
+            m.put(c, regWallGlowLights("wall_" + GLOW_LIGHTS_NAME + "_" + c.getName(), c));
+        }
+        m.put(null, regWallGlowLights("wall_" + GLOW_LIGHTS_NAME + "_prismatic", null));
+        return m;
+    });
+
+    private static Supplier<Block> regWallGlowLights(String name, DyeColor color) {
+        return regBlock(name, () -> new GlowLightsWallBlock(color, BlockBehaviour.Properties.of()
+                .mapColor(MapColor.NONE)
+                .noCollission()
+                .noOcclusion()
+                .instabreak()
+                .ignitedByLava()
+                .sound(SoundType.WOOL)
+                .lightLevel(s -> 6)));
+    }
+
+    public static final Map<DyeColor, Supplier<Block>> ROPED_GLOW_LIGHTS =
+            SnowySpirit.SUPPLEMENTARIES_INSTALLED ? SuppCompat.registerRopedGlowLights() : Map.of();
+
     public static final Map<DyeColor, Supplier<Item>> GLOW_LIGHTS_ITEMS = Util.make(() -> {
         var m = new LinkedHashMap<DyeColor, Supplier<Item>>();
         for (DyeColor c : BlocksColorAPI.SORTED_COLORS) {
-            m.put(c, regItem("glow_lights_" + c.getName(), () -> new GlowLightsItem(GLOW_LIGHTS_BLOCKS.get(c).get())));
+            m.put(c, regItem("glow_lights_" + c.getName(), () -> new GlowLightsItem(
+                    GLOW_LIGHTS_BLOCKS.get(c).get(), GLOW_LIGHTS_WALL_BLOCKS.get(c).get())));
         }
-        m.put(null, regItem("glow_lights_prismatic", () -> new GlowLightsItem(GLOW_LIGHTS_BLOCKS.get(null).get())));
+        m.put(null, regItem("glow_lights_prismatic", () -> new GlowLightsItem(
+                GLOW_LIGHTS_BLOCKS.get(null).get(), GLOW_LIGHTS_WALL_BLOCKS.get(null).get())));
         return m;
     });
 

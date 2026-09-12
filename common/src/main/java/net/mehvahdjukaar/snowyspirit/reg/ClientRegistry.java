@@ -57,6 +57,12 @@ public class ClientRegistry {
             //TODO: use forge emissive layer
             ClientHelper.registerRenderType(v.get(), RenderType.cutout());
         }
+        for (var v : ModRegistry.GLOW_LIGHTS_WALL_BLOCKS.values()) {
+            ClientHelper.registerRenderType(v.get(), RenderType.cutout());
+        }
+        for (var v : ModRegistry.ROPED_GLOW_LIGHTS.values()) {
+            ClientHelper.registerRenderType(v.get(), RenderType.cutout());
+        }
 
         ItemProperties.register(ModRegistry.GINGERBREAD_COOKIE.get(), ResourceLocation.parse("shape"),
                 (stack, world, entity, s) -> (System.identityHashCode(stack) % 4) / 3f);

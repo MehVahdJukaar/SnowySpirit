@@ -1,0 +1,60 @@
+{
+  "multipart": [
+    {
+      "apply": {
+        "model": "snowyspirit:block/roped_glow_lights_cyan_hub"
+      }
+    },
+    {
+      "when": {
+        "down": "true"
+      },
+      "apply": {
+        "model": "snowyspirit:block/roped_glow_lights_cyan_down"
+      }
+    },
+    {
+      "when": {
+        "up": "true"
+      },
+      "apply": {
+        "model": "snowyspirit:block/roped_glow_lights_cyan_up"
+      }
+    },
+    {
+      "when": {
+        "north": "true"
+      },
+      "apply": {
+        "model": "snowyspirit:block/roped_glow_lights_cyan_side"
+      }
+    },
+    {
+      "when": {
+        "east": "true"
+      },
+      "apply": {
+        "model": "snowyspirit:block/roped_glow_lights_cyan_side",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "south": "true"
+      },
+      "apply": {
+        "model": "snowyspirit:block/roped_glow_lights_cyan_side",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "west": "true"
+      },
+      "apply": {
+        "model": "snowyspirit:block/roped_glow_lights_cyan_side",
+        "y": 270
+      }
+    }
+  ]
+}

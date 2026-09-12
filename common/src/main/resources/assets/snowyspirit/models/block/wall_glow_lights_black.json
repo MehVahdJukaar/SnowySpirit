@@ -1,0 +1,6 @@
+{
+  "parent": "snowyspirit:block/template_wall_lights",
+  "textures": {
+    "lights": "snowyspirit:block/wall_lights_black"
+  }
+}

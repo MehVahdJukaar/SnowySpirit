@@ -1,0 +1,6 @@
+{
+  "parent": "snowyspirit:block/template_roped_lights_side",
+  "textures": {
+    "lights": "snowyspirit:block/roped_lights_pink"
+  }
+}

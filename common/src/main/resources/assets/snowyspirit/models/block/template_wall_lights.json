@@ -1,0 +1,16 @@
+{
+	"ambientocclusion": false,
+	"textures": {
+		"particle": "#lights"
+	},
+	"elements": [
+		{
+			"from": [0, 0, 15.5],
+			"to": [16, 16, 15.5],
+			"faces": {
+				"north": {"uv": [0, 0, 16, 16], "texture": "#lights", "emissivity": 15},
+				"south": {"uv": [0, 0, 16, 16], "texture": "#lights", "emissivity": 15}
+			}
+		}
+	]
+}
