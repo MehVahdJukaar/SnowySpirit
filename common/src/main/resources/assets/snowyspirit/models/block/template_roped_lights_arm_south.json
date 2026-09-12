@@ -1,0 +1,76 @@
+{
+  "ambientocclusion": false,
+  "textures": {
+    "particle": "#lights"
+  },
+  "elements": [
+    {
+      "from": [
+        5.9,
+        8.9,
+        10.1
+      ],
+      "to": [
+        10.1,
+        13.1,
+        16
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            4.0,
+            10.1,
+            0.0,
+            16
+          ],
+          "texture": "#lights",
+          "emissivity": 15,
+          "neoforge_data": {
+            "block_light": 15
+          },
+          "rotation": 90
+        },
+        "up": {
+          "uv": [
+            8.0,
+            10.1,
+            4.0,
+            16
+          ],
+          "texture": "#lights",
+          "emissivity": 15,
+          "neoforge_data": {
+            "block_light": 15
+          }
+        },
+        "west": {
+          "uv": [
+            8.0,
+            16,
+            12.0,
+            10.1
+          ],
+          "texture": "#lights",
+          "emissivity": 15,
+          "neoforge_data": {
+            "block_light": 15
+          },
+          "rotation": 90
+        },
+        "down": {
+          "uv": [
+            12.0,
+            16,
+            16.0,
+            10.1
+          ],
+          "texture": "#lights",
+          "emissivity": 15,
+          "neoforge_data": {
+            "block_light": 15
+          }
+        }
+      }
+    }
+  ]
+}

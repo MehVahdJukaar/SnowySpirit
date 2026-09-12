@@ -2,23 +2,41 @@
   "multipart": [
     {
       "apply": {
-        "model": "snowyspirit:block/roped_glow_lights_light_blue_hub"
+        "model": "snowyspirit:block/roped_glow_lights_light_blue_rope"
       }
     },
     {
       "when": {
-        "down": "true"
+        "OR": [
+          {
+            "north": "true"
+          },
+          {
+            "south": "true"
+          }
+        ]
       },
       "apply": {
-        "model": "snowyspirit:block/roped_glow_lights_light_blue_down"
+        "model": "snowyspirit:block/roped_glow_lights_light_blue_hub_z"
       }
     },
     {
       "when": {
-        "up": "true"
+        "OR": [
+          {
+            "north": "false",
+            "south": "false",
+            "east": "true"
+          },
+          {
+            "north": "false",
+            "south": "false",
+            "west": "true"
+          }
+        ]
       },
       "apply": {
-        "model": "snowyspirit:block/roped_glow_lights_light_blue_up"
+        "model": "snowyspirit:block/roped_glow_lights_light_blue_hub_x"
       }
     },
     {
@@ -26,16 +44,7 @@
         "north": "true"
       },
       "apply": {
-        "model": "snowyspirit:block/roped_glow_lights_light_blue_side"
-      }
-    },
-    {
-      "when": {
-        "east": "true"
-      },
-      "apply": {
-        "model": "snowyspirit:block/roped_glow_lights_light_blue_side",
-        "y": 90
+        "model": "snowyspirit:block/roped_glow_lights_light_blue_arm_north"
       }
     },
     {
@@ -43,8 +52,15 @@
         "south": "true"
       },
       "apply": {
-        "model": "snowyspirit:block/roped_glow_lights_light_blue_side",
-        "y": 180
+        "model": "snowyspirit:block/roped_glow_lights_light_blue_arm_south"
+      }
+    },
+    {
+      "when": {
+        "east": "true"
+      },
+      "apply": {
+        "model": "snowyspirit:block/roped_glow_lights_light_blue_arm_east"
       }
     },
     {
@@ -52,8 +68,7 @@
         "west": "true"
       },
       "apply": {
-        "model": "snowyspirit:block/roped_glow_lights_light_blue_side",
-        "y": 270
+        "model": "snowyspirit:block/roped_glow_lights_light_blue_arm_west"
       }
     }
   ]

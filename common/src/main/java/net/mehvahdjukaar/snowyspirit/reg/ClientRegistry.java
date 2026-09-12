@@ -5,6 +5,7 @@ import net.mehvahdjukaar.moonlight.api.platform.ClientHelper;
 import net.mehvahdjukaar.snowyspirit.SnowySpirit;
 import net.mehvahdjukaar.snowyspirit.client.*;
 import net.mehvahdjukaar.snowyspirit.common.block.GlowLightsBlockTile;
+import net.mehvahdjukaar.snowyspirit.integration.supp.SuppCompat;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.color.block.BlockColor;
 import net.minecraft.client.model.geom.ModelLayerLocation;
@@ -84,6 +85,7 @@ public class ClientRegistry {
 
     private static void registerModelLoaders(ClientHelper.ModelLoaderEvent event) {
         event.register(SnowySpirit.res("glow_lights"), new NestedModelLoader("overlay", GlowLightsBakedModel::new));
+        if (SnowySpirit.SUPPLEMENTARIES_INSTALLED) SuppCompat.registerRopeModelLoader(event);
     }
 
     private static void registerBlockColors(ClientHelper.BlockColorEvent event) {

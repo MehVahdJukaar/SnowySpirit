@@ -29,6 +29,9 @@ import java.util.List;
 
 public class RopedGlowLightsBlock extends RopeBlock implements IColored, IWashable {
 
+    private static final double ARM_RADIUS = 2.1 / 16;
+    private static final double ROPE_Y = 11 / 16d;
+
     public final DyeColor color;
 
     public RopedGlowLightsBlock(DyeColor color, Properties properties) {
@@ -88,10 +91,26 @@ public class RopedGlowLightsBlock extends RopeBlock implements IColored, IWashab
         if (random.nextFloat() > 0.2f) return;
         Direction dir = Direction.values()[random.nextInt(6)];
         if (!this.hasConnection(dir, state)) return;
-        double d = random.nextDouble() * 0.45;
-        double x = pos.getX() + 0.5 + dir.getStepX() * d;
-        double y = pos.getY() + 0.6875 + dir.getStepY() * d;
-        double z = pos.getZ() + 0.5 + dir.getStepZ() * d;
+
+        double reach = switch (dir) {
+            case UP -> 1 - ROPE_Y;
+            case DOWN -> ROPE_Y;
+            default -> 0.5;
+        };
+        double along = dir.getAxisDirection().getStep() * random.nextDouble() * reach;
+        //stick them onto one of the 4 long faces, inside the arm they'd just clip
+        double onFace = random.nextBoolean() ? ARM_RADIUS : -ARM_RADIUS;
+        double acrossFace = (random.nextDouble() * 2 - 1) * ARM_RADIUS;
+        if (random.nextBoolean()) {
+            double t = onFace;
+            onFace = acrossFace;
+            acrossFace = t;
+        }
+
+        Direction.Axis axis = dir.getAxis();
+        double x = pos.getX() + 0.5 + axis.choose(along, onFace, onFace);
+        double y = pos.getY() + ROPE_Y + axis.choose(onFace, along, acrossFace);
+        double z = pos.getZ() + 0.5 + axis.choose(acrossFace, acrossFace, along);
         var c = ClientDynamicResourcesHandler.getGlowLightColor(color, random);
         level.addParticle(ModRegistry.GLOW_LIGHT_PARTICLE.get(), x, y, z, c[0], c[1], c[2]);
     }

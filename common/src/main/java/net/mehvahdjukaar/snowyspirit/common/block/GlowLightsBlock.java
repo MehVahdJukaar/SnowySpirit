@@ -34,7 +34,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -78,9 +77,8 @@ public class GlowLightsBlock extends WaterBlock implements EntityBlock, IColored
         return m;
     });
 
-    public GlowLightsBlock(DyeColor color) {
-        super(Properties.ofFullCopy(Blocks.OAK_LEAVES)
-                .lightLevel(s -> 6));
+    public GlowLightsBlock(DyeColor color, Properties properties) {
+        super(properties);
         this.color = color;
     }
 

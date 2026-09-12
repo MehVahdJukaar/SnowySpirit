@@ -1,19 +1,39 @@
 {
-  "variants": {
-    "facing=north": {
-      "model": "snowyspirit:block/wall_glow_lights_white"
+  "multipart": [
+    {
+      "when": {
+        "north": "true"
+      },
+      "apply": {
+        "model": "snowyspirit:block/wall_glow_lights_white"
+      }
     },
-    "facing=east": {
-      "model": "snowyspirit:block/wall_glow_lights_white",
-      "y": 90
+    {
+      "when": {
+        "east": "true"
+      },
+      "apply": {
+        "model": "snowyspirit:block/wall_glow_lights_white",
+        "y": 90
+      }
     },
-    "facing=south": {
-      "model": "snowyspirit:block/wall_glow_lights_white",
-      "y": 180
+    {
+      "when": {
+        "south": "true"
+      },
+      "apply": {
+        "model": "snowyspirit:block/wall_glow_lights_white",
+        "y": 180
+      }
     },
-    "facing=west": {
-      "model": "snowyspirit:block/wall_glow_lights_white",
-      "y": 270
+    {
+      "when": {
+        "west": "true"
+      },
+      "apply": {
+        "model": "snowyspirit:block/wall_glow_lights_white",
+        "y": 270
+      }
     }
-  }
+  ]
 }

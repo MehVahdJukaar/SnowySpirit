@@ -1,16 +1,24 @@
 package net.mehvahdjukaar.snowyspirit.integration.supp;
 
+import net.mehvahdjukaar.moonlight.api.client.model.NestedModelLoader;
 import net.mehvahdjukaar.moonlight.api.set.BlocksColorAPI;
+import net.mehvahdjukaar.moonlight.api.platform.ClientHelper;
+import net.mehvahdjukaar.snowyspirit.SnowySpirit;
 import net.mehvahdjukaar.snowyspirit.common.entity.ContainerHolderEntity;
 import net.mehvahdjukaar.supplementaries.common.block.tiles.SackBlockTile;
 import net.mehvahdjukaar.supplementaries.common.inventories.VariableSizeContainerMenu;
 import net.mehvahdjukaar.supplementaries.common.items.CandyItem;
 import net.mehvahdjukaar.supplementaries.common.items.SackItem;
+import net.mehvahdjukaar.supplementaries.common.block.blocks.RopeBlock;
+import net.mehvahdjukaar.supplementaries.common.utils.MiscUtils;
 import net.mehvahdjukaar.supplementaries.configs.CommonConfigs;
 import net.mehvahdjukaar.supplementaries.reg.ModMenuTypes;
 import net.mehvahdjukaar.supplementaries.reg.ModRegistry;
+import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -22,14 +30,17 @@ import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
@@ -87,10 +98,21 @@ public class SuppCompat {
         Level level = context.getLevel();
         BlockPos pos = context.getClickedPos();
         BlockState state = level.getBlockState(pos);
-        if (!state.is(ModRegistry.ROPE.get())) return false;
-        level.setBlockAndUpdate(pos, ropeToGlowLights(state, color));
-        level.playSound(context.getPlayer(), pos, SoundEvents.AMETHYST_CLUSTER_HIT, SoundSource.BLOCKS, 1.0F, 0.8F);
+        if (!state.is(ModRegistry.ROPE.get()) || !hasHorizontalConnection(state)) return false;
+        BlockState lit = ropeToGlowLights(state, color);
+        level.setBlockAndUpdate(pos, lit);
+        SoundType sound = lit.getSoundType();
+        level.playSound(context.getPlayer(), pos, SoundEvents.AMETHYST_CLUSTER_HIT, SoundSource.BLOCKS,
+                (sound.getVolume() + 1.0F) / 2.0F, sound.getPitch() * 0.8F);
         return true;
+    }
+
+    private static boolean hasHorizontalConnection(BlockState state) {
+        RopeBlock rope = (RopeBlock) state.getBlock();
+        for (Direction dir : Direction.Plane.HORIZONTAL) {
+            if (rope.hasConnection(dir, state)) return true;
+        }
+        return false;
     }
 
     public static BlockState ropeToGlowLights(BlockState state, DyeColor color) {
@@ -104,5 +126,17 @@ public class SuppCompat {
 
     public static ItemStack ropeStack() {
         return ModRegistry.ROPE_ITEM.get().getDefaultInstance();
+    }
+
+    public static void addRopeHint(List<Component> tooltip, TooltipFlag flag) {
+        if (MiscUtils.showsHints(flag)) {
+            tooltip.add(Component.translatable("message.supplementaries.bunting")
+                    .withStyle(ChatFormatting.GRAY).withStyle(ChatFormatting.ITALIC));
+        }
+    }
+
+    public static void registerRopeModelLoader(ClientHelper.ModelLoaderEvent event) {
+        event.register(SnowySpirit.res("roped_glow_lights"),
+                new NestedModelLoader("overlay", RopedGlowLightsBakedModel::new));
     }
 }

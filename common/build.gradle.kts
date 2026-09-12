@@ -14,7 +14,7 @@ dependencies {
     modCompileOnly("net.mehvahdjukaar:moonlight-common:${moonlight_version}")
     accessTransformers("net.mehvahdjukaar:moonlight-common:${moonlight_version}")
 
-    modCompileOnly("net.mehvahdjukaar:supplementaries-neoforge:${supplementaries_version}")
+    modCompileOnly("net.mehvahdjukaar:supplementaries-common:${supplementaries_version}")
 
     modCompileOnly("curse.maven:farmers-delight-398521:5772720")
     modCompileOnly("curse.maven:entity-model-features-844662:8063559")

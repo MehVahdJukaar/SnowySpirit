@@ -1,0 +1,9 @@
+{
+  "loader": "snowyspirit:roped_glow_lights",
+  "overlay": {
+    "parent": "block/block",
+    "textures": {
+      "particle": "snowyspirit:block/roped_lights_green"
+    }
+  }
+}

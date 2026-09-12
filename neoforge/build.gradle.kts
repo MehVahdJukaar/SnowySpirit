@@ -17,7 +17,10 @@ dependencies {
     // JiJ'd into Moonlight, so not on the dev runtime classpath — add explicitly to avoid missing schema codec class.
     modRuntimeOnly("net.mehvahdjukaar:codecui-neoforge:${codecui_version}")
 
-    modImplementation("net.mehvahdjukaar:supplementaries-neoforge:${supplementaries_version}")
+    // moonlight already JiJs mixinsquared, two copies on the module path blow up modlauncher
+    modImplementation("net.mehvahdjukaar:supplementaries-neoforge:${supplementaries_version}") {
+        exclude(group = "com.github.bawnorton.mixinsquared")
+    }
     modCompileOnly("curse.maven:entity-model-features-844662:8063559")
 
     modCompileOnly("curse.maven:jei-238222:5846880")

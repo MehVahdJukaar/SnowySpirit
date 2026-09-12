@@ -210,11 +210,17 @@ public class ModRegistry {
     public static final Map<DyeColor, Supplier<Block>> GLOW_LIGHTS_BLOCKS = Util.make(() -> {
         var m = new LinkedHashMap<DyeColor, Supplier<Block>>();
         for (DyeColor c : BlocksColorAPI.SORTED_COLORS) {
-            m.put(c, regBlock(GLOW_LIGHTS_NAME + "_" + c.getName(), () -> new GlowLightsBlock(c)));
+            m.put(c, regGlowLights(GLOW_LIGHTS_NAME + "_" + c.getName(), c));
         }
-        m.put(null, regBlock(GLOW_LIGHTS_NAME + "_prismatic", () -> new GlowLightsBlock(null)));
+        m.put(null, regGlowLights(GLOW_LIGHTS_NAME + "_prismatic", null));
         return m;
     });
+
+    private static Supplier<Block> regGlowLights(String name, DyeColor color) {
+        return regBlock(name, () -> new GlowLightsBlock(color, BlockBehaviour.Properties.ofFullCopy(Blocks.OAK_LEAVES)
+                .sound(ModSounds.GLOW_LIGHTS)
+                .lightLevel(s -> 6)));
+    }
 
     public static final Map<DyeColor, Supplier<Block>> GLOW_LIGHTS_WALL_BLOCKS = Util.make(() -> {
         var m = new LinkedHashMap<DyeColor, Supplier<Block>>();
@@ -232,7 +238,7 @@ public class ModRegistry {
                 .noOcclusion()
                 .instabreak()
                 .ignitedByLava()
-                .sound(SoundType.WOOL)
+                .sound(ModSounds.GLOW_LIGHTS)
                 .lightLevel(s -> 6)));
     }
 

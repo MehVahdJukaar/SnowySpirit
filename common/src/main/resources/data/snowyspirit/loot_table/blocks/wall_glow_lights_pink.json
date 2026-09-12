@@ -11,6 +11,76 @@
       ],
       "conditions": [
         {
+          "condition": "minecraft:block_state_property",
+          "block": "snowyspirit:wall_glow_lights_pink",
+          "properties": {
+            "north": "true"
+          }
+        },
+        {
+          "condition": "minecraft:survives_explosion"
+        }
+      ]
+    },
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "snowyspirit:glow_lights_pink"
+        }
+      ],
+      "conditions": [
+        {
+          "condition": "minecraft:block_state_property",
+          "block": "snowyspirit:wall_glow_lights_pink",
+          "properties": {
+            "east": "true"
+          }
+        },
+        {
+          "condition": "minecraft:survives_explosion"
+        }
+      ]
+    },
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "snowyspirit:glow_lights_pink"
+        }
+      ],
+      "conditions": [
+        {
+          "condition": "minecraft:block_state_property",
+          "block": "snowyspirit:wall_glow_lights_pink",
+          "properties": {
+            "south": "true"
+          }
+        },
+        {
+          "condition": "minecraft:survives_explosion"
+        }
+      ]
+    },
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "snowyspirit:glow_lights_pink"
+        }
+      ],
+      "conditions": [
+        {
+          "condition": "minecraft:block_state_property",
+          "block": "snowyspirit:wall_glow_lights_pink",
+          "properties": {
+            "west": "true"
+          }
+        },
+        {
           "condition": "minecraft:survives_explosion"
         }
       ]
