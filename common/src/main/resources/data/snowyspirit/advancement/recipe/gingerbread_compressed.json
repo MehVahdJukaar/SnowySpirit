@@ -1,0 +1,44 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "snowyspirit:flag",
+      "flag": "ginger"
+    }
+  ],
+  "fabric:load_conditions": [
+    {
+      "condition": "snowyspirit:flag",
+      "flag": "ginger"
+    }
+  ],
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_ginger": {
+      "conditions": {
+        "items": [
+          {
+            "items": "snowyspirit:ginger"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "snowyspirit:gingerbread_compressed"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_ginger"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "snowyspirit:gingerbread_compressed"
+    ]
+  }
+}
