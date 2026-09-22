@@ -75,12 +75,12 @@ public class CommonConfigs {
         builder.pop();
 
         builder.icon("minecraft:oak_leaves").push("season_mod_compat");
-        SEASONS_MOD_COMPAT = builder.comment("Enables compatibility with Serene Seasons (Forge) or Fabric Seasons (Fabric). Only takes effect if the mod is installed. Will make snowy season only active during certain seasons. Note that this will override previous time window settings")
-                .define("enabled", SnowySpirit.SEASON_MOD_INSTALLED);
+        builder.comment("Enables compatibility with Serene Seasons (Forge) or Fabric Seasons (Fabric). Only takes effect if the mod is installed. Will make snowy season only active during certain seasons. Note that this will override previous time window settings");
+        SEASONS_MOD_COMPAT = builder.mainFeature(SnowySpirit.SEASON_MOD_INSTALLED);
         if (SnowySpirit.SEASON_MOD_INSTALLED) SeasonModCompat.addConfig(builder);
         builder.pop(2);
 
-        builder.push("misc");
+        builder.icon("minecraft:bundle").push("misc");
         MOD_TAB = builder.gameRestart().comment("Gather all this mod items in their own creative tab instead of putting them in the vanilla ones")
                 .define("mod_creative_tab", false);
         builder.pop();
