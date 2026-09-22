@@ -90,6 +90,7 @@ public class SledEntity extends Entity implements IControllableVehicle {
     private double lerpXRot;
 
     //client one
+    private boolean clientSoundsStarted;
     private boolean inputLeft;
     private boolean inputRight;
     private boolean inputUp;
@@ -110,12 +111,10 @@ public class SledEntity extends Entity implements IControllableVehicle {
         this.blocksBuilding = true;
     }
 
-    @Override
-    public void onAddedToLevel() {
-        super.onAddedToLevel();
-        if (level().isClientSide) {
-            SledSoundInstance.playAt(this);
-        }
+    private void startSoundsOnce() {
+        if (this.clientSoundsStarted) return;
+        this.clientSoundsStarted = true;
+        SledSoundInstance.playAt(this);
     }
 
     @Override
@@ -137,7 +136,7 @@ public class SledEntity extends Entity implements IControllableVehicle {
         if (this.getSeatType() != null) {
             tag.putInt("Seat", this.getSeatType().getId());
         }
-        if (this.sledPuller != null) {
+        if (this.hasPuller()) {
             tag.putByte("PullerIndex", (byte) getPullerIndex());
         }
     }
@@ -284,7 +283,6 @@ public class SledEntity extends Entity implements IControllableVehicle {
         return this.entityData.get(DATA_ADDITIONAL_Y);
     }
 
-    @Nullable
     public void setDataAdditionalY(float additionalY) {
         this.entityData.set(DATA_ADDITIONAL_Y, additionalY);
     }
@@ -322,7 +320,7 @@ public class SledEntity extends Entity implements IControllableVehicle {
     public AABB pullerAABB = new AABB(0.0D, 0.0D, 0.0D, 0.0D, 0.0D, 0.0D);
     private final EntityDimensions pullerDimensions = new EntityDimensions(
             0.8f, 2.1f,
-            2.1f * 0.5f, // Moved from ContainerHolderEntity to here
+            2.1f * 0.5f,
             EntityAttachments.createDefault(0.8f, 2.1f),
             false
     );
@@ -416,35 +414,31 @@ public class SledEntity extends Entity implements IControllableVehicle {
             this.setBoundingBox(this.makeBoundingBox());
         }
 
-        //wolf stuff
+        this.movePullerAlong(wantedPosIncrement);
+    }
 
-        //this is a mess. hacks everywhere
+    //this is a mess. hacks everywhere
+    private void movePullerAlong(Vec3 wantedPosIncrement) {
         this.prevPullerPos = this.pullerPos;
+        if (!this.hasPuller()) return;
 
-        //so wolf can climb up
+        this.pullerAABB = this.resetPullerAABB();
 
-        if (this.hasPuller()) {
-            this.pullerAABB = this.pullerDimensions.makeBoundingBox(this.position().add(0, 0, 0));
+        //this is extremely inefficent
+        Vec3 wantedPullerPos = this.calculateSlopePosition(wantedPosIncrement.add(this.getLookAngle().scale(2)), this.pullerAABB,
+                this::resetPullerAABB, -1.25f);
 
-            //this is extremely inefficent
+        //at most half a block increment is allowed
+        double pxInc = Mth.clamp(wantedPullerPos.x - prevPullerPos.x, -0.75, 0.75);
+        double pyInc;
+        //only slows when going lower than the sled itself. idk why but it overshoots up otherwise and this fixes it
+        if (wantedPullerPos.y < 0 && wantedPullerPos.y < prevPullerPos.y) {
+            pyInc = Mth.clamp(wantedPullerPos.y - prevPullerPos.y, -0.15, 1);
+        } else pyInc = wantedPullerPos.y - prevPullerPos.y;
+        double pzInc = Mth.clamp(wantedPullerPos.z - prevPullerPos.z, -0.75, 0.75);
+        this.pullerPos = prevPullerPos.add(pxInc, pyInc, pzInc);
 
-            Vec3 wantedPullerPos = this.calculateSlopePosition(wantedPosIncrement.add(this.getLookAngle().scale(2)), this.pullerAABB,
-                    this::resetPullerAABB, -1.25f);
-
-            //at most half a block increment is allowed
-            double pxInc = Mth.clamp(wantedPullerPos.x - prevPullerPos.x, -0.75, 0.75);
-            double pyInc;
-            //only slows when going lower than the sled itself. idk why but it overshoots up otherwise and this fixes it
-            if (wantedPullerPos.y < 0 && wantedPullerPos.y < prevPullerPos.y) {
-                pyInc = Mth.clamp(wantedPullerPos.y - prevPullerPos.y, -0.15, 1);
-            } else pyInc = wantedPullerPos.y - prevPullerPos.y;
-            double pzInc = Mth.clamp(wantedPullerPos.z - prevPullerPos.z, -0.75, 0.75);
-            this.pullerPos = prevPullerPos.add(pxInc, pyInc, pzInc);
-
-            this.pullerAABB = this.pullerDimensions.makeBoundingBox(this.position().add(this.pullerPos));
-        }
-
-        //end wolf stuff
+        this.pullerAABB = this.pullerDimensions.makeBoundingBox(this.position().add(this.pullerPos));
     }
 
     //modified collide method to take into account puller AABB
@@ -462,6 +456,7 @@ public class SledEntity extends Entity implements IControllableVehicle {
             }
         }
 
+        if (level.isClientSide) this.startSoundsOnce();
         if (this.chest != null && chest.isRemoved()) this.chest = null;
         this.updatePuller();
 
@@ -484,38 +479,16 @@ public class SledEntity extends Entity implements IControllableVehicle {
         super.tick();
         this.tickLerp();
 
-        Vec3 movement = this.getDeltaMovement();
-
-
         //decrese step height with low speed
         // this.maxUpStep = (float) Mth.clamp(speed * 8 + this.additionalY * 1, 0.5, 1);
-        this.boost = false;
-        //slope deceleration/ acceleration
-        //check if on next pos is down or up and if has block relatively near below (ie on ground but with more leeway)
-        if (this.projectedPos.y != 0 && this.onGround()) {
-            double k = Mth.clamp(this.projectedPos.y, -1, 1);
-            if (k > 0) {
-                //decelerate uphill if doesnt have wolf
-                if (!this.hasPuller())
-                    this.setDeltaMovement(movement.scale(1 + -0.06 * k));
-            } else {
-                //boost downhill
-                this.boost = true;
-                //gives downward velocity to keep on the slope
-                this.setDeltaMovement(movement.add(movement.normalize().scale(k * -0.01f)).add(0, -0.2, 0));
-            }
-        }
+        this.applySlopeBoost();
 
         boolean controlledByLocalInstance = this.isControlledByLocalInstance();
-        //local player controlling code
-
         if (controlledByLocalInstance) {
-
             this.applyFriction();
             if (level.isClientSide) {
                 this.controlSled();
             }
-
         } else {
             this.setDeltaMovement(Vec3.ZERO);
         }
@@ -524,63 +497,71 @@ public class SledEntity extends Entity implements IControllableVehicle {
 
         this.checkInsideBlocks();
 
-        //interact with nearby entities and adds passengers
-
-        List<Entity> list = level.getEntities(this, this.getBoundingBox().inflate(0.15F, 0.01F, 0.15F),
-                EntitySelector.pushableBy(this));
-
-        if (!list.isEmpty()) {
-            boolean notLocalPlayerControlled = !level.isClientSide && !(this.getControllingPassenger() instanceof Player);
-
-            for (Entity entity : list) {
-                if (!entity.hasPassenger(this)) {
-                    if (notLocalPlayerControlled && !entity.isPassenger() &&
-                            entity.getBbWidth() < this.getBbWidth() &&
-                            entity instanceof LivingEntity &&
-                            !(entity instanceof WaterAnimal) &&
-                            !(entity instanceof Player) &&
-                            ((this.hasPuller() && this.canAddPassenger(entity)) || this.getPassengers().size() < 2)) {
-
-                        entity.startRiding(this);
-                    } else {
-                        this.push(entity);
-                    }
-                }
-            }
-        }
-
-
-        //spawn particles
+        this.pickUpOrPushNearbyEntities();
 
         if (level.isClientSide) {
-
-            // if it's controlled by local player, use current movement.
-            // otherwise, send a packet to server which will update all other clients to have syncedDeltaMovement
-            if (controlledByLocalInstance) {
-                movement = this.getDeltaMovement();
-                double horizontalSpeed = movement.x * movement.x + movement.z * movement.z;
-                if (horizontalSpeed > 0.001) {
-                    // updates same synced data also on client cause u never know
-                    this.setSyncedMovement(movement);
-                    // send client movement to other clients
-                    NetworkHelper.sendToServer(new ServerBoundUpdateSledStateMessage(movement));
-                    this.spawnTrailParticles(movement, horizontalSpeed);
-                }
-            } else {
-                movement = this.getSyncedMovement();
-                double horizontalSpeed = movement.x * movement.x + movement.z * movement.z;
-                if (horizontalSpeed > 0.001) {
-                    this.spawnTrailParticles(movement, horizontalSpeed);
-                    // reset every tick (this might break)
-                    // this.setSyncedMovement(Vec3.ZERO);
-                }
-            }
-        } else {
+            this.syncMovementAndSpawnTrail(controlledByLocalInstance);
+        } else if (!controlledByLocalInstance) {
             //resets synced movement
-            if (!controlledByLocalInstance) {
-                if (this.getSyncedMovement() != Vec3.ZERO) this.setSyncedMovement(Vec3.ZERO);
+            if (this.getSyncedMovement() != Vec3.ZERO) this.setSyncedMovement(Vec3.ZERO);
+        }
+    }
+
+    //slope deceleration/ acceleration
+    //check if on next pos is down or up and if has block relatively near below (ie on ground but with more leeway)
+    private void applySlopeBoost() {
+        this.boost = false;
+        if (this.projectedPos.y == 0 || !this.onGround()) return;
+        Vec3 movement = this.getDeltaMovement();
+        double k = Mth.clamp(this.projectedPos.y, -1, 1);
+        if (k > 0) {
+            //decelerate uphill if doesnt have wolf
+            if (!this.hasPuller())
+                this.setDeltaMovement(movement.scale(1 + -0.06 * k));
+        } else {
+            //boost downhill
+            this.boost = true;
+            //gives downward velocity to keep on the slope
+            this.setDeltaMovement(movement.add(movement.normalize().scale(k * -0.01f)).add(0, -0.2, 0));
+        }
+    }
+
+    //interact with nearby entities and adds passengers
+    private void pickUpOrPushNearbyEntities() {
+        Level level = this.level();
+        List<Entity> list = level.getEntities(this, this.getBoundingBox().inflate(0.15F, 0.01F, 0.15F),
+                EntitySelector.pushableBy(this));
+        if (list.isEmpty()) return;
+
+        boolean notLocalPlayerControlled = !level.isClientSide && !(this.getControllingPassenger() instanceof Player);
+        for (Entity entity : list) {
+            if (entity.hasPassenger(this)) continue;
+            boolean canBoard = notLocalPlayerControlled && !entity.isPassenger() &&
+                    entity.getBbWidth() < this.getBbWidth() &&
+                    entity instanceof LivingEntity &&
+                    !(entity instanceof WaterAnimal) &&
+                    !(entity instanceof Player) &&
+                    ((this.hasPuller() && this.canAddPassenger(entity)) || this.getPassengers().size() < 2);
+            if (canBoard) {
+                entity.startRiding(this);
+            } else {
+                this.push(entity);
             }
         }
+    }
+
+    // if it's controlled by local player, use current movement.
+    // otherwise, send a packet to server which will update all other clients to have syncedDeltaMovement
+    private void syncMovementAndSpawnTrail(boolean controlledByLocalInstance) {
+        Vec3 movement = controlledByLocalInstance ? this.getDeltaMovement() : this.getSyncedMovement();
+        double horizontalSpeed = movement.x * movement.x + movement.z * movement.z;
+        if (horizontalSpeed <= 0.001) return;
+        if (controlledByLocalInstance) {
+            // updates same synced data also on client cause u never know
+            this.setSyncedMovement(movement);
+            NetworkHelper.sendToServer(new ServerBoundUpdateSledStateMessage(movement));
+        }
+        this.spawnTrailParticles(movement, horizontalSpeed);
     }
 
     //hardcoded to ignore powder snow
@@ -617,65 +598,38 @@ public class SledEntity extends Entity implements IControllableVehicle {
 
 
     private void spawnTrailParticles(Vec3 movement, double horizontalSpeed) {
-        if (this.groundStatus.onSnow() && this.onGround()) {
-            float xRot = this.getXRot();
-            float yRot = this.getYRot();
-            Vec3 left = null;
-            Vec3 right = null;
-            Level level = level();
-            if (this.random.nextFloat() * 0.16f < horizontalSpeed) {
-                float up = (float) Math.min(horizontalSpeed * 0.6, 0.3);
-                Vec3 a = this.calculateViewVector(xRot, yRot + 24);
-                Vec3 b = this.calculateViewVector(xRot, yRot - 24);
-                left = a.scale(-1f).add(this.position());
-                right = b.scale(-1f).add(this.position());
+        if (!this.groundStatus.onSnow() || !this.onGround()) return;
+        Level level = level();
+        float up = (float) Math.min(horizontalSpeed * 0.6, 0.3);
 
-                this.spawnSnowFlakeParticle(level, left,
+        boolean spawnedRunnerTrails = this.random.nextFloat() * 0.16f < horizontalSpeed;
+        if (spawnedRunnerTrails) {
+            for (Vec3 runner : List.of(this.runnerPosition(24), this.runnerPosition(-24))) {
+                this.spawnSnowFlakeParticle(level, runner,
                         Mth.randomBetween(random, -1.0F, 1.0F) * 0.083,
                         0.015 + random.nextFloat() * 0.1f + up,
                         Mth.randomBetween(random, -1.0F, 1.0F) * 0.083);
-
-                this.spawnSnowFlakeParticle(level, right,
-                        Mth.randomBetween(random, -1.0F, 1.0F) * 0.083,
-                        0.015 + random.nextFloat() * 0.1f + up,
-                        Mth.randomBetween(random, -1.0F, 1.0F) * 0.083);
-
-            }
-            if (Math.abs(xRot) < 0.01) {
-                Vec3 v = new Vec3(0, 0, 1);
-                v = v.yRot((float) (-yRot / 180 * Math.PI));
-
-                double cross = v.cross(new Vec3(movement.x, 0, movement.z).normalize()).y;
-                //more particles!
-                for (int j = 0; j < 2; j++) {
-                    if (random.nextFloat() < (cross * cross) - 0.1) {
-                        Vec3 forward = this.calculateViewVector(xRot, yRot);
-                        float up = (float) Math.min(horizontalSpeed * 0.6, 0.3);
-                        if (cross > 0) {
-                            if (left == null) {
-                                Vec3 a = this.calculateViewVector(xRot, yRot + 24);
-                                left = a.scale(-1f).add(this.position());
-                                Vec3 p = left.add(forward.scale(random.nextFloat() * 1.85f));
-                                this.spawnSnowFlakeParticle(level, p,
-                                        movement.x * 0.75 + forward.x * 0.25,
-                                        movement.y + 0.017 + up,
-                                        movement.z * 0.75 + forward.z * 0.25);
-                            }
-                        } else {
-                            if (right == null) {
-                                Vec3 b = this.calculateViewVector(xRot, yRot - 24);
-                                right = b.scale(-1f).add(this.position());
-                                Vec3 p = right.add(forward.scale(random.nextFloat() * 1.85f));
-                                this.spawnSnowFlakeParticle(level, p,
-                                        movement.x * 0.75 + forward.x * 0.25,
-                                        movement.y + 0.017 + up,
-                                        movement.z * 0.75 + forward.z * 0.25);
-                            }
-                        }
-                    }
-                }
             }
         }
+
+        boolean onFlatGround = Math.abs(this.getXRot()) < 0.01;
+        if (onFlatGround && !spawnedRunnerTrails) {
+            double sideways = this.forwardDirection().cross(new Vec3(movement.x, 0, movement.z).normalize()).y;
+            double driftChance = sideways * sideways - 0.1;
+            if (random.nextFloat() < driftChance || random.nextFloat() < driftChance) {
+                Vec3 forward = this.calculateViewVector(this.getXRot(), this.getYRot());
+                Vec3 outerRunner = this.runnerPosition(sideways > 0 ? 24 : -24);
+                Vec3 p = outerRunner.add(forward.scale(random.nextFloat() * 1.85f));
+                this.spawnSnowFlakeParticle(level, p,
+                        movement.x * 0.75 + forward.x * 0.25,
+                        movement.y + 0.017 + up,
+                        movement.z * 0.75 + forward.z * 0.25);
+            }
+        }
+    }
+
+    private Vec3 runnerPosition(float yawOffset) {
+        return this.position().subtract(this.calculateViewVector(this.getXRot(), this.getYRot() + yawOffset));
     }
 
     public void spawnSnowFlakeParticle(Level level, Vec3 pos, double dx, double dy, double dz) {
@@ -814,10 +768,7 @@ public class SledEntity extends Entity implements IControllableVehicle {
             //max friction decrement cause by misaligned speed vector
             double inc = 0.825;
             if (this.inputUp || this.inputDown || movement.lengthSqr() > 0.001) {
-                Vec3 v = new Vec3(0, 0, 1);
-                v = v.yRot((float) ((-this.getYRot()) / 180 * Math.PI));
-
-                double dot = v.dot(new Vec3(movement.x, 0, movement.z).normalize());
+                double dot = this.forwardDirection().dot(new Vec3(movement.x, 0, movement.z).normalize());
                 inc = Mth.clamp(((dot + 3) / 4f) + 0.005, inc, 1);
             }
             //this is only visual
@@ -836,35 +787,22 @@ public class SledEntity extends Entity implements IControllableVehicle {
             float powah = 0.0F;
             Vec3 movement = this.getDeltaMovement();
 
-            boolean canSteer = !(this.inputRight && this.inputLeft) && this.inputUp;
+            boolean canSteer = !(this.inputRight && this.inputLeft) && this.inputUp && this.groundStatus.touchingGround();
             boolean hasWolf = this.hasPuller();
             final double steerFactor = hasWolf ? CommonConfigs.STEER_FACTOR_WOLF.get() : CommonConfigs.STEER_FACTOR.get();
+            double alignment = canSteer ? this.forwardDirection().dot(movement.normalize()) : 0;
 
             if (this.inputLeft) {
                 --this.deltaRotation;
-                //crappy steering
-                if (this.groundStatus.touchingGround() && canSteer) {
-                    Vec3 v = new Vec3(0, 0, 1);
-                    v = v.yRot((float) ((-this.getYRot()) / 180 * Math.PI));
-
-                    double dot = v.dot(movement.normalize());
-                    if (dot > 0) {
-                        this.setDeltaMovement(movement.yRot((float) (dot * steerFactor)));
-                    }
+                if (alignment > 0) {
+                    this.setDeltaMovement(movement.yRot((float) (alignment * steerFactor)));
                 }
             }
 
             if (this.inputRight) {
                 ++this.deltaRotation;
-                //steering
-                if (this.groundStatus.touchingGround() && canSteer) {
-                    Vec3 v = new Vec3(0, 0, 1);
-                    v = v.yRot((float) ((-this.getYRot()) / 180 * Math.PI));
-
-                    double dot = v.dot(movement.normalize());
-                    if (dot > 0.8) {
-                        this.setDeltaMovement(movement.yRot((float) (-dot * steerFactor)));
-                    }
+                if (alignment > 0.8) {
+                    this.setDeltaMovement(movement.yRot((float) (-alignment * steerFactor)));
                 }
             }
 
@@ -887,12 +825,12 @@ public class SledEntity extends Entity implements IControllableVehicle {
             }
 
 
-            this.setDeltaMovement(this.getDeltaMovement().add(
-                    Mth.sin(-this.getYRot() * ((float) Math.PI / 180F)) * powah,
-                    0.0D,
-                    Mth.cos(this.getYRot() * ((float) Math.PI / 180F)) * powah));
-
+            this.setDeltaMovement(this.getDeltaMovement().add(this.forwardDirection().scale(powah)));
         }
+    }
+
+    private Vec3 forwardDirection() {
+        return Vec3.directionFromRotation(0, this.getYRot());
     }
 
     protected void clampRotation(Entity entity) {
@@ -1126,39 +1064,20 @@ public class SledEntity extends Entity implements IControllableVehicle {
         } else {
             float zPos = 0.0F;
             float yPos = 0.45f + this.getAdditionalY() + (this.getSeatType() != null ? 0.0615f : 0);
+            float slope = Mth.sin(this.getXRot() * Mth.DEG_TO_RAD);
 
-            boolean isMoreThanOneOnBoard;
             if (this.isChestEntity(passenger)) {
-                //passenger.yRotO = this.yRotO;
                 zPos = -0.4f;
-                float cos = Mth.sin((float) (this.getXRot() * Math.PI / 180f));
-                yPos -= cos * zPos;
-
-            } else {
-
-                //this is an utter mess
-                isMoreThanOneOnBoard = this.getPassengers().size() > this.getMaxPassengersSize() - 1;
-                if (isMoreThanOneOnBoard) {
-                    int i = 0;
-                    for (Entity p : this.getPassengers()) {
-                        if (p == passenger) break;
-                        if (!isMyPuller(p) && !isChestEntity(p)) i++;
-                    }
-
-                    float cos = Mth.sin((float) (this.getXRot() * Math.PI / 180f));
-                    if (i == 0) {
-                        zPos = 0.1F;
-                    } else {
-                        zPos = -0.8F;
-                    }
-                    yPos -= cos * zPos;
+                yPos -= slope * zPos;
+            } else if (this.allSeatsTaken()) {
+                int ridersInFront = 0;
+                for (Entity p : this.getPassengers()) {
+                    if (p == passenger) break;
+                    if (!isMyPuller(p) && !isChestEntity(p)) ridersInFront++;
                 }
-
-                if (passenger instanceof Animal) {
-                    if (isMoreThanOneOnBoard) {
-                        zPos += 0.2F;
-                    }
-                }
+                zPos = ridersInFront == 0 ? 0.1F : -0.8F;
+                yPos -= slope * zPos;
+                if (passenger instanceof Animal) zPos += 0.2F;
             }
 
             return (new Vec3(0, yPos, zPos)).yRot(-this.getYRot() * Mth.DEG_TO_RAD);
@@ -1186,25 +1105,20 @@ public class SledEntity extends Entity implements IControllableVehicle {
 
                 this.updatePullerAnimations();
             } else {
-                boolean isMoreThanOneOnBoard = false;
                 if (this.isChestEntity(passenger)) {
-
                     passenger.xRotO = this.xRotO;
                     passenger.setXRot(this.getXRot());
                     passenger.yRotO = this.yRotO;
                     passenger.setYRot(this.getYRot());
-
-                    //passenger.yRotO = this.yRotO;
                 } else {
-                    //this is an utter mess
-                    isMoreThanOneOnBoard = this.getPassengers().size() > this.getMaxPassengersSize() - 1;
-
                     passenger.setYRot(passenger.getYRot() + this.deltaRotation);
                     passenger.setYHeadRot(passenger.getYHeadRot() + this.deltaRotation);
                     this.clampRotation(passenger);
                 }
 
-                if (passenger instanceof Animal animal && isMoreThanOneOnBoard) {
+                boolean animalSharesSeats = passenger instanceof Animal && this.allSeatsTaken();
+                if (animalSharesSeats) {
+                    Animal animal = (Animal) passenger;
                     int yRot = passenger.getId() % 2 == 0 ? 90 : 270;
                     passenger.setYBodyRot(animal.yBodyRot + yRot);
                     passenger.setYHeadRot(passenger.getYHeadRot() + yRot);
@@ -1439,6 +1353,10 @@ public class SledEntity extends Entity implements IControllableVehicle {
 
     private int getMaxPassengersSize() {
         return this.hasPuller() ? 3 : 2;
+    }
+
+    private boolean allSeatsTaken() {
+        return this.getPassengers().size() >= this.getMaxPassengersSize();
     }
 
     //precaution so it's always immune to powder snow if the mixin fails to apply

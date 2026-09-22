@@ -138,7 +138,6 @@ public class MongoEntity extends GingyEntity implements PlayerRideableJumping {
     public void aiStep() {
         super.aiStep();
         if (this.isAlive() && this.horizontalCollision) {
-            //when ridden the rider's client controls movement but the server still gets horizontalCollision from the vehicle move packet
             boolean brokeLeaves = false;
             if (!this.level().isClientSide) {
                 AABB aabb = this.getBoundingBox().inflate(1);

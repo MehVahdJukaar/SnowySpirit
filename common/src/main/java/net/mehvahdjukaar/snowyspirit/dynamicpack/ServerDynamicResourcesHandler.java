@@ -1,7 +1,9 @@
 package net.mehvahdjukaar.snowyspirit.dynamicpack;
 
 import net.mehvahdjukaar.moonlight.api.platform.PlatHelper;
+import net.mehvahdjukaar.moonlight.api.resources.ResType;
 import net.mehvahdjukaar.moonlight.api.resources.SimpleTagBuilder;
+import net.mehvahdjukaar.moonlight.api.resources.StaticResource;
 import net.mehvahdjukaar.moonlight.api.resources.pack.DynamicServerResourceProvider;
 import net.mehvahdjukaar.moonlight.api.resources.pack.PackGenerationStrategy;
 import net.mehvahdjukaar.moonlight.api.resources.pack.ResourceGenTask;
@@ -43,6 +45,8 @@ public class ServerDynamicResourcesHandler extends DynamicServerResourceProvider
         sink.addTag(builder, Registries.ITEM);
 
         ResourceLocation templateId = SnowySpirit.res("sled_oak");
+        StaticResource oakUnlockAdvancement = StaticResource.getOrThrow(resourceManager,
+                ResType.ADVANCEMENTS.getPath(SnowySpirit.res("recipe/sled_oak")));
 
         ModRegistry.SLED_ITEMS.forEach((w, b) -> {
             if (w != VanillaWoodTypes.OAK) {
@@ -50,6 +54,7 @@ public class ServerDynamicResourcesHandler extends DynamicServerResourceProvider
                 //sleds stay gated behind the sleds config just like the oak one
                 sink.addBlockTypeSwapRecipe(resourceManager, templateId, VanillaWoodTypes.OAK, w,
                         SnowySpirit.res("sled" + "_" + w.getTypeName()));
+                sink.addSimilarJsonResource(resourceManager, oakUnlockAdvancement, "sled_oak", "sled_" + w.getTypeName());
             }
         });
     }
