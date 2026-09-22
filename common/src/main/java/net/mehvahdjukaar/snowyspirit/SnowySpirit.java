@@ -18,8 +18,8 @@ import net.minecraft.world.level.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.Calendar;
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.MonthDay;
 
 
 /**
@@ -91,67 +91,40 @@ public class SnowySpirit {
     }
 
 
-    public static boolean IS_CHRISTMAS_REAL_TIME;
-
     public static boolean USES_SEASON_MOD;
 
+    private static LocalDate seasonCheckedOn;
+    private static boolean inSeasonOnThatDay;
+
     public static void onConfigReload() {
-
-        //refresh date after configs are loaded
-        int startM = CommonConfigs.START_MONTH.get() - 1;
-        int startD = CommonConfigs.START_DAY.get();
-
-        int endM = CommonConfigs.END_MONTH.get() - 1;
-        int endD = CommonConfigs.END_DAY.get();
-
-        boolean inv = startM > endM;
-
-        //pain
-        Date start = new Date(0, startM, startD);
-        Date end = new Date((inv ? 1 : 0), endM, endD);
-
-        Date today = new Date(0, Calendar.getInstance().get(Calendar.MONTH), Calendar.getInstance().get(Calendar.DATE));
-        if (today.before(start) && inv) today = new Date(1, today.getMonth(), today.getDate());
-        //TODO: rewrite properly
-        //if seasonal use pumpkin placement time window
-        IS_CHRISTMAS_REAL_TIME = after(today, start) && before(today, end);
         USES_SEASON_MOD = SEASON_MOD_INSTALLED && CommonConfigs.SEASONS_MOD_COMPAT.get();
-
+        seasonCheckedOn = null;
         if (USES_SEASON_MOD) {
             SeasonModCompat.refresh();
         }
-
     }
 
-    public static boolean before(Date obj, Date that) {
-        int objYear = obj.getYear();
-        int thatYear = that.getYear();
-        int objMonth = obj.getMonth();
-        int thatMonth = that.getMonth();
-        int objDay = obj.getDate();
-        int thatDay = that.getDate();
-
-        if (objYear < thatYear) {
-            return true;
-        } else if (objYear > thatYear) {
-            return false;
-        } else {
-            if (objMonth < thatMonth) {
-                return true;
-            } else if (objMonth > thatMonth) {
-                return false;
-            } else {
-                return objDay < thatDay;
-            }
+    public static boolean isChristmasRealTime() {
+        LocalDate today = LocalDate.now();
+        if (!today.equals(seasonCheckedOn)) {
+            seasonCheckedOn = today;
+            inSeasonOnThatDay = isInSeason(MonthDay.from(today));
         }
+        return inSeasonOnThatDay;
     }
 
-    public static boolean after(Date obj, Date that) {
-        return !before(obj, that) && !obj.equals(that);
+    private static boolean isInSeason(MonthDay day) {
+        MonthDay start = CommonConfigs.SEASON_START.get();
+        MonthDay end = CommonConfigs.SEASON_END.get();
+        boolean afterStart = !day.isBefore(start);
+        boolean beforeEnd = !day.isAfter(end);
+        boolean wrapsAroundNewYear = start.isAfter(end);
+        if (wrapsAroundNewYear) return afterStart || beforeEnd;
+        return afterStart && beforeEnd;
     }
 
     public static boolean isChristmasSeason(Level level) {
         if (USES_SEASON_MOD) return SeasonModCompat.isWinter(level);
-        return IS_CHRISTMAS_REAL_TIME;
+        return isChristmasRealTime();
     }
 }
