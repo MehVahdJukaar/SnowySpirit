@@ -118,14 +118,6 @@ public class ClientRegistry {
             }
             return -1;
         }
-
-        public static class NoParticle implements BlockColor {
-            @Override
-            public int getColor(BlockState state, @Nullable BlockAndTintGetter world, @Nullable BlockPos pos, int tint) {
-                if (tint == 0) return -1;
-                return col(state, world, pos, tint);
-            }
-        }
     }
 
 

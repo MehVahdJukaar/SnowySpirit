@@ -26,27 +26,20 @@ public class WinterVillagerAI {
 
     public static void onVillagerBrainInitialize(IVillagerBrainEvent event) {
         Villager villager = event.getVillager();
-        if (SnowySpirit.isChristmasSeason(villager.level())) {
-            if (villager.isBaby()) {
-                var t = villager.getVillagerData().getType();
-                if (t == VillagerType.SNOW || t == VillagerType.TAIGA) {
-                    event.addTaskToActivity(Activity.PLAY, Pair.of(4, new ThrowSnowballsTask(10)));
-                }
-            } else {
-                //event.addOrReplaceActivity(Activity.IDLE, getHalloweenIdlePackage(event.getVillager().getVillagerData().getProfession(), 0.5F));
-                if (PRESENTS_ENABLED) {
-                    event.addTaskToActivity(Activity.MEET, Pair.of(3, new PlacePresentTask(0.5f)));
-                }
-                if (CommonConfigs.WREATH.get()) {
-                    addPlaceWreath(event);
-                }
-
+        if (villager.isBaby()) {
+            var t = villager.getVillagerData().getType();
+            if (t == VillagerType.SNOW || t == VillagerType.TAIGA) {
+                event.addTaskToActivity(Activity.PLAY, Pair.of(4, new ThrowSnowballsTask(10)));
             }
         } else {
-            if (!villager.isBaby()) {
-                addRemoveWreath(event);
-
+            //event.addOrReplaceActivity(Activity.IDLE, getHalloweenIdlePackage(event.getVillager().getVillagerData().getProfession(), 0.5F));
+            if (PRESENTS_ENABLED) {
+                event.addTaskToActivity(Activity.MEET, Pair.of(3, new PlacePresentTask(0.5f)));
             }
+            if (CommonConfigs.WREATH.get()) {
+                addPlaceWreath(event);
+            }
+            addRemoveWreath(event);
         }
     }
 

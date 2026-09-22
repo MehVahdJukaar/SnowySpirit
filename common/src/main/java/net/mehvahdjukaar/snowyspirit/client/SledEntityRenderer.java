@@ -79,13 +79,6 @@ public class SledEntityRenderer extends EntityRenderer<SledEntity> {
             poseStack.mulPose(Axis.ZP.rotationDegrees(zRot));
         }
 
-        poseStack.pushPose();
-        poseStack.translate(-0, 0.125, 0.4);
-        poseStack.scale(0.75F, 0.75F, 0.75F);
-        poseStack.translate(-0.5, 0, -0.5);
-
-        poseStack.popPose();
-
         ResourceLocation resourcelocation = this.getTextureLocation(sled);
 
         poseStack.scale(-1.0F, -1.0F, 1.0F);
@@ -122,7 +115,6 @@ public class SledEntityRenderer extends EntityRenderer<SledEntity> {
         return this.textures.get(sled.getWoodType());
     }
 
-    public static final WoodType BAMBOO = WoodTypeRegistry.INSTANCE.get(ResourceLocation.tryParse("bamboo"));
 
     public SledModel<SledEntity> getModel(SledEntity sled){
         return sled.getWoodType().isBambooLike() ? modelBamboo : model;
@@ -261,10 +253,6 @@ public class SledEntityRenderer extends EntityRenderer<SledEntity> {
                 }
 
                 poseStack.popPose();
-
-                if (pBuffer instanceof MultiBufferSource.BufferSource bu) {
-                    bu.endBatch();
-                }
             }
         }
     }

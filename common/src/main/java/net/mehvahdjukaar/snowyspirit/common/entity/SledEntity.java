@@ -108,7 +108,11 @@ public class SledEntity extends Entity implements IControllableVehicle {
     public SledEntity(EntityType<? extends SledEntity> entityType, Level level) {
         super(entityType, level);
         this.blocksBuilding = true;
+    }
 
+    @Override
+    public void onAddedToLevel() {
+        super.onAddedToLevel();
         if (level().isClientSide) {
             SledSoundInstance.playAt(this);
         }
@@ -799,12 +803,7 @@ public class SledEntity extends Entity implements IControllableVehicle {
         switch (this.groundStatus) {
             case IN_AIR -> invFriction = 0.9F;
             case IN_WATER -> invFriction = 0.45f;
-            case ON_SNOW, ON_SNOW_LAYER, ON_LAND -> {
-                invFriction = this.landFriction;
-                if (this.getControllingPassenger() instanceof Player) {
-                    this.landFriction /= 2.0F;
-                }
-            }
+            case ON_SNOW, ON_SNOW_LAYER, ON_LAND -> invFriction = this.landFriction;
         }
 
 

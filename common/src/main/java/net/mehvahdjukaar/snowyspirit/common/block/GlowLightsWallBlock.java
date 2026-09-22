@@ -55,7 +55,11 @@ public class GlowLightsWallBlock extends MultifaceBlock implements IColored, IWa
 
     @Override
     protected boolean canBeReplaced(BlockState state, BlockPlaceContext context) {
-        return context.getItemInHand().is(this.asItem()) && super.canBeReplaced(state, context);
+        if (!context.getItemInHand().is(this.asItem())) return false;
+        for (Direction dir : Direction.Plane.HORIZONTAL) {
+            if (!hasFace(state, dir)) return true;
+        }
+        return false;
     }
 
     @Nullable

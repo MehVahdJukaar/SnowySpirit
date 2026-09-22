@@ -30,6 +30,9 @@ public class ModSetup {
         for (var b : ModRegistry.GLOW_LIGHTS_BLOCKS.values()) {
             RegHelper.registerBlockFlammability(b.get(), 30, 60);
         }
+        for (var b : ModRegistry.GLOW_LIGHTS_WALL_BLOCKS.values()) {
+            RegHelper.registerBlockFlammability(b.get(), 30, 60);
+        }
         RegHelper.registerBlockFlammability(ModRegistry.GINGER_WILD.get(), 60, 100);
     }
 

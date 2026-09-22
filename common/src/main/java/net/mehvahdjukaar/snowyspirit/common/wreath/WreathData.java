@@ -15,6 +15,7 @@ import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.LevelEvent;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -36,7 +37,12 @@ public class WreathData {
 
     private final Set<BlockPos> wreathBlocks = new HashSet<>();
 
+    @Nullable
     public static WreathData getAt(Level level, BlockPos pos) {
+        return ModRegistry.WREATH_CHUNK_DATA.getOrNull(level.getChunkAt(pos));
+    }
+
+    public static WreathData getOrCreateAt(Level level, BlockPos pos) {
         return ModRegistry.WREATH_CHUNK_DATA.getOrCreate(level.getChunkAt(pos));
     }
 

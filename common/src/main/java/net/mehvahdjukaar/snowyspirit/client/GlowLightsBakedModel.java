@@ -42,7 +42,7 @@ public class GlowLightsBakedModel implements CustomBakedModel {
                 BlockState mimic = extraData.get(GlowLightsBlockTile.MIMIC_KEY);
                 if (mimic != null && !mimic.isAir()) {
                     BakedModel model = blockModelShaper.getBlockModel(mimic);
-                    var qu = model.getQuads(state, side, rand);
+                    var qu = model.getQuads(mimic, side, rand);
                    // BakedQuadBuilder builder = BakedQuadBuilder.create();
                  //   for(var q : qu){
                     //} //TODO: fabric emissive

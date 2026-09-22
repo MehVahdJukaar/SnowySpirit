@@ -17,35 +17,28 @@ import net.minecraft.world.level.chunk.ChunkAccess;
 public class WreathHandler {
 
     public static boolean placeWreathOnDoor(BlockPos pos, Level level) {
-        WreathData wreathData = WreathData.getAt(level, pos);
+        BlockState door = level.getBlockState(pos);
+        if (!(door.getBlock() instanceof DoorBlock)) return false;
 
-        if (wreathData != null) {
-            BlockState door = level.getBlockState(pos);
+        boolean lower = door.getValue(DoorBlock.HALF) == DoubleBlockHalf.LOWER;
+        BlockPos p = lower ? pos.above() : pos;
+        WreathData wreathData = WreathData.getOrCreateAt(level, pos);
+        if (wreathData.hasWreathAt(p)) return false;
 
-            if (door.getBlock() instanceof DoorBlock) {
-                boolean lower = door.getValue(DoorBlock.HALF) == DoubleBlockHalf.LOWER;
-                BlockPos p = lower ? pos.above() : pos;
-                if (!wreathData.hasWreathAt(p)) {
+        if (level instanceof ServerLevel sl) {
+            BlockState state = ModRegistry.WREATH.get().defaultBlockState();
 
-                    if (level instanceof ServerLevel sl) {
-                        BlockState state = ModRegistry.WREATH.get().defaultBlockState();
-
-                        wreathData.setWreath(p, level);
-                        wreathData.markDirtyAndSync(p, sl);
-                        SoundType soundtype = state.getSoundType();
-                        level.playSound(null, p, soundtype.getPlaceSound(), SoundSource.BLOCKS, (soundtype.getVolume() + 1.0F) / 2.0F, soundtype.getPitch() * 0.8F);
-                        //send packet to clients
-
-                    }
-                    return true;
-                }
-            }
+            wreathData.setWreath(p, level);
+            wreathData.markDirtyAndSync(p, sl);
+            SoundType soundtype = state.getSoundType();
+            level.playSound(null, p, soundtype.getPlaceSound(), SoundSource.BLOCKS, (soundtype.getVolume() + 1.0F) / 2.0F, soundtype.getPitch() * 0.8F);
         }
-        return false;
+        return true;
     }
 
 
     public static InteractionResult onRightClickBlock(Player player, Level level, ItemStack stack, BlockPos pos) {
+        if (!player.mayBuild()) return InteractionResult.PASS;
 
         if (stack.is(ModRegistry.WREATH.get().asItem())) {
 

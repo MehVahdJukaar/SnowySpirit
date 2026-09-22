@@ -67,7 +67,7 @@ public abstract class IglooPiecesMixin extends TemplateStructurePiece {
                     MinecraftServer server = level.getServer();
                     if (server == null) return;
                     server.executeIfPossible(() -> {
-                        SledEntity sledEntity = new SledEntity(level, blockPos.getX() + 0.5, blockPos.getY() + 0.5, blockPos.getZ());
+                        SledEntity sledEntity = new SledEntity(level, blockPos.getX() + 0.5, blockPos.getY() + 0.5, blockPos.getZ() + 0.5);
                         Item chest = PlatHelper.isModLoaded("quark") ?
                                 BuiltInRegistries.ITEM.get(ResourceLocation.parse("quark:spruce_chest")) : Items.CHEST;
                         ContainerHolderEntity c = sledEntity.tryAddingChest(chest.getDefaultInstance());

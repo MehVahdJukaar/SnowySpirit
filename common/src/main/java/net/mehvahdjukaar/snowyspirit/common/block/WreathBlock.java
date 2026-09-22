@@ -74,7 +74,7 @@ public class WreathBlock extends HorizontalDirectionalBlock {
     @Override
     public boolean canSurvive(BlockState pState, LevelReader pLevel, BlockPos pPos) {
         BlockPos blockpos = pPos.relative(pState.getValue(FACING).getOpposite());
-        return pLevel.getBlockState(blockpos).isRedstoneConductor(pLevel, pPos);
+        return pLevel.getBlockState(blockpos).isRedstoneConductor(pLevel, blockpos);
     }
 
     @Override

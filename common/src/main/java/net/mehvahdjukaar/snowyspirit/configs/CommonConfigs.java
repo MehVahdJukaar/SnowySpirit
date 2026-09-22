@@ -161,6 +161,7 @@ public class CommonConfigs {
         else if (key.contains("sled")) return SLEDS.get();
         else if (key.contains("gumdrop")) return GUMDROPS.get();
         else if (key.contains("glow_light")) return GLOW_LIGHTS.get();
+        else if (key.contains(ModRegistry.GINGERBREAD_GOLEM_NAME)) return GINGERBREAD_MAN.get();
         else if (key.contains("ginger")) return GINGER.get();
         return SPEC.isFeatureEnabled(key);
     }

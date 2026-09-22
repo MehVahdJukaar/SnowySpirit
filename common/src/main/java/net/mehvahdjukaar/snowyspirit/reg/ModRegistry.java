@@ -41,6 +41,7 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.properties.BlockSetType;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.material.MapColor;
+import net.minecraft.world.level.material.PushReaction;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -238,6 +239,7 @@ public class ModRegistry {
                 .noOcclusion()
                 .instabreak()
                 .ignitedByLava()
+                .pushReaction(PushReaction.DESTROY)
                 .sound(ModSounds.GLOW_LIGHTS)
                 .lightLevel(s -> 6)));
     }
@@ -297,10 +299,6 @@ public class ModRegistry {
 
     public static <T extends Block> Supplier<T> regWithItem(String name, Supplier<T> blockFactory) {
         return RegHelper.registerBlockWithItem(SnowySpirit.res(name), blockFactory);
-    }
-
-    public static <T extends Block> Supplier<T> rewWithItem(String name, Supplier<T> blockSup, Item.Properties properties) {
-        return RegHelper.registerBlockWithItem(SnowySpirit.res(name), blockSup, properties);
     }
 
     public static <T extends Entity> Supplier<EntityType<T>> regEntity(String name, Supplier<EntityType.Builder<T>> builder) {
