@@ -1,6 +1,6 @@
 package net.mehvahdjukaar.snowyspirit.common.items;
 
-import net.mehvahdjukaar.snowyspirit.SnowySpirit;
+import net.mehvahdjukaar.snowyspirit.integration.CompatHandler;
 import net.mehvahdjukaar.snowyspirit.common.block.GlowLightsBlock;
 import net.mehvahdjukaar.snowyspirit.common.block.GlowLightsBlockTile;
 import net.mehvahdjukaar.snowyspirit.integration.supp.SuppCompat;
@@ -55,12 +55,12 @@ public class GlowLightsItem extends BlockItem {
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
         super.appendHoverText(stack, context, tooltip, flag);
-        if (SnowySpirit.SUPPLEMENTARIES_INSTALLED) SuppCompat.addRopeHint(tooltip, flag);
+        if (CompatHandler.SUPPLEMENTARIES) SuppCompat.addRopeHint(tooltip, flag);
     }
 
     @Override
     public InteractionResult useOn(UseOnContext context) {
-        if (SnowySpirit.SUPPLEMENTARIES_INSTALLED && SuppCompat.placeOnRope(context, this.color())) {
+        if (CompatHandler.SUPPLEMENTARIES && SuppCompat.placeOnRope(context, this.color())) {
             Player player = context.getPlayer();
             if (player != null) context.getItemInHand().consume(1, player);
             return InteractionResult.sidedSuccess(context.getLevel().isClientSide);

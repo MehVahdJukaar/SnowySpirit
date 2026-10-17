@@ -9,6 +9,7 @@ import net.mehvahdjukaar.snowyspirit.configs.ClientConfigs;
 import net.mehvahdjukaar.snowyspirit.configs.CommonConfigs;
 import net.mehvahdjukaar.snowyspirit.dynamicpack.ClientDynamicResourcesHandler;
 import net.mehvahdjukaar.snowyspirit.dynamicpack.ServerDynamicResourcesHandler;
+import net.mehvahdjukaar.snowyspirit.integration.CompatHandler;
 import net.mehvahdjukaar.snowyspirit.integration.FDCompat;
 import net.mehvahdjukaar.snowyspirit.integration.SeasonModCompat;
 import net.mehvahdjukaar.snowyspirit.reg.*;
@@ -33,13 +34,6 @@ public class SnowySpirit {
     }
 
     public static final Logger LOGGER = LogManager.getLogger();
-
-    public static final boolean SUPPLEMENTARIES_INSTALLED = PlatHelper.isModLoaded("supplementaries");
-    public static final boolean FARMERSDELIGHT_INSTALLED = PlatHelper.isModLoaded("farmersdelight");
-    public static final boolean SEASON_MOD_INSTALLED = PlatHelper.isModLoaded(PlatHelper.getPlatform().isForge() ? "sereneseasons" : "seasons");
-    public static final boolean BOATLOAD_INSTALLED = PlatHelper.isModLoaded("boatload");
-    public static final boolean POLYTONE_INSTALLED = PlatHelper.isModLoaded("polytone");
-
 
     public static void commonInit() {
 
@@ -67,7 +61,7 @@ public class SnowySpirit {
         ModRegistry.init();
         ModMemoryModules.init();
         ModCreativeTabs.init();
-        if (FARMERSDELIGHT_INSTALLED) FDCompat.init();
+        if (CompatHandler.FARMERS_DELIGHT) FDCompat.init();
 
 
         PlatHelper.addCommonSetup(ModSetup::setup);
@@ -98,7 +92,7 @@ public class SnowySpirit {
     private static boolean inSeasonOnThatDay;
 
     public static void onConfigReload() {
-        USES_SEASON_MOD = SEASON_MOD_INSTALLED && CommonConfigs.SEASONS_MOD_COMPAT.get();
+        USES_SEASON_MOD = CompatHandler.SEASON_MOD && CommonConfigs.SEASONS_MOD_COMPAT.get();
         seasonCheckedOn = null;
         if (USES_SEASON_MOD) {
             SeasonModCompat.refresh();

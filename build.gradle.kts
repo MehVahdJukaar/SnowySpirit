@@ -29,11 +29,10 @@ subprojects {
 
     apply(plugin = "com.possible-triangle.core")
     apply(plugin = "net.mehvahdjukaar.candlelight")
-    apply(plugin = "dev.mixinmcp.decompile")
     apply(plugin = "maven-publish")
 
     dependencies {
-        compileOnly("net.mehvahdjukaar:candlelight:1.2.6")
+        compileOnly("net.mehvahdjukaar:candlelight:1.2.4")
     }
 
 

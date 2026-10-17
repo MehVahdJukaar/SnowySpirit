@@ -16,10 +16,8 @@ dependencies {
     modImplementation("net.mehvahdjukaar:moonlight-neoforge:${moonlight_version}")
     accessTransformers("net.mehvahdjukaar:moonlight-neoforge:${moonlight_version}")
     modCompileOnly("net.mehvahdjukaar:polytone-neoforge:${polytone_version}")
-    // JiJ'd into Moonlight, so not on the dev runtime classpath — add explicitly to avoid missing schema codec class.
     modRuntimeOnly("net.mehvahdjukaar:codecui-neoforge:${codecui_version}")
 
-    // moonlight already JiJs mixinsquared, two copies on the module path blow up modlauncher
     modImplementation("net.mehvahdjukaar:supplementaries-neoforge:${supplementaries_version}") {
         exclude(group = "com.github.bawnorton.mixinsquared")
     }

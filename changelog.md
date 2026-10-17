@@ -1,1 +1,2 @@
-- updated emf hack that prevents emf from making dogs sit while pulling a sled
+- many misc fixes
+- glow lights can be placed on walls and ropes

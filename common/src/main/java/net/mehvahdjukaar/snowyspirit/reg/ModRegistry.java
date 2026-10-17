@@ -1,5 +1,6 @@
 package net.mehvahdjukaar.snowyspirit.reg;
 
+import net.mehvahdjukaar.snowyspirit.integration.CompatHandler;
 import com.google.common.collect.ImmutableMap;
 import net.mehvahdjukaar.moonlight.api.block.ModStairBlock;
 import net.mehvahdjukaar.moonlight.api.misc.IAttachmentType;
@@ -64,7 +65,7 @@ public class ModRegistry {
 
     private static void registerSledItems(Registrator<Item> event) {
         for (WoodType wood : WoodTypeRegistry.INSTANCE) {
-            if (wood.canBurn() || SnowySpirit.BOATLOAD_INSTALLED) {
+            if (wood.canBurn() || CompatHandler.BOATLOAD) {
                 String name = wood.getVariantId(SLED_NAME);
                 SledItem item = new SledItem(wood);
                 event.register(SnowySpirit.res(name), item);
@@ -245,7 +246,7 @@ public class ModRegistry {
     }
 
     public static final Map<DyeColor, Supplier<Block>> ROPED_GLOW_LIGHTS =
-            SnowySpirit.SUPPLEMENTARIES_INSTALLED ? SuppCompat.registerRopedGlowLights() : Map.of();
+            CompatHandler.SUPPLEMENTARIES ? SuppCompat.registerRopedGlowLights() : Map.of();
 
     public static final Map<DyeColor, Supplier<Item>> GLOW_LIGHTS_ITEMS = Util.make(() -> {
         var m = new LinkedHashMap<DyeColor, Supplier<Item>>();

@@ -1,5 +1,6 @@
 package net.mehvahdjukaar.snowyspirit.configs;
 
+import net.mehvahdjukaar.snowyspirit.integration.CompatHandler;
 import net.mehvahdjukaar.moonlight.api.platform.configs.ConfigBuilder;
 import net.mehvahdjukaar.moonlight.api.platform.configs.ConfigType;
 import net.mehvahdjukaar.moonlight.api.platform.configs.ModConfigHolder;
@@ -68,8 +69,8 @@ public class CommonConfigs {
 
         builder.icon("minecraft:oak_leaves").push("season_mod_compat");
         builder.comment("Enables compatibility with Serene Seasons (Forge) or Fabric Seasons (Fabric). Only takes effect if the mod is installed. Will make snowy season only active during certain seasons. Note that this will override previous time window settings");
-        SEASONS_MOD_COMPAT = builder.mainFeature(SnowySpirit.SEASON_MOD_INSTALLED);
-        if (SnowySpirit.SEASON_MOD_INSTALLED) SeasonModCompat.addConfig(builder);
+        SEASONS_MOD_COMPAT = builder.mainFeature(CompatHandler.SEASON_MOD);
+        if (CompatHandler.SEASON_MOD) SeasonModCompat.addConfig(builder);
         builder.pop(2);
 
         builder.icon("minecraft:bundle").push("misc");

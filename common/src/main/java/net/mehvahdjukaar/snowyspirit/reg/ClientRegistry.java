@@ -1,5 +1,6 @@
 package net.mehvahdjukaar.snowyspirit.reg;
 
+import net.mehvahdjukaar.snowyspirit.integration.CompatHandler;
 import net.mehvahdjukaar.moonlight.api.client.model.NestedModelLoader;
 import net.mehvahdjukaar.moonlight.api.platform.ClientHelper;
 import net.mehvahdjukaar.snowyspirit.SnowySpirit;
@@ -39,7 +40,7 @@ public class ClientRegistry {
         ClientHelper.addBlockColorsRegistration(ClientRegistry::registerBlockColors);
         ClientHelper.addParticleRegistration(ClientRegistry::registerParticles);
         SeasonConfigOverlay.register();
-        if (SnowySpirit.POLYTONE_INSTALLED) PolytoneCompat.setupClient();
+        if (CompatHandler.POLYTONE) PolytoneCompat.setupClient();
     }
 
     private static void registerParticles(ClientHelper.ParticleEvent event) {
@@ -87,7 +88,7 @@ public class ClientRegistry {
 
     private static void registerModelLoaders(ClientHelper.ModelLoaderEvent event) {
         event.register(SnowySpirit.res("glow_lights"), new NestedModelLoader("overlay", GlowLightsBakedModel::new));
-        if (SnowySpirit.SUPPLEMENTARIES_INSTALLED) SuppCompat.registerRopeModelLoader(event);
+        if (CompatHandler.SUPPLEMENTARIES) SuppCompat.registerRopeModelLoader(event);
     }
 
     private static void registerBlockColors(ClientHelper.BlockColorEvent event) {

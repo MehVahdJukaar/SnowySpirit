@@ -15,12 +15,9 @@ val codecui_version: String by extra
 dependencies {
     modImplementation("net.mehvahdjukaar:moonlight-fabric:${moonlight_version}")
     modCompileOnly("net.mehvahdjukaar:polytone-fabric:${polytone_version}")
-    // JiJ'd into Moonlight, so not on the dev runtime classpath — add explicitly to avoid missing schema codec class.
     modRuntimeOnly("net.mehvahdjukaar:codecui-fabric:${codecui_version}")
 
     modCompileOnly("net.mehvahdjukaar:supplementaries-fabric:${supplementaries_version}") {
-        // We already provide moonlight explicitly above; Supplementaries' metadata requests
-        // moonlight-fabric with a `fabric` classifier that Loom can't resolve, so drop the transitive copy.
         exclude(group = "net.mehvahdjukaar", module = "moonlight-fabric")
     }
 

@@ -1,8 +1,8 @@
 package net.mehvahdjukaar.snowyspirit.common.entity;
 
+import net.mehvahdjukaar.snowyspirit.integration.CompatHandler;
 import net.mehvahdjukaar.candlelight.api.VirtualOverride;
 import net.mehvahdjukaar.moonlight.api.platform.PlatHelper;
-import net.mehvahdjukaar.snowyspirit.SnowySpirit;
 import net.mehvahdjukaar.snowyspirit.integration.supp.SuppCompat;
 import net.mehvahdjukaar.snowyspirit.reg.ModRegistry;
 import net.mehvahdjukaar.snowyspirit.reg.ModTags;
@@ -361,7 +361,7 @@ public class ContainerHolderEntity extends Entity implements Container, MenuProv
     }
 
     private static boolean isSack(Item i) {
-        return SnowySpirit.SUPPLEMENTARIES_INSTALLED && SuppCompat.isSack(i);
+        return CompatHandler.SUPPLEMENTARIES && SuppCompat.isSack(i);
     }
 
 

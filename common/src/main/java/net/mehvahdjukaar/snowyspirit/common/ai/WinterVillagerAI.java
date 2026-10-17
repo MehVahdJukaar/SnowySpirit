@@ -1,10 +1,10 @@
 package net.mehvahdjukaar.snowyspirit.common.ai;
 
+import net.mehvahdjukaar.snowyspirit.integration.CompatHandler;
 import com.mojang.datafixers.util.Pair;
 import net.mehvahdjukaar.moonlight.api.entity.VillagerAIHooks;
 import net.mehvahdjukaar.moonlight.api.events.IVillagerBrainEvent;
 import net.mehvahdjukaar.moonlight.api.events.MoonlightEventsHelper;
-import net.mehvahdjukaar.snowyspirit.SnowySpirit;
 import net.mehvahdjukaar.snowyspirit.configs.CommonConfigs;
 import net.mehvahdjukaar.snowyspirit.integration.supp.PlacePresentTask;
 import net.mehvahdjukaar.snowyspirit.reg.ModMemoryModules;
@@ -14,7 +14,7 @@ import net.minecraft.world.entity.schedule.Activity;
 
 public class WinterVillagerAI {
 
-    public static boolean PRESENTS_ENABLED = SnowySpirit.SUPPLEMENTARIES_INSTALLED && PlacePresentTask.isPresentOn();
+    public static boolean PRESENTS_ENABLED = CompatHandler.SUPPLEMENTARIES && PlacePresentTask.isPresentOn();
 
     public static void setup() {
 

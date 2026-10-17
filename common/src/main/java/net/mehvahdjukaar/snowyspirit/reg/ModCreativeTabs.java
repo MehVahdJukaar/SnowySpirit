@@ -1,5 +1,6 @@
 package net.mehvahdjukaar.snowyspirit.reg;
 
+import net.mehvahdjukaar.snowyspirit.integration.CompatHandler;
 import net.mehvahdjukaar.moonlight.api.misc.RegSupplier;
 import net.mehvahdjukaar.moonlight.api.platform.RegHelper;
 import net.mehvahdjukaar.moonlight.api.platform.TabAdderHelper;
@@ -37,7 +38,7 @@ public class ModCreativeTabs {
                 ModRegistry.EGGNOG_NAME,
                 ModRegistry.EGGNOG);
 
-        if (SnowySpirit.SUPPLEMENTARIES_INSTALLED) {
+        if (CompatHandler.SUPPLEMENTARIES) {
             adder.after(SuppCompat::isCandy, CreativeModeTabs.FOOD_AND_DRINKS,
                     ModRegistry.GINGER_NAME,
                     ModRegistry.GINGERBREAD_COOKIE);
