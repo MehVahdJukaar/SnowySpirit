@@ -38,6 +38,7 @@ public class SnowySpirit {
     public static final boolean FARMERSDELIGHT_INSTALLED = PlatHelper.isModLoaded("farmersdelight");
     public static final boolean SEASON_MOD_INSTALLED = PlatHelper.isModLoaded(PlatHelper.getPlatform().isForge() ? "sereneseasons" : "seasons");
     public static final boolean BOATLOAD_INSTALLED = PlatHelper.isModLoaded("boatload");
+    public static final boolean POLYTONE_INSTALLED = PlatHelper.isModLoaded("polytone");
 
 
     public static void commonInit() {

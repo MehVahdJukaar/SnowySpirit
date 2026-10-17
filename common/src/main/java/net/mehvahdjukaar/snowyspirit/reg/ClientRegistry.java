@@ -5,6 +5,7 @@ import net.mehvahdjukaar.moonlight.api.platform.ClientHelper;
 import net.mehvahdjukaar.snowyspirit.SnowySpirit;
 import net.mehvahdjukaar.snowyspirit.client.*;
 import net.mehvahdjukaar.snowyspirit.common.block.GlowLightsBlockTile;
+import net.mehvahdjukaar.snowyspirit.integration.PolytoneCompat;
 import net.mehvahdjukaar.snowyspirit.integration.supp.SuppCompat;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.color.block.BlockColor;
@@ -38,6 +39,7 @@ public class ClientRegistry {
         ClientHelper.addBlockColorsRegistration(ClientRegistry::registerBlockColors);
         ClientHelper.addParticleRegistration(ClientRegistry::registerParticles);
         SeasonConfigOverlay.register();
+        if (SnowySpirit.POLYTONE_INSTALLED) PolytoneCompat.setupClient();
     }
 
     private static void registerParticles(ClientHelper.ParticleEvent event) {

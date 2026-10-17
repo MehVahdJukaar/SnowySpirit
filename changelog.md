@@ -1,2 +1,1 @@
-- improved configs further
-- random fixes
+- updated emf hack that prevents emf from making dogs sit while pulling a sled
