@@ -1,6 +1,7 @@
 package net.mehvahdjukaar.snowyspirit.common.block;
 
 import net.mehvahdjukaar.moonlight.api.block.IColored;
+import net.mehvahdjukaar.moonlight.api.block.IWashable;
 import net.mehvahdjukaar.moonlight.api.block.WaterBlock;
 import net.mehvahdjukaar.moonlight.api.platform.ForgeHelper;
 import net.mehvahdjukaar.moonlight.api.platform.PlatHelper;
@@ -33,7 +34,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -57,7 +57,7 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
-public class GlowLightsBlock extends WaterBlock implements EntityBlock, IColored {
+public class GlowLightsBlock extends WaterBlock implements EntityBlock, IColored, IWashable {
     public final DyeColor color;
 
     public static final BooleanProperty NORTH = BlockStateProperties.NORTH;
@@ -77,9 +77,8 @@ public class GlowLightsBlock extends WaterBlock implements EntityBlock, IColored
         return m;
     });
 
-    public GlowLightsBlock(DyeColor color) {
-        super(Properties.ofFullCopy(Blocks.OAK_LEAVES)
-                .lightLevel(s -> 6));
+    public GlowLightsBlock(DyeColor color, Properties properties) {
+        super(properties);
         this.color = color;
     }
 
@@ -129,6 +128,17 @@ public class GlowLightsBlock extends WaterBlock implements EntityBlock, IColored
 
     @Override
     public boolean supportsBlankColor() {
+        return true;
+    }
+
+    @Override
+    public boolean tryWash(Level level, BlockPos pos, BlockState state, Vec3 hitVec) {
+        if (this.color == DyeColor.WHITE) return false;
+        BlockState held = level.getBlockEntity(pos) instanceof GlowLightsBlockTile tile ? tile.getHeldBlock() : null;
+        level.setBlockAndUpdate(pos, ModRegistry.GLOW_LIGHTS_BLOCKS.get(DyeColor.WHITE).get().withPropertiesOf(state));
+        if (held != null && level.getBlockEntity(pos) instanceof GlowLightsBlockTile washed) {
+            washed.acceptBlock(held);
+        }
         return true;
     }
 

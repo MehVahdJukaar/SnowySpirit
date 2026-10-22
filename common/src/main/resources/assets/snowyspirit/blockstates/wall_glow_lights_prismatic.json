@@ -1,0 +1,39 @@
+{
+  "multipart": [
+    {
+      "when": {
+        "north": "true"
+      },
+      "apply": {
+        "model": "snowyspirit:block/wall_glow_lights_prismatic"
+      }
+    },
+    {
+      "when": {
+        "east": "true"
+      },
+      "apply": {
+        "model": "snowyspirit:block/wall_glow_lights_prismatic",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "south": "true"
+      },
+      "apply": {
+        "model": "snowyspirit:block/wall_glow_lights_prismatic",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "west": "true"
+      },
+      "apply": {
+        "model": "snowyspirit:block/wall_glow_lights_prismatic",
+        "y": 270
+      }
+    }
+  ]
+}

@@ -26,7 +26,7 @@ public class SeasonConfigOverlay implements ConfigScreenExtensions.Overlay {
         if (SnowySpirit.USES_SEASON_MOD && level == null) {
             key = "gui.snowyspirit.snow_season_unknown";
             color = UNKNOWN_COLOR;
-        } else if (level != null ? SnowySpirit.isChristmasSeason(level) : SnowySpirit.IS_CHRISTMAS_REAL_TIME) {
+        } else if (level != null ? SnowySpirit.isChristmasSeason(level) : SnowySpirit.isChristmasRealTime()) {
             key = "gui.snowyspirit.snow_season_on";
             color = ON_COLOR;
         } else {

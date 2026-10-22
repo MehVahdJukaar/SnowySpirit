@@ -18,6 +18,7 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.util.Mth;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
@@ -34,8 +35,6 @@ public class GlowLightParticle extends TextureSheetParticle {
     private GlowLightParticle(ClientLevel arg, double d, double e, double f, SpriteSet sprites) {
         super(arg, d, e, f);
         this.sprites = sprites;
-        // Sodium's particle path reads this.sprite directly instead of calling renderRotatedQuad,
-        // so a sprite must be set here or it NPEs before our override ever runs.
         this.setSprite(sprites.get(0, 3));
         this.gravity = 0.0F;
         this.lifetime = 19 + this.random.nextInt(12);
@@ -49,6 +48,19 @@ public class GlowLightParticle extends TextureSheetParticle {
         this.roll = (float) (Math.PI * this.random.nextFloat());
     }
 
+
+    //sodium injects into the super one and only draws one quad...
+    @Override
+    public void render(VertexConsumer buffer, Camera camera, float partialTicks) {
+        Quaternionf q = new Quaternionf();
+        this.getFacingCameraMode().setRotation(q, camera, partialTicks);
+        if (this.roll != 0.0F) q.rotateZ(Mth.lerp(partialTicks, this.oRoll, this.roll));
+        Vec3 cam = camera.getPosition();
+        float x = (float) (Mth.lerp(partialTicks, this.xo, this.x) - cam.x());
+        float y = (float) (Mth.lerp(partialTicks, this.yo, this.y) - cam.y());
+        float z = (float) (Mth.lerp(partialTicks, this.zo, this.z) - cam.z());
+        this.renderRotatedQuad(buffer, q, x, y, z, partialTicks);
+    }
 
     @Override
     protected void renderRotatedQuad(VertexConsumer buffer, Quaternionf quaternionf,

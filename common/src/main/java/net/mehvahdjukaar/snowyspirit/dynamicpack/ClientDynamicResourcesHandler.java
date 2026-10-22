@@ -20,6 +20,7 @@ import net.mehvahdjukaar.snowyspirit.SnowySpirit;
 import net.mehvahdjukaar.snowyspirit.reg.ModRegistry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.util.FastColor;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
@@ -52,6 +53,12 @@ public class ClientDynamicResourcesHandler extends DynamicClientResourceProvider
             throw new Error("Returned null color. How? " + color + " " + COLORS);
         }
         return arr;
+    }
+
+    public static int getGlowLightRgb(DyeColor color) {
+        float[] c = COLORS.get(color);
+        if (c == null) return color.getFireworkColor();
+        return FastColor.ARGB32.colorFromFloat(1, c[0], c[1], c[2]) & 0xFFFFFF;
     }
 
     @Override

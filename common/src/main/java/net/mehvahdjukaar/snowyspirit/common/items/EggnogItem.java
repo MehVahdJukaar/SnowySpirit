@@ -1,11 +1,8 @@
 package net.mehvahdjukaar.snowyspirit.common.items;
 
 
-import net.minecraft.advancements.CriteriaTriggers;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.effect.MobEffects;
@@ -36,10 +33,6 @@ public class EggnogItem extends Item {
     @Override
     public ItemStack finishUsingItem(ItemStack pStack, Level pLevel, LivingEntity pEntityLiving) {
         super.finishUsingItem(pStack, pLevel, pEntityLiving);
-        if (pEntityLiving instanceof ServerPlayer serverplayer) {
-            CriteriaTriggers.CONSUME_ITEM.trigger(serverplayer, pStack);
-            serverplayer.awardStat(Stats.ITEM_USED.get(this));
-        }
 
         if (!pLevel.isClientSide) {
             pEntityLiving.removeEffect(MobEffects.CONFUSION);

@@ -1,0 +1,6 @@
+{
+  "parent": "snowyspirit:block/template_roped_lights_hub_x",
+  "textures": {
+    "lights": "snowyspirit:block/roped_lights_rainbow"
+  }
+}

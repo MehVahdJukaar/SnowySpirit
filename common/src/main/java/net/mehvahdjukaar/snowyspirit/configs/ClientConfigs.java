@@ -21,7 +21,7 @@ public class ClientConfigs {
         PARTICLE_MODE = builder.comment("Glow light particle mode. I made 2 variants of this so choose the one you like the most")
                 .defineSlider("glow_particle_mode", 1, 1, 3);
         SLED_SOUND_AMPLIFIER = builder.comment("Increases sled sound volume")
-                .define("sled_sound_volume", 1.2, 0, 20);
+                .defineSlider("sled_sound_volume", 1.2, 0, 20);
         builder.pop();
 
         SPEC = builder.build();

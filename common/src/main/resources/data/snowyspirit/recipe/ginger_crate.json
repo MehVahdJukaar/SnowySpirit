@@ -1,7 +1,7 @@
 {
   "fabric:load_conditions": [
     {
-      "condition": "neofabric:mod_loaded",
+      "condition": "fabric:mod_loaded",
       "modid": "farmersdelight"
     },
     {

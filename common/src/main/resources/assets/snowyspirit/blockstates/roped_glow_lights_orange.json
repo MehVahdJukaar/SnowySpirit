@@ -1,0 +1,75 @@
+{
+  "multipart": [
+    {
+      "apply": {
+        "model": "snowyspirit:block/roped_glow_lights_orange_rope"
+      }
+    },
+    {
+      "when": {
+        "OR": [
+          {
+            "north": "true"
+          },
+          {
+            "south": "true"
+          }
+        ]
+      },
+      "apply": {
+        "model": "snowyspirit:block/roped_glow_lights_orange_hub_z"
+      }
+    },
+    {
+      "when": {
+        "OR": [
+          {
+            "north": "false",
+            "south": "false",
+            "east": "true"
+          },
+          {
+            "north": "false",
+            "south": "false",
+            "west": "true"
+          }
+        ]
+      },
+      "apply": {
+        "model": "snowyspirit:block/roped_glow_lights_orange_hub_x"
+      }
+    },
+    {
+      "when": {
+        "north": "true"
+      },
+      "apply": {
+        "model": "snowyspirit:block/roped_glow_lights_orange_arm_north"
+      }
+    },
+    {
+      "when": {
+        "south": "true"
+      },
+      "apply": {
+        "model": "snowyspirit:block/roped_glow_lights_orange_arm_south"
+      }
+    },
+    {
+      "when": {
+        "east": "true"
+      },
+      "apply": {
+        "model": "snowyspirit:block/roped_glow_lights_orange_arm_east"
+      }
+    },
+    {
+      "when": {
+        "west": "true"
+      },
+      "apply": {
+        "model": "snowyspirit:block/roped_glow_lights_orange_arm_west"
+      }
+    }
+  ]
+}

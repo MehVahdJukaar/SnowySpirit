@@ -21,18 +21,18 @@ public class GingySitWhenOrderedToGoal extends Goal {
 
     @Override
     public boolean canUse() {
-        if (this.mob.getOwnerUUID()==null) {
+        if (this.mob.getOwnerUUID() == null) {
             return false;
         } else if (this.mob.isInWaterOrBubble()) {
             return false;
         } else if (!this.mob.onGround()) {
             return false;
         } else {
-            LivingEntity livingEntity = this.mob.getOwner();
-            if (livingEntity == null) {
-                return true;
+            LivingEntity owner = this.mob.getOwner();
+            if (owner == null) {
+                return this.mob.isOrderedToSit();
             } else {
-                return ((this.mob.distanceToSqr(livingEntity) >= 144.0) || livingEntity.getLastHurtByMob() == null) && this.mob.isOrderedToSit();
+                return ((this.mob.distanceToSqr(owner) >= 144.0) || owner.getLastHurtByMob() == null) && this.mob.isOrderedToSit();
             }
         }
     }
@@ -40,11 +40,5 @@ public class GingySitWhenOrderedToGoal extends Goal {
     @Override
     public void start() {
         this.mob.getNavigation().stop();
-        this.mob.setOrderedToSit(true);
-    }
-
-    @Override
-    public void stop() {
-        this.mob.setOrderedToSit(false);
     }
 }

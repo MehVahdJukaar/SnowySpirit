@@ -1,8 +1,8 @@
 package net.mehvahdjukaar.snowyspirit.common.entity;
 
+import net.mehvahdjukaar.snowyspirit.integration.CompatHandler;
 import net.mehvahdjukaar.candlelight.api.VirtualOverride;
 import net.mehvahdjukaar.moonlight.api.platform.PlatHelper;
-import net.mehvahdjukaar.snowyspirit.SnowySpirit;
 import net.mehvahdjukaar.snowyspirit.integration.supp.SuppCompat;
 import net.mehvahdjukaar.snowyspirit.reg.ModRegistry;
 import net.mehvahdjukaar.snowyspirit.reg.ModTags;
@@ -80,19 +80,16 @@ public class ContainerHolderEntity extends Entity implements Container, MenuProv
         if (dataAccessor.equals(DATA_CONTAINER)) {
             ItemStack stack = this.entityData.get(DATA_CONTAINER);
 
-            if (stack.getItem() instanceof BlockItem blockItem) {
-                this.displayState = blockItem.getBlock().defaultBlockState();
-            }
             if (stack.getItem() instanceof BlockItem bi) {
                 Block block = bi.getBlock();
-
+                this.displayState = block.defaultBlockState();
                 if (block instanceof EntityBlock eb && eb.newBlockEntity(BlockPos.ZERO, block.defaultBlockState()) instanceof BaseContainerBlockEntity c) {
                     innerBlockEntity = c;
                     innerBlockEntity.setLevel(level());
                 }
             }
             if (innerBlockEntity == null) {
-                throw new IllegalStateException("block {} does not provide a valid container block entity");
+                throw new IllegalStateException("item " + stack.getItem() + " does not provide a valid container block entity");
             }
             loadContentsFromItem(stack);
         }
@@ -132,7 +129,7 @@ public class ContainerHolderEntity extends Entity implements Container, MenuProv
     @Override
     protected void addAdditionalSaveData(CompoundTag tag) {
         tag.put("ContainerItem", this.getContainerItem().save(this.registryAccess(), new CompoundTag()));
-        tag.merge(innerBlockEntity.saveWithoutMetadata(this.registryAccess()));
+        if (innerBlockEntity != null) tag.merge(innerBlockEntity.saveWithoutMetadata(this.registryAccess()));
     }
 
     @Override
@@ -210,6 +207,8 @@ public class ContainerHolderEntity extends Entity implements Container, MenuProv
         if (isContainerWithNBT(this.getContainerItem())) {
             innerBlockEntity.saveToItem(stack, this.registryAccess());
         } else {
+            stack.remove(DataComponents.CONTAINER);
+            stack.remove(DataComponents.BLOCK_ENTITY_DATA);
             Containers.dropContents(this.level(), this, innerBlockEntity);
         }
         if (this.hasCustomName()) {
@@ -252,9 +251,6 @@ public class ContainerHolderEntity extends Entity implements Container, MenuProv
                 this.setDamage(this.getDamage() - 1.0F);
             }
 
-            this.checkBelowWorld();
-            this.handlePortal();
-
             super.tick();
 
             // this.xRotO = v.xRotO;
@@ -262,8 +258,9 @@ public class ContainerHolderEntity extends Entity implements Container, MenuProv
             //this.setYRot(v.getYRot());
             // this.xRotO = this.getXRot();
             //this.yRotO = this.getYRot();
-        } else {
-            if (!level().isClientSide) this.destroy(this.damageSources().generic());
+        } else if (!level().isClientSide) {
+            if (innerBlockEntity == null) this.discard();
+            else this.destroy(this.damageSources().generic());
         }
     }
 
@@ -310,7 +307,7 @@ public class ContainerHolderEntity extends Entity implements Container, MenuProv
 
     @Override
     public void remove(Entity.RemovalReason pReason) {
-        if (!this.level().isClientSide && pReason.shouldDestroy()) {
+        if (!this.level().isClientSide && pReason.shouldDestroy() && innerBlockEntity != null) {
             if (this.level().getGameRules().getBoolean(GameRules.RULE_DOENTITYDROPS)) {
                 this.spawnDrops();
             }
@@ -364,7 +361,7 @@ public class ContainerHolderEntity extends Entity implements Container, MenuProv
     }
 
     private static boolean isSack(Item i) {
-        return SnowySpirit.SUPPLEMENTARIES_INSTALLED && SuppCompat.isSack(i);
+        return CompatHandler.SUPPLEMENTARIES && SuppCompat.isSack(i);
     }
 
 

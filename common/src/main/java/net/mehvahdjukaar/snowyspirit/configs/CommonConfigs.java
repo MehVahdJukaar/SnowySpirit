@@ -1,5 +1,6 @@
 package net.mehvahdjukaar.snowyspirit.configs;
 
+import net.mehvahdjukaar.snowyspirit.integration.CompatHandler;
 import net.mehvahdjukaar.moonlight.api.platform.configs.ConfigBuilder;
 import net.mehvahdjukaar.moonlight.api.platform.configs.ConfigType;
 import net.mehvahdjukaar.moonlight.api.platform.configs.ModConfigHolder;
@@ -7,17 +8,16 @@ import net.mehvahdjukaar.snowyspirit.SnowySpirit;
 import net.mehvahdjukaar.snowyspirit.integration.SeasonModCompat;
 import net.mehvahdjukaar.snowyspirit.reg.ModRegistry;
 
+import java.time.MonthDay;
 import java.util.function.Supplier;
 
 public class CommonConfigs {
 
     public static final ModConfigHolder SPEC;
 
-    public static final Supplier<Integer> START_DAY;
-    public static final Supplier<Integer> START_MONTH;
+    public static final Supplier<MonthDay> SEASON_START;
 
-    public static final Supplier<Integer> END_DAY;
-    public static final Supplier<Integer> END_MONTH;
+    public static final Supplier<MonthDay> SEASON_END;
 
     public static final Supplier<Boolean> SEASONS_MOD_COMPAT;
 
@@ -60,27 +60,20 @@ public class CommonConfigs {
 
         builder.icon("minecraft:snowball").push("snowy_season");
 
-        builder.icon("minecraft:snow_block").push("snow_season_start");
-        START_MONTH = builder.comment("Month from which villagers will start placing wreaths, presents and throwing snowballs")
-                .define("month", 12, 1, 12);
-        START_DAY = builder.comment("Day from which villagers will start placing wreaths, presents and throwing snowballs")
-                .define("day", 20, 1, 31);
-        builder.pop();
-
-        builder.icon("minecraft:oak_sapling").push("snow_season_end");
-        END_MONTH = builder.comment("Month from which villagers will start removing placed wreaths")
-                .define("month", 1, 1, 12);
-        END_DAY = builder.comment("Day from which villagers will start removing placed wreaths")
-                .define("day", 30, 1, 31);
-        builder.pop();
+        SEASON_START = builder.icon("minecraft:snow_block")
+                .comment("Day from which villagers will start placing wreaths, presents and throwing snowballs")
+                .defineDate("snow_season_start", MonthDay.of(12, 20));
+        SEASON_END = builder.icon("minecraft:oak_sapling")
+                .comment("Day from which villagers will start removing placed wreaths")
+                .defineDate("snow_season_end", MonthDay.of(1, 30));
 
         builder.icon("minecraft:oak_leaves").push("season_mod_compat");
-        SEASONS_MOD_COMPAT = builder.comment("Enables compatibility with Serene Seasons (Forge) or Fabric Seasons (Fabric). Only takes effect if the mod is installed. Will make snowy season only active during certain seasons. Note that this will override previous time window settings")
-                .define("enabled", SnowySpirit.SEASON_MOD_INSTALLED);
-        if (SnowySpirit.SEASON_MOD_INSTALLED) SeasonModCompat.addConfig(builder);
+        builder.comment("Enables compatibility with Serene Seasons (Forge) or Fabric Seasons (Fabric). Only takes effect if the mod is installed. Will make snowy season only active during certain seasons. Note that this will override previous time window settings");
+        SEASONS_MOD_COMPAT = builder.mainFeature(CompatHandler.SEASON_MOD);
+        if (CompatHandler.SEASON_MOD) SeasonModCompat.addConfig(builder);
         builder.pop(2);
 
-        builder.push("misc");
+        builder.icon("minecraft:bundle").push("misc");
         MOD_TAB = builder.gameRestart().comment("Gather all this mod items in their own creative tab instead of putting them in the vanilla ones")
                 .define("mod_creative_tab", false);
         builder.pop();
@@ -161,6 +154,7 @@ public class CommonConfigs {
         else if (key.contains("sled")) return SLEDS.get();
         else if (key.contains("gumdrop")) return GUMDROPS.get();
         else if (key.contains("glow_light")) return GLOW_LIGHTS.get();
+        else if (key.contains(ModRegistry.GINGERBREAD_GOLEM_NAME)) return GINGERBREAD_MAN.get();
         else if (key.contains("ginger")) return GINGER.get();
         return SPEC.isFeatureEnabled(key);
     }

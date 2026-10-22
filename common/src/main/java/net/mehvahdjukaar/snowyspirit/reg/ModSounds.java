@@ -3,12 +3,10 @@ package net.mehvahdjukaar.snowyspirit.reg;
 import net.mehvahdjukaar.moonlight.api.misc.ModSoundType;
 import net.mehvahdjukaar.moonlight.api.platform.RegHelper;
 import net.mehvahdjukaar.snowyspirit.SnowySpirit;
-import net.mehvahdjukaar.snowyspirit.client.SledSoundInstance;
-import net.mehvahdjukaar.snowyspirit.common.entity.SledEntity;
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.item.JukeboxSong;
 import net.minecraft.world.level.block.SoundType;
 
@@ -34,4 +32,8 @@ public class ModSounds {
 
     public static final SoundType GINGERBREAD = new ModSoundType(
             1,1,GINGERBREAD_BREAK, GINGERBREAD_STEP,GINGERBREAD_PLACE, GINGERBREAD_HIT, GINGERBREAD_FALL);
+
+    public static final SoundType GLOW_LIGHTS = new SoundType(1, 1,
+            SoundEvents.GRASS_BREAK, SoundEvents.GRASS_STEP, SoundEvents.AMETHYST_CLUSTER_HIT,
+            SoundEvents.GRASS_HIT, SoundEvents.GRASS_FALL);
 }

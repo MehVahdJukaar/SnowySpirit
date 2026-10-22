@@ -9,16 +9,20 @@ neoforge {
 
 val moonlight_version: String by extra
 val supplementaries_version: String by extra
+val polytone_version: String by extra
 val codecui_version: String by extra
 
 dependencies {
     modImplementation("net.mehvahdjukaar:moonlight-neoforge:${moonlight_version}")
     accessTransformers("net.mehvahdjukaar:moonlight-neoforge:${moonlight_version}")
-    // JiJ'd into Moonlight, so not on the dev runtime classpath — add explicitly to avoid missing schema codec class.
+    modCompileOnly("net.mehvahdjukaar:polytone-neoforge:${polytone_version}")
     modRuntimeOnly("net.mehvahdjukaar:codecui-neoforge:${codecui_version}")
 
-    modCompileOnly("net.mehvahdjukaar:supplementaries-neoforge:${supplementaries_version}")
-    modCompileOnly("curse.maven:entity-model-features-844662:8063559")
+    modImplementation("net.mehvahdjukaar:supplementaries-neoforge:${supplementaries_version}") {
+        exclude(group = "com.github.bawnorton.mixinsquared")
+    }
+    modImplementation("maven.modrinth:entity-model-features:3.3.12-neoforge-1.21")
+    modImplementation("maven.modrinth:entitytexturefeatures:7.2.6-neoforge-1.21")
 
     modCompileOnly("curse.maven:jei-238222:5846880")
     modCompileOnly("curse.maven:farmers-delight-398521:5772720")

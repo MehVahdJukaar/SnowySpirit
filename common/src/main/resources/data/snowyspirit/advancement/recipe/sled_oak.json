@@ -1,0 +1,40 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "snowyspirit:flag",
+      "flag": "sleds"
+    }
+  ],
+  "fabric:load_conditions": [
+    {
+      "condition": "snowyspirit:flag",
+      "flag": "sleds"
+    }
+  ],
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "in_snow": {
+      "conditions": {
+        "block": "minecraft:snow"
+      },
+      "trigger": "minecraft:enter_block"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "snowyspirit:sled_oak"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "in_snow"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "snowyspirit:sled_oak"
+    ]
+  }
+}

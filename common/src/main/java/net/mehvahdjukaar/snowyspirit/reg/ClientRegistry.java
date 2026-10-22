@@ -1,10 +1,13 @@
 package net.mehvahdjukaar.snowyspirit.reg;
 
+import net.mehvahdjukaar.snowyspirit.integration.CompatHandler;
 import net.mehvahdjukaar.moonlight.api.client.model.NestedModelLoader;
 import net.mehvahdjukaar.moonlight.api.platform.ClientHelper;
 import net.mehvahdjukaar.snowyspirit.SnowySpirit;
 import net.mehvahdjukaar.snowyspirit.client.*;
 import net.mehvahdjukaar.snowyspirit.common.block.GlowLightsBlockTile;
+import net.mehvahdjukaar.snowyspirit.integration.PolytoneCompat;
+import net.mehvahdjukaar.snowyspirit.integration.supp.SuppCompat;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.color.block.BlockColor;
 import net.minecraft.client.model.geom.ModelLayerLocation;
@@ -37,6 +40,7 @@ public class ClientRegistry {
         ClientHelper.addBlockColorsRegistration(ClientRegistry::registerBlockColors);
         ClientHelper.addParticleRegistration(ClientRegistry::registerParticles);
         SeasonConfigOverlay.register();
+        if (CompatHandler.POLYTONE) PolytoneCompat.setupClient();
     }
 
     private static void registerParticles(ClientHelper.ParticleEvent event) {
@@ -55,6 +59,12 @@ public class ClientRegistry {
         }
         for (var v : ModRegistry.GLOW_LIGHTS_BLOCKS.values()) {
             //TODO: use forge emissive layer
+            ClientHelper.registerRenderType(v.get(), RenderType.cutout());
+        }
+        for (var v : ModRegistry.GLOW_LIGHTS_WALL_BLOCKS.values()) {
+            ClientHelper.registerRenderType(v.get(), RenderType.cutout());
+        }
+        for (var v : ModRegistry.ROPED_GLOW_LIGHTS.values()) {
             ClientHelper.registerRenderType(v.get(), RenderType.cutout());
         }
 
@@ -78,6 +88,7 @@ public class ClientRegistry {
 
     private static void registerModelLoaders(ClientHelper.ModelLoaderEvent event) {
         event.register(SnowySpirit.res("glow_lights"), new NestedModelLoader("overlay", GlowLightsBakedModel::new));
+        if (CompatHandler.SUPPLEMENTARIES) SuppCompat.registerRopeModelLoader(event);
     }
 
     private static void registerBlockColors(ClientHelper.BlockColorEvent event) {
@@ -109,14 +120,6 @@ public class ClientRegistry {
                 }
             }
             return -1;
-        }
-
-        public static class NoParticle implements BlockColor {
-            @Override
-            public int getColor(BlockState state, @Nullable BlockAndTintGetter world, @Nullable BlockPos pos, int tint) {
-                if (tint == 0) return -1;
-                return col(state, world, pos, tint);
-            }
         }
     }
 

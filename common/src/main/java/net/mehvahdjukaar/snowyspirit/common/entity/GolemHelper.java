@@ -3,6 +3,7 @@ package net.mehvahdjukaar.snowyspirit.common.entity;
 import com.google.common.base.Suppliers;
 import net.mehvahdjukaar.snowyspirit.common.block.GumdropButton;
 import net.mehvahdjukaar.snowyspirit.reg.ModRegistry;
+import net.mehvahdjukaar.snowyspirit.configs.CommonConfigs;
 import net.mehvahdjukaar.snowyspirit.reg.ModTags;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
@@ -28,6 +29,7 @@ public class GolemHelper {
 
     public static void trySpawningGingy(BlockState pumpkinState, LevelAccessor level, BlockPos pumpkinPos, @Nullable Entity entity) {
         BlockPos below = pumpkinPos.below();
+        if (!CommonConfigs.GINGERBREAD_MAN.get()) return;
         if (level instanceof ServerLevel serverLevel && level.getBlockState(below).is(ModTags.GINGERBREADS)) {
             Direction dir = pumpkinState.getValue(CarvedPumpkinBlock.FACING);
             BlockPos button = below.relative(dir);
@@ -55,6 +57,7 @@ public class GolemHelper {
     }
 
     public static void trySpawningMongo(BlockState buttonState, Level level, BlockPos buttonPos, @Nullable Entity entity) {
+        if (level.isClientSide || !CommonConfigs.GINGERBREAD_MAN.get()) return;
         BlockPos behind = buttonPos.relative(buttonState.getValue(GumdropButton.FACING).getOpposite());
         if (level.getBlockState(behind).is(ModTags.GINGERBREADS)) {
             var patternMatch = MONGO_PATTERN.get().find(level, behind);
@@ -66,7 +69,7 @@ public class GolemHelper {
 
                     clearBlocks(level, patternMatch);
 
-                    BlockPos bottom = patternMatch.getBlock(patternMatch.getWidth() / 2, patternMatch.getHeight(), 0).getPos();
+                    BlockPos bottom = patternMatch.getBlock(patternMatch.getWidth() / 2, patternMatch.getHeight() - 1, 0).getPos();
                     giant.moveTo(bottom.getX() + 0.5, bottom.getY() + 0.05, bottom.getZ() + 0.5, 0.0F, 0.0F);
                     level.addFreshEntity(giant);
 

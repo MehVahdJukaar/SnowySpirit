@@ -9,14 +9,12 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.animal.AbstractGolem;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.LeavesBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Iterator;
 
 public class MongoEntity extends GingyEntity implements PlayerRideableJumping {
 
@@ -139,29 +137,18 @@ public class MongoEntity extends GingyEntity implements PlayerRideableJumping {
     @Override
     public void aiStep() {
         super.aiStep();
-        if (this.isAlive() && this.horizontalCollision && this.isControlledByLocalInstance()) {
-            boolean bl = false;
-            AABB aABB = this.getBoundingBox().inflate(1);
-            Iterator<BlockPos> var8 = BlockPos.betweenClosed(Mth.floor(aABB.minX), Mth.floor(aABB.minY), Mth.floor(aABB.minZ), Mth.floor(aABB.maxX), Mth.floor(aABB.maxY), Mth.floor(aABB.maxZ)).iterator();
-
-            label60:
-            while (true) {
-                BlockPos blockPos;
-                Block block;
-                do {
-                    if (!var8.hasNext()) {
-                        if (!bl && this.onGround()) {
-                            this.jumpFromGround();
-                        }
-                        break label60;
+        if (this.isAlive() && this.horizontalCollision) {
+            boolean brokeLeaves = false;
+            if (!this.level().isClientSide) {
+                AABB aabb = this.getBoundingBox().inflate(1);
+                for (BlockPos blockPos : BlockPos.betweenClosed(Mth.floor(aabb.minX), Mth.floor(aabb.minY), Mth.floor(aabb.minZ), Mth.floor(aabb.maxX), Mth.floor(aabb.maxY), Mth.floor(aabb.maxZ))) {
+                    if (this.level().getBlockState(blockPos).getBlock() instanceof LeavesBlock) {
+                        brokeLeaves = this.level().destroyBlock(blockPos, true, this) || brokeLeaves;
                     }
-
-                    blockPos = var8.next();
-                    BlockState blockState = this.level().getBlockState(blockPos);
-                    block = blockState.getBlock();
-                } while (!(block instanceof LeavesBlock));
-
-                bl = this.level().destroyBlock(blockPos, true, this) || bl;
+                }
+            }
+            if (!brokeLeaves && this.onGround() && this.isControlledByLocalInstance()) {
+                this.jumpFromGround();
             }
         }
     }

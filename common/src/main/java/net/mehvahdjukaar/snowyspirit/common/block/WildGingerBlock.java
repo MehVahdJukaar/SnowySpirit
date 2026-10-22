@@ -37,11 +37,6 @@ public class WildGingerBlock extends BushBlock implements BonemealableBlock {
     }
 
     @Override
-    public boolean canSurvive(BlockState pState, LevelReader pLevel, BlockPos pPos) {
-        return super.canSurvive(pState, pLevel, pPos);
-    }
-
-    @Override
     public boolean canBeReplaced(BlockState state, BlockPlaceContext useContext) {
         return false;
     }

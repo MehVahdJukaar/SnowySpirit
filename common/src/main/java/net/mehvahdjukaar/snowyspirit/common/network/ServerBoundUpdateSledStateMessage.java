@@ -5,12 +5,16 @@ import net.mehvahdjukaar.snowyspirit.SnowySpirit;
 import net.mehvahdjukaar.snowyspirit.common.entity.SledEntity;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 
 public class ServerBoundUpdateSledStateMessage implements Message {
 
     public static final TypeAndCodec<RegistryFriendlyByteBuf, ServerBoundUpdateSledStateMessage> CODEC =
             Message.makeType(SnowySpirit.res("s2c_update_sled_movement"), ServerBoundUpdateSledStateMessage::new);
+
+    private static final float MAX_SPEED = 4;
 
     public final float clientDx;
     public final float clientDy;
@@ -38,8 +42,11 @@ public class ServerBoundUpdateSledStateMessage implements Message {
 
     @Override
     public void handle(Context context) {
-        if (context.getPlayer().getVehicle() instanceof SledEntity sled) {
-            sled.setSyncedMovement(this.clientDx, this.clientDy, this.clientDx);
+        Player player = context.getPlayer();
+        if (player.getVehicle() instanceof SledEntity sled && sled.getControllingPassenger() == player) {
+            if (!Float.isFinite(clientDx) || !Float.isFinite(clientDy) || !Float.isFinite(clientDz)) return;
+            sled.setSyncedMovement(Mth.clamp(clientDx, -MAX_SPEED, MAX_SPEED), Mth.clamp(clientDy, -MAX_SPEED, MAX_SPEED),
+                    Mth.clamp(clientDz, -MAX_SPEED, MAX_SPEED));
         }
     }
 

@@ -1,6 +1,6 @@
 package net.mehvahdjukaar.snowyspirit.mixins;
 
-import net.mehvahdjukaar.moonlight.api.platform.PlatHelper;
+import net.mehvahdjukaar.snowyspirit.integration.CompatHandler;
 import net.mehvahdjukaar.snowyspirit.SnowySpirit;
 import net.mehvahdjukaar.snowyspirit.common.entity.ContainerHolderEntity;
 import net.mehvahdjukaar.snowyspirit.common.entity.SledEntity;
@@ -67,8 +67,8 @@ public abstract class IglooPiecesMixin extends TemplateStructurePiece {
                     MinecraftServer server = level.getServer();
                     if (server == null) return;
                     server.executeIfPossible(() -> {
-                        SledEntity sledEntity = new SledEntity(level, blockPos.getX() + 0.5, blockPos.getY() + 0.5, blockPos.getZ());
-                        Item chest = PlatHelper.isModLoaded("quark") ?
+                        SledEntity sledEntity = new SledEntity(level, blockPos.getX() + 0.5, blockPos.getY() + 0.5, blockPos.getZ() + 0.5);
+                        Item chest = CompatHandler.QUARK ?
                                 BuiltInRegistries.ITEM.get(ResourceLocation.parse("quark:spruce_chest")) : Items.CHEST;
                         ContainerHolderEntity c = sledEntity.tryAddingChest(chest.getDefaultInstance());
                         if (c != null) {

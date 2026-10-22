@@ -8,6 +8,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.sounds.AbstractTickableSoundInstance;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
+import net.minecraft.world.phys.Vec3;
 
 public class SledSoundInstance extends AbstractTickableSoundInstance {
     public static final int DELAY = 20;
@@ -44,7 +45,8 @@ public class SledSoundInstance extends AbstractTickableSoundInstance {
             this.x = (float) this.sled.getX();
             this.y = (float) this.sled.getY();
             this.z = (float) this.sled.getZ();
-            float f = (float) this.sled.getDeltaMovement().lengthSqr();
+            Vec3 movement = this.sled.isControlledByLocalInstance() ? this.sled.getDeltaMovement() : this.sled.getSyncedMovement();
+            float f = (float) movement.lengthSqr();
             if (f > CUTOFF_SPEED) {
                 fastTime++;
             } else {
@@ -59,8 +61,8 @@ public class SledSoundInstance extends AbstractTickableSoundInstance {
             }
 
 
-            if (this.time < DELAY) {
-                this.volume *= (float) (this.fastTime - DELAY) / DELAY;
+            if (this.fastTime < DELAY) {
+                this.volume *= this.fastTime / (float) DELAY;
             }
 
             if (this.isSnow) {
@@ -70,7 +72,7 @@ public class SledSoundInstance extends AbstractTickableSoundInstance {
                 } else {
                     this.ticksOnSnow++;
                     if (this.ticksOnSnow < 5)
-                        this.volume *= (float) (this.ticksOnSnow - 5) / 5;
+                        this.volume *= this.ticksOnSnow / 5f;
                     this.volume = Math.min(0.8f, volume); //so it never gets pitch shifted
                 }
             }

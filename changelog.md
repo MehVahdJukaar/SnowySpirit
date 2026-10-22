@@ -1,1 +1,2 @@
-- better configs
+- many misc fixes
+- glow lights can be placed on walls and ropes

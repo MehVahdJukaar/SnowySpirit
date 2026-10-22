@@ -4,14 +4,9 @@ import com.mojang.serialization.Codec;
 import io.netty.buffer.ByteBuf;
 import net.mehvahdjukaar.moonlight.api.misc.WorldSavedData;
 import net.mehvahdjukaar.moonlight.api.misc.WorldSavedDataType;
-import net.mehvahdjukaar.moonlight.api.util.Utils;
 import net.mehvahdjukaar.snowyspirit.reg.ModRegistry;
-import net.mehvahdjukaar.supplementaries.common.items.components.BlackboardData;
-import net.minecraft.Util;
-import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.chunk.ChunkAccess;
@@ -47,14 +42,13 @@ public class ChunksWithWreaths extends WorldSavedData {
     }
 
 
-    public Stream<ChunkAccess> getLoadedChunks(ServerLevel level) {
-        return chunksWithWreaths.stream().filter(cp -> level.hasChunk(cp.x, cp.z))
-                .map(cp -> level.getChunk(cp.x, cp.z));
-    }
-
     public Stream<ChunkAccess> getLoadedChunksInRange(Level level, Vec3 center, int range) {
         return chunksWithWreaths.stream()
-                .filter(cp -> center.distanceTo(cp.getWorldPosition().getCenter()) <= range * range)
+                .filter(cp -> {
+                    double dx = center.x - cp.getMiddleBlockX();
+                    double dz = center.z - cp.getMiddleBlockZ();
+                    return dx * dx + dz * dz <= range * range;
+                })
                 .filter(cp -> level.hasChunk(cp.x, cp.z))
                 .map(cp -> level.getChunk(cp.x, cp.z));
 

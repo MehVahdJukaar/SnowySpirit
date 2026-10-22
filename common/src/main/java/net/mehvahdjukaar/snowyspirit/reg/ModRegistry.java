@@ -1,5 +1,6 @@
 package net.mehvahdjukaar.snowyspirit.reg;
 
+import net.mehvahdjukaar.snowyspirit.integration.CompatHandler;
 import com.google.common.collect.ImmutableMap;
 import net.mehvahdjukaar.moonlight.api.block.ModStairBlock;
 import net.mehvahdjukaar.moonlight.api.misc.IAttachmentType;
@@ -23,6 +24,7 @@ import net.mehvahdjukaar.snowyspirit.common.items.GlowLightsItem;
 import net.mehvahdjukaar.snowyspirit.common.items.SledItem;
 import net.mehvahdjukaar.snowyspirit.common.wreath.ChunksWithWreaths;
 import net.mehvahdjukaar.snowyspirit.common.wreath.WreathData;
+import net.mehvahdjukaar.snowyspirit.integration.supp.SuppCompat;
 import net.minecraft.Util;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.particles.SimpleParticleType;
@@ -40,6 +42,7 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.properties.BlockSetType;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.material.MapColor;
+import net.minecraft.world.level.material.PushReaction;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -62,7 +65,7 @@ public class ModRegistry {
 
     private static void registerSledItems(Registrator<Item> event) {
         for (WoodType wood : WoodTypeRegistry.INSTANCE) {
-            if (wood.canBurn() || SnowySpirit.BOATLOAD_INSTALLED) {
+            if (wood.canBurn() || CompatHandler.BOATLOAD) {
                 String name = wood.getVariantId(SLED_NAME);
                 SledItem item = new SledItem(wood);
                 event.register(SnowySpirit.res(name), item);
@@ -209,18 +212,50 @@ public class ModRegistry {
     public static final Map<DyeColor, Supplier<Block>> GLOW_LIGHTS_BLOCKS = Util.make(() -> {
         var m = new LinkedHashMap<DyeColor, Supplier<Block>>();
         for (DyeColor c : BlocksColorAPI.SORTED_COLORS) {
-            m.put(c, regBlock(GLOW_LIGHTS_NAME + "_" + c.getName(), () -> new GlowLightsBlock(c)));
+            m.put(c, regGlowLights(GLOW_LIGHTS_NAME + "_" + c.getName(), c));
         }
-        m.put(null, regBlock(GLOW_LIGHTS_NAME + "_prismatic", () -> new GlowLightsBlock(null)));
+        m.put(null, regGlowLights(GLOW_LIGHTS_NAME + "_prismatic", null));
         return m;
     });
+
+    private static Supplier<Block> regGlowLights(String name, DyeColor color) {
+        return regBlock(name, () -> new GlowLightsBlock(color, BlockBehaviour.Properties.ofFullCopy(Blocks.OAK_LEAVES)
+                .sound(ModSounds.GLOW_LIGHTS)
+                .lightLevel(s -> 6)));
+    }
+
+    public static final Map<DyeColor, Supplier<Block>> GLOW_LIGHTS_WALL_BLOCKS = Util.make(() -> {
+        var m = new LinkedHashMap<DyeColor, Supplier<Block>>();
+        for (DyeColor c : BlocksColorAPI.SORTED_COLORS) {
+            m.put(c, regWallGlowLights("wall_" + GLOW_LIGHTS_NAME + "_" + c.getName(), c));
+        }
+        m.put(null, regWallGlowLights("wall_" + GLOW_LIGHTS_NAME + "_prismatic", null));
+        return m;
+    });
+
+    private static Supplier<Block> regWallGlowLights(String name, DyeColor color) {
+        return regBlock(name, () -> new GlowLightsWallBlock(color, BlockBehaviour.Properties.of()
+                .mapColor(MapColor.NONE)
+                .noCollission()
+                .noOcclusion()
+                .instabreak()
+                .ignitedByLava()
+                .pushReaction(PushReaction.DESTROY)
+                .sound(ModSounds.GLOW_LIGHTS)
+                .lightLevel(s -> 6)));
+    }
+
+    public static final Map<DyeColor, Supplier<Block>> ROPED_GLOW_LIGHTS =
+            CompatHandler.SUPPLEMENTARIES ? SuppCompat.registerRopedGlowLights() : Map.of();
 
     public static final Map<DyeColor, Supplier<Item>> GLOW_LIGHTS_ITEMS = Util.make(() -> {
         var m = new LinkedHashMap<DyeColor, Supplier<Item>>();
         for (DyeColor c : BlocksColorAPI.SORTED_COLORS) {
-            m.put(c, regItem("glow_lights_" + c.getName(), () -> new GlowLightsItem(GLOW_LIGHTS_BLOCKS.get(c).get())));
+            m.put(c, regItem("glow_lights_" + c.getName(), () -> new GlowLightsItem(
+                    GLOW_LIGHTS_BLOCKS.get(c).get(), GLOW_LIGHTS_WALL_BLOCKS.get(c).get())));
         }
-        m.put(null, regItem("glow_lights_prismatic", () -> new GlowLightsItem(GLOW_LIGHTS_BLOCKS.get(null).get())));
+        m.put(null, regItem("glow_lights_prismatic", () -> new GlowLightsItem(
+                GLOW_LIGHTS_BLOCKS.get(null).get(), GLOW_LIGHTS_WALL_BLOCKS.get(null).get())));
         return m;
     });
 
@@ -265,10 +300,6 @@ public class ModRegistry {
 
     public static <T extends Block> Supplier<T> regWithItem(String name, Supplier<T> blockFactory) {
         return RegHelper.registerBlockWithItem(SnowySpirit.res(name), blockFactory);
-    }
-
-    public static <T extends Block> Supplier<T> rewWithItem(String name, Supplier<T> blockSup, Item.Properties properties) {
-        return RegHelper.registerBlockWithItem(SnowySpirit.res(name), blockSup, properties);
     }
 
     public static <T extends Entity> Supplier<EntityType<T>> regEntity(String name, Supplier<EntityType.Builder<T>> builder) {
