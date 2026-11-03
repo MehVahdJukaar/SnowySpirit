@@ -2,9 +2,6 @@
   "replace": false,
   "values": [
     "#minecraft:sand",
-    {
-      "id" :"supplementaries:ash",
-      "required": false
-    }
+    {"id": "supplementaries:ash", "required": false}
   ]
 }

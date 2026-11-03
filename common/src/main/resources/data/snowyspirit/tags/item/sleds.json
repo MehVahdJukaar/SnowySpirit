@@ -1,11 +1,59 @@
 {
   "replace": false,
   "values": [
-    "snowyspirit:sled_oak",
-    "snowyspirit:sled_birch",
-    "snowyspirit:sled_acacia",
-    "snowyspirit:sled_jungle",
-    "snowyspirit:sled_spruce",
-    "snowyspirit:sled_dark_oak"
+    {
+      "id": "snowyspirit:sled_oak",
+      "fabric:load_conditions": [
+        {"condition": "snowyspirit:flag", "flag": "sled"}
+      ],
+      "neoforge:conditions": [
+        {"type": "snowyspirit:flag", "flag": "sled"}
+      ]
+    },
+    {
+      "id": "snowyspirit:sled_birch",
+      "fabric:load_conditions": [
+        {"condition": "snowyspirit:flag", "flag": "sled"}
+      ],
+      "neoforge:conditions": [
+        {"type": "snowyspirit:flag", "flag": "sled"}
+      ]
+    },
+    {
+      "id": "snowyspirit:sled_acacia",
+      "fabric:load_conditions": [
+        {"condition": "snowyspirit:flag", "flag": "sled"}
+      ],
+      "neoforge:conditions": [
+        {"type": "snowyspirit:flag", "flag": "sled"}
+      ]
+    },
+    {
+      "id": "snowyspirit:sled_jungle",
+      "fabric:load_conditions": [
+        {"condition": "snowyspirit:flag", "flag": "sled"}
+      ],
+      "neoforge:conditions": [
+        {"type": "snowyspirit:flag", "flag": "sled"}
+      ]
+    },
+    {
+      "id": "snowyspirit:sled_spruce",
+      "fabric:load_conditions": [
+        {"condition": "snowyspirit:flag", "flag": "sled"}
+      ],
+      "neoforge:conditions": [
+        {"type": "snowyspirit:flag", "flag": "sled"}
+      ]
+    },
+    {
+      "id": "snowyspirit:sled_dark_oak",
+      "fabric:load_conditions": [
+        {"condition": "snowyspirit:flag", "flag": "sled"}
+      ],
+      "neoforge:conditions": [
+        {"type": "snowyspirit:flag", "flag": "sled"}
+      ]
+    }
   ]
 }

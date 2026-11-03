@@ -1,7 +1,23 @@
 {
   "replace": false,
   "values": [
-    "snowyspirit:gingerbread",
-    "snowyspirit:gingerbread_frosted"
+    {
+      "id": "snowyspirit:gingerbread",
+      "fabric:load_conditions": [
+        {"condition": "snowyspirit:flag", "flag": "ginger"}
+      ],
+      "neoforge:conditions": [
+        {"type": "snowyspirit:flag", "flag": "ginger"}
+      ]
+    },
+    {
+      "id": "snowyspirit:gingerbread_frosted",
+      "fabric:load_conditions": [
+        {"condition": "snowyspirit:flag", "flag": "ginger"}
+      ],
+      "neoforge:conditions": [
+        {"type": "snowyspirit:flag", "flag": "ginger"}
+      ]
+    }
   ]
 }

@@ -1,6 +1,14 @@
 {
   "replace": false,
   "values": [
-    "snowyspirit:candy_cane_block"
+    {
+      "id": "snowyspirit:candy_cane_block",
+      "fabric:load_conditions": [
+        {"condition": "snowyspirit:flag", "flag": "candy_cane"}
+      ],
+      "neoforge:conditions": [
+        {"type": "snowyspirit:flag", "flag": "candy_cane"}
+      ]
+    }
   ]
 }

@@ -2,8 +2,14 @@
   "replace": false,
   "values": [
     {
-        "id": "snowyspirit:ginger_crate",
-        "required": false
+      "id": "snowyspirit:ginger_crate",
+      "required": false,
+      "fabric:load_conditions": [
+        {"condition": "snowyspirit:flag", "flag": "ginger"}
+      ],
+      "neoforge:conditions": [
+        {"type": "snowyspirit:flag", "flag": "ginger"}
+      ]
     }
   ]
 }

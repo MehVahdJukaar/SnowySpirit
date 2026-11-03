@@ -1,6 +1,14 @@
 {
   "replace": false,
   "values": [
-    "snowyspirit:gingerbread_stairs"
+    {
+      "id": "snowyspirit:gingerbread_stairs",
+      "fabric:load_conditions": [
+        {"condition": "snowyspirit:flag", "flag": "ginger"}
+      ],
+      "neoforge:conditions": [
+        {"type": "snowyspirit:flag", "flag": "ginger"}
+      ]
+    }
   ]
 }

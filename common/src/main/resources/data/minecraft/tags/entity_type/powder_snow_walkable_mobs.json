@@ -1,7 +1,14 @@
 {
   "replace": false,
   "values": [
-    "snowyspirit:sled"
+    {
+      "id": "snowyspirit:sled",
+      "fabric:load_conditions": [
+        {"condition": "snowyspirit:flag", "flag": "sled"}
+      ],
+      "neoforge:conditions": [
+        {"type": "snowyspirit:flag", "flag": "sled"}
+      ]
+    }
   ]
 }
-

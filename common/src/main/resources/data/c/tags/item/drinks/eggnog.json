@@ -1,6 +1,14 @@
 {
   "replace": false,
   "values": [
-    "snowyspirit:eggnog"
+    {
+      "id": "snowyspirit:eggnog",
+      "fabric:load_conditions": [
+        {"condition": "snowyspirit:flag", "flag": "eggnog"}
+      ],
+      "neoforge:conditions": [
+        {"type": "snowyspirit:flag", "flag": "eggnog"}
+      ]
+    }
   ]
 }

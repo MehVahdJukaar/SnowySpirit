@@ -2,6 +2,14 @@
   "replace": false,
   "values": [
     "#snowyspirit:gumdrops",
-    "snowyspirit:wreath"
+    {
+      "id": "snowyspirit:wreath",
+      "fabric:load_conditions": [
+        {"condition": "snowyspirit:flag", "flag": "wreath"}
+      ],
+      "neoforge:conditions": [
+        {"type": "snowyspirit:flag", "flag": "wreath"}
+      ]
+    }
   ]
 }

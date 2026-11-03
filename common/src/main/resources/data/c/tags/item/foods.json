@@ -1,7 +1,23 @@
 {
   "replace": false,
   "values": [
-    "snowyspirit:eggnog",
-    "snowyspirit:gingerbread_cookie"
+    {
+      "id": "snowyspirit:eggnog",
+      "fabric:load_conditions": [
+        {"condition": "snowyspirit:flag", "flag": "eggnog"}
+      ],
+      "neoforge:conditions": [
+        {"type": "snowyspirit:flag", "flag": "eggnog"}
+      ]
+    },
+    {
+      "id": "snowyspirit:gingerbread_cookie",
+      "fabric:load_conditions": [
+        {"condition": "snowyspirit:flag", "flag": "ginger"}
+      ],
+      "neoforge:conditions": [
+        {"type": "snowyspirit:flag", "flag": "ginger"}
+      ]
+    }
   ]
 }

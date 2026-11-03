@@ -1,16 +1,78 @@
 {
   "replace": false,
   "values": [
-    "snowyspirit:gingerbread",
-    "snowyspirit:gingerbread_stairs",
-    "snowyspirit:gingerbread_slab",
-    "snowyspirit:gingerbread_frosted",
-    "snowyspirit:gingerbread_door",
-    "snowyspirit:gingerbread_trapdoor",
-    "snowyspirit:wild_ginger",
+    {
+      "id": "snowyspirit:gingerbread",
+      "fabric:load_conditions": [
+        {"condition": "snowyspirit:flag", "flag": "ginger"}
+      ],
+      "neoforge:conditions": [
+        {"type": "snowyspirit:flag", "flag": "ginger"}
+      ]
+    },
+    {
+      "id": "snowyspirit:gingerbread_stairs",
+      "fabric:load_conditions": [
+        {"condition": "snowyspirit:flag", "flag": "ginger"}
+      ],
+      "neoforge:conditions": [
+        {"type": "snowyspirit:flag", "flag": "ginger"}
+      ]
+    },
+    {
+      "id": "snowyspirit:gingerbread_slab",
+      "fabric:load_conditions": [
+        {"condition": "snowyspirit:flag", "flag": "ginger"}
+      ],
+      "neoforge:conditions": [
+        {"type": "snowyspirit:flag", "flag": "ginger"}
+      ]
+    },
+    {
+      "id": "snowyspirit:gingerbread_frosted",
+      "fabric:load_conditions": [
+        {"condition": "snowyspirit:flag", "flag": "ginger"}
+      ],
+      "neoforge:conditions": [
+        {"type": "snowyspirit:flag", "flag": "ginger"}
+      ]
+    },
+    {
+      "id": "snowyspirit:gingerbread_door",
+      "fabric:load_conditions": [
+        {"condition": "snowyspirit:flag", "flag": "ginger"}
+      ],
+      "neoforge:conditions": [
+        {"type": "snowyspirit:flag", "flag": "ginger"}
+      ]
+    },
+    {
+      "id": "snowyspirit:gingerbread_trapdoor",
+      "fabric:load_conditions": [
+        {"condition": "snowyspirit:flag", "flag": "ginger"}
+      ],
+      "neoforge:conditions": [
+        {"type": "snowyspirit:flag", "flag": "ginger"}
+      ]
+    },
+    {
+      "id": "snowyspirit:wild_ginger",
+      "fabric:load_conditions": [
+        {"condition": "snowyspirit:flag", "flag": "ginger"}
+      ],
+      "neoforge:conditions": [
+        {"type": "snowyspirit:flag", "flag": "ginger"}
+      ]
+    },
     {
       "id": "snowyspirit:ginger_crate",
-      "required": false
+      "required": false,
+      "fabric:load_conditions": [
+        {"condition": "snowyspirit:flag", "flag": "ginger"}
+      ],
+      "neoforge:conditions": [
+        {"type": "snowyspirit:flag", "flag": "ginger"}
+      ]
     }
   ]
 }

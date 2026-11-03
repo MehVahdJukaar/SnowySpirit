@@ -5,9 +5,6 @@
     "minecraft:snowy_taiga",
     "minecraft:snowy_slopes",
     "minecraft:grove",
-    {
-      "id": "#c:is_snowy",
-      "required": false
-    }
+    {"id": "#c:is_snowy", "required": false}
   ]
 }
