@@ -4,12 +4,10 @@ import net.mehvahdjukaar.moonlight.api.platform.ClientHelper;
 import net.mehvahdjukaar.moonlight.api.platform.PlatHelper;
 import net.mehvahdjukaar.moonlight.api.util.Utils;
 import net.mehvahdjukaar.snowyspirit.SnowySpirit;
-import net.mehvahdjukaar.snowyspirit.common.entity.GolemHelper;
 import net.mehvahdjukaar.snowyspirit.common.wreath.WreathHandler;
 import net.mehvahdjukaar.snowyspirit.reg.ModRegistry;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.CarvedPumpkinBlock;
 import net.minecraft.world.level.block.FlowerPotBlock;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.IEventBus;
@@ -20,7 +18,6 @@ import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
-import net.neoforged.neoforge.event.level.BlockEvent;
 import net.neoforged.neoforge.items.wrapper.InvWrapper;
 
 /**
@@ -54,13 +51,6 @@ public class SnowySpiritForge {
         if (res != InteractionResult.PASS) {
             event.setCanceled(true);
             event.setCancellationResult(res);
-        }
-    }
-
-    @SubscribeEvent
-    public void onUseBlock(BlockEvent.EntityPlaceEvent event) {
-        if (event.getPlacedBlock().getBlock() instanceof CarvedPumpkinBlock) {
-            GolemHelper.trySpawningGingy(event.getPlacedBlock(), event.getLevel(), event.getPos(), event.getEntity());
         }
     }
 }

@@ -5,6 +5,7 @@
   "compatibilityLevel": "JAVA_16",
   "package": "net.mehvahdjukaar.snowyspirit.mixins",
   "mixins": [
+    "CarvedPumpkinBlockMixin",
     "DoorBlockMixin",
     "EntityMixin",
     "IglooPiecesMixin",

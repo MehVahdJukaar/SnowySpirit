@@ -33,6 +33,8 @@
     "moonlight": ">=${moonlight_min_version}"
   },
   "suggests": {
-    "hauntedharvest": "*"
+    "supplementaries": "*",
+    "farmersdelight": "*",
+    "seasons": "*"
   }
 }

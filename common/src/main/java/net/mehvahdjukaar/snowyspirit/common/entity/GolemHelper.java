@@ -13,6 +13,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.CarvedPumpkinBlock;
@@ -27,33 +28,53 @@ import java.util.function.Supplier;
 
 public class GolemHelper {
 
-    public static void trySpawningGingy(BlockState pumpkinState, LevelAccessor level, BlockPos pumpkinPos, @Nullable Entity entity) {
-        BlockPos below = pumpkinPos.below();
+    public static void trySpawningGingy(BlockState pumpkinState, Level level, BlockPos pumpkinPos, @Nullable Entity placer) {
         if (!CommonConfigs.GINGERBREAD_MAN.get()) return;
-        if (level instanceof ServerLevel serverLevel && level.getBlockState(below).is(ModTags.GINGERBREADS)) {
-            Direction dir = pumpkinState.getValue(CarvedPumpkinBlock.FACING);
-            BlockPos button = below.relative(dir);
-            BlockState state = level.getBlockState(button);
-            if (state.getBlock() instanceof GumdropButton b && state.getValue(GumdropButton.FACING) == dir) {
-                GingyEntity golem = ModRegistry.GINGERBREAD_GOLEM.get().create(serverLevel);
-                if (golem != null) {
-                    level.removeBlock(pumpkinPos, false);
-                    level.removeBlock(button, false);
-                    level.removeBlock(below, false);
-                    golem.moveTo(pumpkinPos.getX() + 0.5, pumpkinPos.getY() + 0.05 - 1, pumpkinPos.getZ() + 0.5, dir.toYRot(), 0.0F);
-                    if (entity instanceof ServerPlayer serverPlayer) {
-                        CriteriaTriggers.SUMMONED_ENTITY.trigger(serverPlayer, golem);
-                        golem.setOwnerUUID(serverPlayer.getUUID());
-                        golem.setPersistenceRequired();
-                    }
-                    golem.setColor(b.color);
-                    golem.setYHeadRot(dir.toYRot());
+        if (!(level instanceof ServerLevel serverLevel)) return;
+        BlockPos below = pumpkinPos.below();
+        Direction dir = findGumdropSide(level, below, pumpkinState.getValue(CarvedPumpkinBlock.FACING));
+        if (dir == null) return;
 
-                    level.addFreshEntity(golem);
+        BlockPos button = below.relative(dir);
+        GumdropButton b = (GumdropButton) level.getBlockState(button).getBlock();
+        GingyEntity golem = ModRegistry.GINGERBREAD_GOLEM.get().create(serverLevel);
+        if (golem == null) return;
 
-                }
-            }
+        level.removeBlock(pumpkinPos, false);
+        level.removeBlock(button, false);
+        level.removeBlock(below, false);
+        golem.moveTo(pumpkinPos.getX() + 0.5, pumpkinPos.getY() + 0.05 - 1, pumpkinPos.getZ() + 0.5, dir.toYRot(), 0.0F);
+        //onPlace doesnt know who placed it. same 5 blocks vanilla uses for the golem advancement
+        if (placer == null) placer = serverLevel.getNearestPlayer(golem, 5);
+        if (placer instanceof ServerPlayer serverPlayer) {
+            CriteriaTriggers.SUMMONED_ENTITY.trigger(serverPlayer, golem);
+            golem.setOwnerUUID(serverPlayer.getUUID());
+            golem.setPersistenceRequired();
         }
+        golem.setColor(b.color);
+        golem.setYHeadRot(dir.toYRot());
+
+        level.addFreshEntity(golem);
+    }
+
+    public static boolean canSpawnGingy(LevelReader level, BlockPos pumpkinPos) {
+        return CommonConfigs.GINGERBREAD_MAN.get() && findGumdropSide(level, pumpkinPos.below(), Direction.NORTH) != null;
+    }
+
+    //dispensers always place pumpkins facing north so the other sides get checked too
+    @Nullable
+    private static Direction findGumdropSide(LevelReader level, BlockPos gingerbreadPos, Direction pumpkinFacing) {
+        if (!level.getBlockState(gingerbreadPos).is(ModTags.GINGERBREADS)) return null;
+        if (hasGumdropFacing(level, gingerbreadPos, pumpkinFacing)) return pumpkinFacing;
+        for (Direction d : Direction.Plane.HORIZONTAL) {
+            if (hasGumdropFacing(level, gingerbreadPos, d)) return d;
+        }
+        return null;
+    }
+
+    private static boolean hasGumdropFacing(LevelReader level, BlockPos gingerbreadPos, Direction dir) {
+        BlockState state = level.getBlockState(gingerbreadPos.relative(dir));
+        return state.getBlock() instanceof GumdropButton && state.getValue(GumdropButton.FACING) == dir;
     }
 
     public static void trySpawningMongo(BlockState buttonState, Level level, BlockPos buttonPos, @Nullable Entity entity) {

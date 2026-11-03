@@ -2,6 +2,7 @@ package net.mehvahdjukaar.snowyspirit.integration;
 
 import net.mehvahdjukaar.moonlight.api.platform.PlatHelper;
 import net.mehvahdjukaar.moonlight.api.platform.RegHelper;
+import net.mehvahdjukaar.snowyspirit.configs.CommonConfigs;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -25,6 +26,7 @@ public class FDCompat {
     }
 
     public static void addItemsToTabs(RegHelper.ItemToTabEvent event) {
+        if (!CommonConfigs.GINGER.get()) return;
         event.add(ResourceKey.create(Registries.CREATIVE_MODE_TAB,
                 ResourceLocation.parse("farmersdelight:farmersdelight")), GINGER_CRATE.get());
     }
