@@ -259,6 +259,17 @@
               "add": false
             }
           ],
+          "conditions": [
+            {
+              "condition": "moonlight:load_conditions",
+              "fabric:load_conditions": [
+                {"condition": "snowyspirit:flag", "flag": "ginger"}
+              ],
+              "neoforge:conditions": [
+                {"type": "snowyspirit:flag", "flag": "ginger"}
+              ]
+            }
+          ],
           "name": "snowyspirit:ginger"
         },
         {
@@ -273,6 +284,17 @@
                 "max": 4.0
               },
               "add": false
+            }
+          ],
+          "conditions": [
+            {
+              "condition": "moonlight:load_conditions",
+              "fabric:load_conditions": [
+                {"condition": "snowyspirit:flag", "flag": "candy_cane"}
+              ],
+              "neoforge:conditions": [
+                {"type": "snowyspirit:flag", "flag": "candy_cane"}
+              ]
             }
           ],
           "name": "snowyspirit:candy_cane"

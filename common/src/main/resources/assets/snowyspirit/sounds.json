@@ -5,8 +5,7 @@
         "name": "snowyspirit:music/a_carol",
         "stream": true
       }
-    ],
-    "subtitle": "subtitle.snowyspirit.music_disc.a_carol"
+    ]
   },
   "entity.sled": {
     "sounds": [

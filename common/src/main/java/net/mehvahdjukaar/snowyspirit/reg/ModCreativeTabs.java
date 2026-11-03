@@ -111,7 +111,7 @@ public class ModCreativeTabs {
                 ModRegistry.WREATH_NAME,
                 ModRegistry.WREATH);
 
-        adder.add(CreativeModeTabs.SPAWN_EGGS,
+        adder.after(Items.GHAST_SPAWN_EGG, CreativeModeTabs.SPAWN_EGGS,
                 ModRegistry.GINGERBREAD_GOLEM_NAME,
                 ModRegistry.GINGERBREAD_GOLEM_EGG);
     }

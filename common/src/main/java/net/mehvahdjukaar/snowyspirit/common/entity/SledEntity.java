@@ -98,7 +98,7 @@ public class SledEntity extends Entity implements IControllableVehicle {
 
     //friction
     private float landFriction;
-    private GroundStatus groundStatus;
+    private GroundStatus groundStatus = GroundStatus.IN_AIR;
 
     //cached references. both updated every tick
     @Nullable

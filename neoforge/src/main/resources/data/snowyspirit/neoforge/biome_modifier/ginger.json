@@ -1,4 +1,7 @@
 {
+  "neoforge:conditions": [
+    {"type": "snowyspirit:flag", "flag": "ginger"}
+  ],
   "type": "neoforge:add_features",
   "biomes": "#snowyspirit:has_wild_ginger",
   "features": "snowyspirit:wild_ginger",

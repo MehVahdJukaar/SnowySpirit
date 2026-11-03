@@ -9,6 +9,7 @@ import net.mehvahdjukaar.moonlight.api.platform.PlatHelper;
 import net.mehvahdjukaar.snowyspirit.SnowySpirit;
 import net.mehvahdjukaar.snowyspirit.client.WreathRenderer;
 import net.mehvahdjukaar.snowyspirit.common.wreath.WreathHandler;
+import net.mehvahdjukaar.snowyspirit.configs.CommonConfigs;
 import net.mehvahdjukaar.snowyspirit.reg.ModTags;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
@@ -35,6 +36,8 @@ public class SnowySpiritFabric implements ModInitializer {
 
 
     private static void commonSetup() {
+        if (!CommonConfigs.GINGER.get()) return;
+
         BiomeModifications.addFeature(BiomeSelectors.tag(ModTags.HAS_GINGER),
                 GenerationStep.Decoration.VEGETAL_DECORATION,
                 ResourceKey.create(Registries.PLACED_FEATURE, SnowySpirit.res("wild_ginger")));

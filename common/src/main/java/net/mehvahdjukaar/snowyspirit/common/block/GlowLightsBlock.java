@@ -145,10 +145,10 @@ public class GlowLightsBlock extends WaterBlock implements EntityBlock, IColored
     @Override
     public List<ItemStack> getDrops(BlockState state, LootParams.Builder builder) {
         List<ItemStack> drops = super.getDrops(state, builder);
-        if (builder.getParameter(LootContextParams.BLOCK_ENTITY) instanceof GlowLightsBlockTile tile) {
+        if (builder.getOptionalParameter(LootContextParams.BLOCK_ENTITY) instanceof GlowLightsBlockTile tile) {
             //checks again if the content itself can be mined
             BlockState heldState = tile.getHeldBlock();
-            if (builder.getParameter(LootContextParams.THIS_ENTITY) instanceof ServerPlayer player) {
+            if (builder.getOptionalParameter(LootContextParams.THIS_ENTITY) instanceof ServerPlayer player) {
                 if (!ForgeHelper.canHarvestBlock(heldState, builder.getLevel(), BlockPos.containing(builder.getParameter(LootContextParams.ORIGIN)), player)) {
                     return drops;
                 }

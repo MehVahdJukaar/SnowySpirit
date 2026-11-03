@@ -23,7 +23,7 @@ issueTrackerURL = "${mod_github}/issues"
 
 [modproperties.snowyspirit]
 catalogueItemIcon = "snowyspirit:sled_oak"
-configuredBackground = "snowyspirit:textures/blocks/gingerbread_frosted_block.png"
+configuredBackground = "snowyspirit:textures/block/gingerbread_frosted_block.png"
 
 [[dependencies.${mod_id}]]
     modId = "neoforge"
