@@ -19,6 +19,8 @@ dependencies {
     modCompileOnly("net.mehvahdjukaar:supplementaries-common:${supplementaries_version}")
 
     modCompileOnly("curse.maven:farmers-delight-398521:5772720")
+    modCompileOnly("curse.maven:quark-243121:8146177")
+    modCompileOnly("curse.maven:zeta-968868:7980010")
     modCompileOnly("maven.modrinth:entity-model-features:3.3.12-fabric-1.21")
     modCompileOnly("maven.modrinth:entitytexturefeatures:7.2.6-fabric-1.21")
     modCompileOnly("curse.maven:entity-texture-features-fabric-568563:5000985")

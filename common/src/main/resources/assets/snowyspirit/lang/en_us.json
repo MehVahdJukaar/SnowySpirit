@@ -1,8 +1,8 @@
 {
   "advancements.adventure.ride_sled_fast.description": "Ride a sled down a slope",
   "advancements.adventure.ride_sled_fast.title": "It's All Downhill From Here",
-  "advancements.adventure.sled_with_wolf.description": "The Wolf of Haul Street",
-  "advancements.adventure.sled_with_wolf.title": "Let a wolf pull a sled with chest",
+  "advancements.adventure.sled_with_wolf.description": "Let a wolf pull a sled with chest",
+  "advancements.adventure.sled_with_wolf.title": "The Wolf of Haul Street",
   "advancements.husbandry.eat_gingerbread_golem.description": "Take a bite off a Gingerbread Golem",
   "advancements.husbandry.eat_gingerbread_golem.title": "You're a Monster!",
   "block.snowyspirit.candy_cane_block": "Candy Cane Block",
@@ -54,6 +54,7 @@
   "block_type.snowyspirit.sled": "Sled",
   "entity.snowyspirit.container_entity": "Sled Chest",
   "entity.snowyspirit.gingerbread_golem": "Gingerbread Golem",
+  "entity.snowyspirit.gingerbread_giant": "Gingerbread Giant",
   "entity.snowyspirit.sled": "Sled",
   "gui.snowyspirit.snow_season_off": "Snow Season Off",
   "gui.snowyspirit.snow_season_on": "Snow Season On",
