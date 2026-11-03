@@ -23,22 +23,13 @@
       }
     ]
   },
-  "block.sack.place": {
-    "sounds": [
-      "snowyspirit:block/gingerbread_break_0",
-      "snowyspirit:block/gingerbread_break_1",
-      "snowyspirit:block/gingerbread_break_2",
-      "snowyspirit:block/gingerbread_break_3"
-    ],
-    "subtitle": "subtitle.snowyspirit.gingerbread.place"
-  },
   "block.gingerbread.place": {
     "sounds": [
       "snowyspirit:block/gingerbread_break_0",
       "snowyspirit:block/gingerbread_break_1",
-      "snowyspirit:block/gingerbread_break_2",
-      "snowyspirit:block/gingerbread_break_3"
-    ]
+      "snowyspirit:block/gingerbread_break_2"
+    ],
+    "subtitle": "subtitles.block.generic.place"
   },
   "block.gingerbread.hit": {
     "sounds": [
@@ -48,7 +39,8 @@
         "name": "snowyspirit:block/gingerbread_hit_2",
         "pitch": 0.8
       }
-    ]
+    ],
+    "subtitle": "subtitles.block.generic.hit"
   },
   "block.gingerbread.step": {
     "sounds": [
@@ -64,7 +56,8 @@
         "name": "snowyspirit:block/gingerbread_step_2",
         "volume": 0.8
       }
-    ]
+    ],
+    "subtitle": "subtitles.block.generic.footsteps"
   },
   "block.gingerbread.fall": {
     "sounds": [
@@ -80,6 +73,7 @@
       "snowyspirit:block/gingerbread_break_t2",
       "snowyspirit:block/gingerbread_break_t3",
       "snowyspirit:block/gingerbread_break_t4"
-    ]
+    ],
+    "subtitle": "subtitles.block.generic.break"
   }
 }

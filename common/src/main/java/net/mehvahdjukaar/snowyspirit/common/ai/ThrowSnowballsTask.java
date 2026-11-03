@@ -28,8 +28,6 @@ public class ThrowSnowballsTask extends Behavior<Villager> {
     //cooldown between tasks
     private int cooldown = 0;
 
-    //TODO: check this code. there was some lazy work here and it works a bit wonky
-
     public ThrowSnowballsTask(int range) {
         super(ImmutableMap.of(
                 MemoryModuleType.LOOK_TARGET, MemoryStatus.VALUE_PRESENT));
@@ -48,7 +46,7 @@ public class ThrowSnowballsTask extends Behavior<Villager> {
     @Override
     protected boolean canStillUse(ServerLevel pLevel, Villager pEntity, long pGameTime) {
         if (duration <= 0) return false;
-        return this.eggs == 0 || this.checkExtraStartConditions(pLevel, pEntity);
+        return this.eggs > 0 && this.checkExtraStartConditions(pLevel, pEntity);
     }
 
     @Override
@@ -58,11 +56,9 @@ public class ThrowSnowballsTask extends Behavior<Villager> {
         pEntity.getBrain().setMemory(MemoryModuleType.INTERACTION_TARGET, livingentity);
         //BehaviorUtils.lookAtEntity(pEntity, livingentity);
         displayAsHeldItem(pEntity, new ItemStack(Items.SNOWBALL));
-        if (eggs == 0) {
-            this.duration = 20 * 20;
-            this.eggs = pLevel.random.nextInt(3) + 1;
-            this.cooldownBetweenAttacks = 35 + pLevel.random.nextInt(30);
-        }
+        this.duration = 20 * 20;
+        this.eggs = pLevel.random.nextInt(3) + 1;
+        this.cooldownBetweenAttacks = 35 + pLevel.random.nextInt(30);
     }
 
     @Override
@@ -87,10 +83,6 @@ public class ThrowSnowballsTask extends Behavior<Villager> {
             pLevel.addFreshEntity(egg);
 
         }
-        if (eggs <= 0) {
-            //goes in cooldown when it shot its snowballs
-            this.cooldown = 20 * (10 + pLevel.random.nextInt(15)) + pLevel.random.nextInt(20);
-        }
         this.duration--;
     }
 
@@ -109,6 +101,7 @@ public class ThrowSnowballsTask extends Behavior<Villager> {
     protected void stop(ServerLevel pLevel, Villager pEntity, long pGameTime) {
         super.stop(pLevel, pEntity, pGameTime);
         clearInteractionTarget(pEntity);
+        this.cooldown = 20 * (10 + pLevel.random.nextInt(15)) + pLevel.random.nextInt(20);
     }
 
     @Nullable
