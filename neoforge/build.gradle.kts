@@ -26,6 +26,8 @@ dependencies {
 
     modCompileOnly("curse.maven:jei-238222:5846880")
     modCompileOnly("curse.maven:farmers-delight-398521:5772720")
+    modCompileOnly("curse.maven:quark-243121:8146177")
+    modCompileOnly("curse.maven:zeta-968868:7980010")
     modCompileOnly("curse.maven:serene-seasons-291874:4577617")
     modCompileOnly("curse.maven:biomes-o-plenty-220318:4683058")
     modCompileOnly("curse.maven:terrablender-563928:4647094")

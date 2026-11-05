@@ -60,6 +60,18 @@ public class GingyEntityRenderer extends HumanoidMobRenderer<GingyEntity, GingyM
             poseStack.mulPose(Axis.XP.rotationDegrees(f * deg));
         }
 
+        float cartwheel = entity.getCartwheelProgress(partialTicks);
+        if (cartwheel > 0) {
+            float spin = (1 - Mth.cos(Mth.PI * cartwheel)) / 2;
+            float angle = (entity.isCartwheelRight() ? -Mth.TWO_PI : Mth.TWO_PI) * entity.getCartwheelSpinCount() * spin;
+            float center = 9 / 16f;
+            // splayed legs sit it a bit lower
+            float pivot = Mth.lerp(GingyModel.cartwheelPoseWeight(cartwheel), center, GingyEntity.CARTWHEEL_RADIUS);
+            poseStack.translate(0, pivot * this.scale, 0);
+            poseStack.mulPose(Axis.ZP.rotation(angle));
+            poseStack.translate(0, -center * this.scale, 0);
+        }
+
         float period = 2.5f * Mth.PI * this.scale;
         float limbSwingAmount = 0.0F;
         float walkAnim = 0.0F;
@@ -84,7 +96,7 @@ public class GingyEntityRenderer extends HumanoidMobRenderer<GingyEntity, GingyM
 
         if (limbSwingAmount > 0.001) {
             float angle = walkAnim * (Mth.TWO_PI / period);
-            float sideSwayPower = 20 / this.scale;
+            float sideSwayPower = 20 / this.scale * (1 - GingyModel.cartwheelPoseWeight(cartwheel));
             poseStack.mulPose(Axis.ZP.rotationDegrees(Mth.cos(angle) * sideSwayPower * limbSwingAmount));
         }
     }

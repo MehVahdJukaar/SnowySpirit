@@ -12,6 +12,7 @@ public class GingyModel extends HumanoidModel<GingyEntity> {
 
     private final ModelPart bodyEaten;
     private final float scale;
+    private float cartwheelWeight;
 
     public GingyModel(ModelPart modelPart, float scale) {
         super(modelPart);
@@ -29,6 +30,11 @@ public class GingyModel extends HumanoidModel<GingyEntity> {
         this.head.visible = b < 3;
         this.body.visible = b < 4;
         this.bodyEaten.visible = !this.body.visible;
+        this.cartwheelWeight = cartwheelPoseWeight(entity.getCartwheelProgress(partialTick));
+    }
+
+    public static float cartwheelPoseWeight(float progress) {
+        return Mth.clamp(Mth.sin(Mth.PI * progress) * 2.5f, 0, 1);
     }
 
     @Override
@@ -80,6 +86,18 @@ public class GingyModel extends HumanoidModel<GingyEntity> {
         this.rightLeg.zRot = (0.005F + legZRot);
         this.leftLeg.zRot = -(0.005F + legZRot);
 
+        if (cartwheelWeight > 0) {
+            float w = cartwheelWeight;
+            this.rightArm.zRot = Mth.lerp(w, this.rightArm.zRot, 0.1f);
+            this.leftArm.zRot = Mth.lerp(w, this.leftArm.zRot, -0.1f);
+            this.rightArm.yRot = Mth.lerp(w, this.rightArm.yRot, 0);
+            this.leftArm.yRot = Mth.lerp(w, this.leftArm.yRot, 0);
+            this.rightLeg.zRot = Mth.lerp(w, this.rightLeg.zRot, 0.65f);
+            this.leftLeg.zRot = Mth.lerp(w, this.leftLeg.zRot, -0.65f);
+            this.rightLeg.xRot = Mth.lerp(w, this.rightLeg.xRot, 0);
+            this.leftLeg.xRot = Mth.lerp(w, this.leftLeg.xRot, 0);
+            this.head.zRot *= 1 - w;
+        }
 
         if (this.riding || entity.isOrderedToSit()) {
             this.rightLeg.xRot = -Mth.HALF_PI + 0.05f;
