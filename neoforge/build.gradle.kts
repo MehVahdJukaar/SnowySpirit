@@ -33,5 +33,7 @@ dependencies {
     modCompileOnly("curse.maven:terrablender-563928:4647094")
     modCompileOnly("curse.maven:configured-457570:5180900")
     modCompileOnly("curse.maven:entity-texture-features-fabric-568563:5000985")
+    // 3.3.x crashes without create on neoforge
+    modRuntimeOnly("maven.modrinth:dramatic-doors:y70qyPca")
 
 }

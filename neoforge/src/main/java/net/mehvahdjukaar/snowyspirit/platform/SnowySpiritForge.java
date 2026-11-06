@@ -47,7 +47,7 @@ public class SnowySpiritForge {
 
     @SubscribeEvent(priority = EventPriority.LOW)
     public void onRightClickBlock(PlayerInteractEvent.RightClickBlock event) {
-        InteractionResult res = WreathHandler.onRightClickBlock(event.getEntity(), event.getLevel(), event.getItemStack(), event.getPos());
+        InteractionResult res = WreathHandler.onRightClickBlock(event.getEntity(), event.getLevel(), event.getHand(), event.getPos());
         if (res != InteractionResult.PASS) {
             event.setCanceled(true);
             event.setCancellationResult(res);

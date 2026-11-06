@@ -6,7 +6,9 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import net.mehvahdjukaar.moonlight.api.client.util.RenderUtil;
 import net.mehvahdjukaar.snowyspirit.common.wreath.ChunksWithWreaths;
+import net.mehvahdjukaar.snowyspirit.common.block.WreathBlock;
 import net.mehvahdjukaar.snowyspirit.common.wreath.WreathData;
+import net.mehvahdjukaar.snowyspirit.common.wreath.WreathHandler;
 import net.mehvahdjukaar.snowyspirit.reg.ModRegistry;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
@@ -14,16 +16,14 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.DoorBlock;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.DoorHingeSide;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec2;
@@ -31,6 +31,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
 import java.util.Iterator;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class WreathRenderer {
@@ -56,7 +57,6 @@ public class WreathRenderer {
             ChunkAccess chunk = loadedChunksInRange.next();
             WreathData wreathData = ModRegistry.WREATH_CHUNK_DATA.getOrNull(chunk);
             if (wreathData == null) continue;
-            BlockState state = ModRegistry.WREATH.get().defaultBlockState();
             BlockRenderDispatcher blockRenderer = mc.getBlockRenderer();
 
             for (BlockPos pos : wreathData.getWreathBlocks()) {
@@ -67,35 +67,9 @@ public class WreathRenderer {
 
 
                 BlockState doorState = level.getBlockState(pos);
-
-                if (doorState.getBlock() instanceof DoorBlock) {
-                    Direction dir = doorState.getValue(DoorBlock.FACING);
-                    boolean open = doorState.getValue(DoorBlock.OPEN);
-                    boolean hinge = doorState.getValue(DoorBlock.HINGE) == DoorHingeSide.RIGHT;
-                    if (open) {
-                        if (hinge) {
-                            dir = dir.getCounterClockWise();
-                        } else {
-                            dir = dir.getClockWise();
-                        }
-                    }
-                    Vec2 dim = calculateDoorDimensions(level, pos, doorState, dir.getAxis());
-
-                    dir = dir.getOpposite(); //idk why
-
-                    poseStack.translate(0.5, 0.5, 0.5);
-
-                    poseStack.pushPose();
-                    poseStack.mulPose(Axis.YP.rotationDegrees(-dir.toYRot()));
-                    poseStack.translate(-0.5, -0.5, -0.5 + dim.x);
-                    RenderUtil.renderBlock(0, poseStack, bufferSource, state, level, pos, blockRenderer);
-                    poseStack.popPose();
-
-                    poseStack.pushPose();
-                    poseStack.mulPose(Axis.YP.rotationDegrees(-dir.getOpposite().toYRot()));
-                    poseStack.translate(-0.5, -0.5, -0.5 + dim.y);
-                    RenderUtil.renderBlock(0, poseStack, bufferSource, state, level, pos, blockRenderer);
-                    poseStack.popPose();
+                if (WreathHandler.canHoldWreath(doorState)) {
+                    renderOnBothSides(level, pos, doorState, poseStack, w ->
+                            RenderUtil.renderBlock(0, poseStack, bufferSource, w, level, pos, blockRenderer));
                 }
 
                 //render stuff
@@ -133,44 +107,17 @@ public class WreathRenderer {
                 }
                 BlockState doorState = level.getBlockState(pos);
 
-               BlockPos relativePos = pos.subtract(origin);
+                BlockPos relativePos = pos.subtract(origin);
                 poseStack.pushPose();
-                poseStack.translate(relativePos.getX() + 0.5, relativePos.getY() + 0.5, relativePos.getZ() + 0.5);
-
-                BakedModel blockModel = blockRenderer.getBlockModel(wreath);
-                if (doorState.getBlock() instanceof DoorBlock) {
-                    Direction dir = doorState.getValue(DoorBlock.FACING);
-                    boolean open = doorState.getValue(DoorBlock.OPEN);
-                    boolean hinge = doorState.getValue(DoorBlock.HINGE) == DoorHingeSide.RIGHT;
-                    if (open) {
-                        if (hinge) {
-                            dir = dir.getCounterClockWise();
-                        } else {
-                            dir = dir.getClockWise();
-                        }
-                    }
-                    Vec2 dim = calculateDoorDimensions(level, pos, doorState, dir.getAxis());
-
-
-                    poseStack.pushPose();
-                    poseStack.mulPose(Axis.YP.rotationDegrees(-dir.toYRot()));
-                    poseStack.translate(-0.5, -0.5, -0.5 + dim.y);
-                    blockRenderer.getModelRenderer().tesselateBlock(level, blockModel, wreath,
-                            pos, poseStack, vc, false, random,
-                            42, OverlayTexture.NO_OVERLAY);
-
-                    poseStack.popPose();
-
-                    poseStack.pushPose();
-                    poseStack.mulPose(Axis.YP.rotationDegrees(-dir.getOpposite().toYRot()));
-                    poseStack.translate(-0.5, -0.5, -0.5 + dim.x);
-                    blockRenderer.getModelRenderer().tesselateBlock(level, blockModel, wreath,
-                            pos, poseStack, vc, false, random,
-                            42, OverlayTexture.NO_OVERLAY);
-                    poseStack.popPose();
+                poseStack.translate(relativePos.getX(), relativePos.getY(), relativePos.getZ());
+                if (WreathHandler.canHoldWreath(doorState)) {
+                    VertexConsumer buffer = vc;
+                    renderOnBothSides(level, pos, doorState, poseStack, w ->
+                            blockRenderer.getModelRenderer().tesselateBlock(level, blockRenderer.getBlockModel(w), w,
+                                    pos, poseStack, buffer, false, random,
+                                    42, OverlayTexture.NO_OVERLAY));
                 } else {
-                    poseStack.translate(-0.5, -0.5, -0.5);
-                    blockRenderer.getModelRenderer().tesselateBlock(level, blockModel, wreath,
+                    blockRenderer.getModelRenderer().tesselateBlock(level, blockRenderer.getBlockModel(wreath), wreath,
                             pos, poseStack, vc, false, random,
                             42, OverlayTexture.NO_OVERLAY);
                 }
@@ -182,14 +129,42 @@ public class WreathRenderer {
         }
     }
 
-    private static Vec2 calculateDoorDimensions(BlockGetter level, BlockPos pos, BlockState state, Direction.Axis axis) {
-        state = state.setValue(DoorBlock.FACING, Direction.NORTH).setValue(DoorBlock.OPEN, Boolean.FALSE)
-                .setValue(DoorBlock.HINGE, DoorHingeSide.RIGHT);
-        VoxelShape shape = state.getShape(level, pos);
+
+    //pose stack has to be at the door block corner
+    private static void renderOnBothSides(BlockGetter level, BlockPos pos, BlockState doorState, PoseStack poseStack,
+                                          Consumer<BlockState> renderWreath) {
+        VoxelShape shape = doorState.getShape(level, pos);
+        if (shape.isEmpty()) return;
         AABB bounds = shape.bounds();
-        double front = bounds.minZ - 1;
-        double back = -bounds.maxZ;
-        return new Vec2((float) front, (float) back);
+
+        Direction.Axis panelAxis = Direction.Axis.Y;
+        for (Direction.Axis axis : Direction.Axis.values()) {
+            if (bounds.max(axis) - bounds.min(axis) < bounds.max(panelAxis) - bounds.min(panelAxis)) panelAxis = axis;
+        }
+        BlockState wreath = ModRegistry.WREATH.get().defaultBlockState();
+
+        for (Direction.AxisDirection side : Direction.AxisDirection.values()) {
+            Direction face = Direction.fromAxisAndDirection(panelAxis, side);
+            boolean positive = side == Direction.AxisDirection.POSITIVE;
+            Vec3 offset = Vec3.ZERO.with(panelAxis, positive ? bounds.max(panelAxis) : bounds.min(panelAxis) - 1);
+
+            poseStack.pushPose();
+            poseStack.translate(offset.x, offset.y, offset.z);
+            if (panelAxis.isHorizontal()) {
+                renderWreath.accept(wreath.setValue(WreathBlock.FACING, face));
+            } else {
+                //closed trapdoor. lay it flat with the top towards the hinge
+                Direction hinge = doorState.getOptionalValue(BlockStateProperties.HORIZONTAL_FACING)
+                        .orElse(Direction.NORTH).getOpposite();
+                poseStack.translate(0.5, 0.5, 0.5);
+                poseStack.mulPose(Axis.YP.rotationDegrees(positive ? 180 - hinge.toYRot() : -hinge.toYRot()));
+                poseStack.mulPose(Axis.XP.rotationDegrees(positive ? -90 : 90));
+
+                poseStack.translate(-0.5, -0.5, -0.5);
+                renderWreath.accept(wreath.setValue(WreathBlock.FACING, Direction.SOUTH));
+            }
+            poseStack.popPose();
+        }
     }
 
 

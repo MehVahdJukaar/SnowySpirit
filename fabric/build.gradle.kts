@@ -32,4 +32,5 @@ dependencies {
     modCompileOnly("curse.maven:entity-texture-features-fabric-568563:5000985")
 
     modRuntimeOnly("maven.modrinth:sodium:mc1.21.1-0.8.12-fabric")
+    modRuntimeOnly("maven.modrinth:dramatic-doors:X5oMCwaA")
 }

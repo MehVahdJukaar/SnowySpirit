@@ -31,7 +31,7 @@ public class SnowySpiritFabric implements ModInitializer {
         }
 
         UseBlockCallback.EVENT.register((player, world, hand, hitResult) ->
-                WreathHandler.onRightClickBlock(player, world, player.getItemInHand(hand), hitResult.getBlockPos()));
+                WreathHandler.onRightClickBlock(player, world, hand, hitResult.getBlockPos()));
     }
 
 

@@ -21,9 +21,7 @@ import net.minecraft.world.entity.ai.memory.MemoryStatus;
 import net.minecraft.world.entity.ai.memory.WalkTarget;
 import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.DoorBlock;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import org.jetbrains.annotations.Nullable;
 
 public class PlaceWreathTask extends Behavior<Villager> {
@@ -126,11 +124,9 @@ public class PlaceWreathTask extends Behavior<Villager> {
     public static boolean isValidPlacementSpot(ServerLevel serverLevel, BlockPos pos) {
 
         BlockState state = serverLevel.getBlockState(pos);
-        if (state.getBlock() instanceof DoorBlock) {
-            boolean lower = state.getValue(DoorBlock.HALF) == DoubleBlockHalf.LOWER;
-
+        if (WreathHandler.isDoor(state)) {
             WreathData c = WreathData.getAt(serverLevel, pos);
-            return c != null && (lower ? !c.hasWreathAt(pos.above()) : !c.hasWreathAt(pos));
+            return c != null && !c.hasWreathAt(WreathHandler.getWreathPos(state, pos));
         }
 
         return false;

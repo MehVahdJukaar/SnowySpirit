@@ -223,7 +223,7 @@ public class GlowLightsBlock extends WaterBlock implements EntityBlock, IColored
             var drops = this.shearAction(pPlayer, stack, level, pos);
             level.playSound(pPlayer, pPlayer.getX(),
                     pPlayer.getY(), pPlayer.getZ(),
-                    SoundEvents.BEEHIVE_SHEAR, SoundSource.BLOCKS, 1.0F, 1.0F);
+                    SoundEvents.SHEEP_SHEAR, SoundSource.BLOCKS, 1.0F, 1.0F);
             drops.forEach(d -> {
                 ItemEntity ent = new ItemEntity(level, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, d);
                 ent.setDefaultPickUpDelay();

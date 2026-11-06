@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import net.mehvahdjukaar.moonlight.api.platform.PlatHelper;
 import net.mehvahdjukaar.snowyspirit.SnowySpirit;
 import net.mehvahdjukaar.snowyspirit.common.wreath.WreathData;
+import net.mehvahdjukaar.snowyspirit.common.wreath.WreathHandler;
 import net.mehvahdjukaar.snowyspirit.reg.ModMemoryModules;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
@@ -16,9 +17,7 @@ import net.minecraft.world.entity.ai.memory.WalkTarget;
 import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.level.block.DoorBlock;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 
 public class RemoveWreathTask extends Behavior<Villager> {
     private final float speedModifier;
@@ -84,11 +83,10 @@ public class RemoveWreathTask extends Behavior<Villager> {
             this.ticksSinceReached++;
 
             BlockState state = level.getBlockState(pos);
-            if (state.getBlock() instanceof DoorBlock) {
-                boolean lower = state.getValue(DoorBlock.HALF) == DoubleBlockHalf.LOWER;
+            if (WreathHandler.canHoldWreath(state)) {
                 var c = WreathData.getAt(level, pos);
 
-                pos = lower ? pos.above() : pos;
+                pos = WreathHandler.getWreathPos(state, pos);
                 if (c != null && c.hasWreathAt(pos)) {
                     //breaking animation. same as fodder lol. might have the same issues
                     int k = (int) ((float) this.ticksSinceReached / (float) 10 * 10.0F);

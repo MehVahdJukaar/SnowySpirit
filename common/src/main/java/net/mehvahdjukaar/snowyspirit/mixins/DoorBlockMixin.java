@@ -4,7 +4,6 @@ import net.mehvahdjukaar.snowyspirit.common.wreath.WreathHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.DoorBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import org.spongepowered.asm.mixin.Mixin;
@@ -22,9 +21,9 @@ public class DoorBlockMixin {
                                 BlockState newState,
                                 boolean isMoving,
                                 CallbackInfo ci) {
-        if (oldState.getBlock() instanceof DoorBlock &&
-                !(newState.getBlock() instanceof DoorBlock) &&
-                world instanceof ServerLevel sl) {
+        if (WreathHandler.canHoldWreath(oldState) &&
+                !WreathHandler.canHoldWreath(newState) &&
+                (world instanceof ServerLevel sl)) {
             WreathHandler.removeWreathAt(pos, sl);
         }
     }

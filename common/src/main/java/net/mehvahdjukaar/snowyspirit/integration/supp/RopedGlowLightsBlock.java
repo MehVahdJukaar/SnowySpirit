@@ -58,7 +58,7 @@ public class RopedGlowLightsBlock extends RopeBlock implements IColored, IWashab
                 level.setBlockAndUpdate(pos, SuppCompat.glowLightsToRope(state));
                 popResource(level, pos, this.lightsStack());
             }
-            level.playSound(player, pos, SoundEvents.BEEHIVE_SHEAR, SoundSource.BLOCKS, 1.0F, 1.0F);
+            level.playSound(player, pos, SoundEvents.SHEEP_SHEAR, SoundSource.BLOCKS, 1.0F, 1.0F);
             stack.hurtAndBreak(1, player, hand == InteractionHand.MAIN_HAND ? EquipmentSlot.MAINHAND : EquipmentSlot.OFFHAND);
             return ItemInteractionResult.sidedSuccess(level.isClientSide);
         }
