@@ -56,6 +56,7 @@ public class GingyEntity extends AbstractGolem implements OwnableEntity {
     private static final byte CARTWHEEL_EVENT = 70;
     private static final byte CARTWHEEL_TURN_EVENT = 74;
     public static final float CARTWHEEL_RADIUS = 7.8f / 16;
+    public static final float WALK_LEG_SWING = 0.9f;
 
     private int cartwheelStart = -1;
     private boolean cartwheelRight;
@@ -70,7 +71,7 @@ public class GingyEntity extends AbstractGolem implements OwnableEntity {
     protected void registerGoals() {
         this.goalSelector.addGoal(1, new FloatGoal(this));
         this.goalSelector.addGoal(2, new GingySitWhenOrderedToGoal(this));
-        this.goalSelector.addGoal(5, new MeleeAttackGoal(this, 1.5, true));
+        this.goalSelector.addGoal(5, new MeleeAttackGoal(this, 1.25, true));
         this.goalSelector.addGoal(6, new GingyFollowOwnerGoal(this, 1.0, 7.0F, 3.5F, false));
         this.goalSelector.addGoal(10, new GingyCartwheelGoal(this));
         this.goalSelector.addGoal(11, new WaterAvoidingRandomStrollGoal(this, 0.8, 1.0000001E-5F));
@@ -382,6 +383,18 @@ public class GingyEntity extends AbstractGolem implements OwnableEntity {
             this.setPersistenceRequired();
         }
         return interactionResult;
+    }
+
+    // matches leg length so feet dont slide
+    public static float walkCyclePeriod(float scale) {
+        float leg = 6 / 16F * scale;
+        return 16 * leg * Mth.sin(WALK_LEG_SWING);
+    }
+
+    //vanilla caps it at 1 so anything faster than 0.25 b/t slides
+    @Override
+    protected void updateWalkAnimation(float distance) {
+        this.walkAnimation.update(distance * 4, 0.4f);
     }
 
     @Override

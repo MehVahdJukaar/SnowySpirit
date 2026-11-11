@@ -54,12 +54,12 @@ public class GingyModel extends HumanoidModel<GingyEntity> {
             f = 1.0F;
         }
 
-        float period = 2.5f * Mth.PI * scale;
+        float period = GingyEntity.walkCyclePeriod(scale);
         float angle = walkAnimation * (Mth.TWO_PI / period);
 
         float armSwingPower = 2;
         float cos = Mth.cos(angle);
-        float walkCycle = cos * limbSwingAmount;
+        float legSwing = GingyEntity.WALK_LEG_SWING * Mth.clamp(limbSwingAmount / 0.3f, 0, 1);
         float walkCycleClamped = cos * Mth.clamp(limbSwingAmount, 0, 0.4f);
 
         this.head.zRot = walkCycleClamped * 0.3f;
@@ -75,8 +75,8 @@ public class GingyModel extends HumanoidModel<GingyEntity> {
         this.leftArm.xRot = 0.005F;
 
 
-        this.rightLeg.xRot = walkCycle * 1.4F / f;
-        this.leftLeg.xRot = -walkCycle * 1.4F / f;
+        this.rightLeg.xRot = cos * legSwing / f;
+        this.leftLeg.xRot = -cos * legSwing / f;
 
         this.rightLeg.yRot = 0.005F;
         this.leftLeg.yRot = -0.005F;

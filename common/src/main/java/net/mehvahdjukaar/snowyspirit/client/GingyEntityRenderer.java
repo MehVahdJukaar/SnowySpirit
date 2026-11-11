@@ -72,7 +72,7 @@ public class GingyEntityRenderer extends HumanoidMobRenderer<GingyEntity, GingyM
             poseStack.translate(0, -center * this.scale, 0);
         }
 
-        float period = 2.5f * Mth.PI * this.scale;
+        float period = GingyEntity.walkCyclePeriod(scale);
         float limbSwingAmount = 0.0F;
         float walkAnim = 0.0F;
         boolean orderedToSit = entity.isOrderedToSit();

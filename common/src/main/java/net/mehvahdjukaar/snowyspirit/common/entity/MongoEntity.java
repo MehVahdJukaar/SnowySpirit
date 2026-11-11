@@ -97,7 +97,7 @@ public class MongoEntity extends GingyEntity implements PlayerRideableJumping {
         if (level().isClientSide) {
             //needs to match the renderer
             float scale = 10;
-            float period = 2.5f * Mth.PI * scale;
+            float period = walkCyclePeriod(scale);
             float limbSwingAmount = 0.0F;
             float walkAnim = 0.0F;
             if (this.isAlive()) {
