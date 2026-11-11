@@ -52,13 +52,15 @@ public class GingyEntity extends AbstractGolem implements OwnableEntity {
 
     public static final Predicate<LivingEntity> TARGET_SELECTOR = (entity) -> entity.getType().is(ModTags.GINGY_TARGETS);
 
-    // 70-73, low bit is right, second bit is double spin
+    //70-73, low bit is right, second bit is double spin
     private static final byte CARTWHEEL_EVENT = 70;
+    private static final byte CARTWHEEL_TURN_EVENT = 74;
     public static final float CARTWHEEL_RADIUS = 7.8f / 16;
 
     private int cartwheelStart = -1;
     private boolean cartwheelRight;
     private int cartwheelSpinCount = 1;
+    private int bodyLockTicks;
 
     public GingyEntity(EntityType<? extends AbstractGolem> entityType, Level level) {
         super(entityType, level);
@@ -194,10 +196,18 @@ public class GingyEntity extends AbstractGolem implements OwnableEntity {
         }
     }
 
+    public void startCartwheelTurn() {
+        this.bodyLockTicks = 20;
+        if (!this.level().isClientSide) {
+            this.level().broadcastEntityEvent(this, CARTWHEEL_TURN_EVENT);
+        }
+    }
+
     public void startCartwheel(boolean right, int spins) {
         this.cartwheelStart = this.tickCount;
         this.cartwheelRight = right;
         this.cartwheelSpinCount = spins;
+        this.bodyLockTicks = 0;
         if (!this.level().isClientSide) {
             this.level().broadcastEntityEvent(this, (byte) (CARTWHEEL_EVENT + (right ? 1 : 0) + (spins == 2 ? 2 : 0)));
         }
@@ -208,7 +218,20 @@ public class GingyEntity extends AbstractGolem implements OwnableEntity {
         int cartwheel = id - CARTWHEEL_EVENT;
         if (cartwheel >= 0 && cartwheel < 4) {
             this.startCartwheel((cartwheel & 1) != 0, (cartwheel & 2) != 0 ? 2 : 1);
+        } else if (id == CARTWHEEL_TURN_EVENT) {
+            this.startCartwheelTurn();
         } else super.handleEntityEvent(id);
+    }
+
+    @Override
+    protected float tickHeadTurn(float yRot, float animStep) {
+        if (bodyLockTicks > 0) bodyLockTicks--;
+        //body control would drag it back towards head while cartwheel goal turns it
+        if (bodyLockTicks > 0 || isCartwheeling()) {
+            this.yBodyRot = this.getYRot();
+            return animStep;
+        }
+        return super.tickHeadTurn(yRot, animStep);
     }
 
     //bigger ones spin slower, like a pendulum
