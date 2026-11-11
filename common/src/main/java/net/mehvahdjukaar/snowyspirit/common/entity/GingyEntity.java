@@ -205,10 +205,12 @@ public class GingyEntity extends AbstractGolem implements OwnableEntity {
     }
 
     public void startCartwheel(boolean right, int spins) {
-        this.cartwheelStart = this.tickCount;
+        // hack. event arrives before positions do
+        int clientDelay = this.level().isClientSide ? 2 : 0;
+        this.cartwheelStart = this.tickCount + clientDelay;
         this.cartwheelRight = right;
         this.cartwheelSpinCount = spins;
-        this.bodyLockTicks = 0;
+        this.bodyLockTicks = clientDelay;
         if (!this.level().isClientSide) {
             this.level().broadcastEntityEvent(this, (byte) (CARTWHEEL_EVENT + (right ? 1 : 0) + (spins == 2 ? 2 : 0)));
         }
@@ -242,7 +244,8 @@ public class GingyEntity extends AbstractGolem implements OwnableEntity {
     }
 
     public boolean isCartwheeling() {
-        return cartwheelStart >= 0 && this.tickCount - cartwheelStart < getCartwheelDuration();
+        int ticksIn = this.tickCount - cartwheelStart;
+        return cartwheelStart >= 0 && ticksIn >= 0 && ticksIn < getCartwheelDuration();
     }
 
     public boolean isCartwheelRight() {

@@ -81,8 +81,10 @@ public class GingyCartwheelGoal extends Goal {
         if (targetYaw == mob.yBodyRot) {
             mob.setYRot(targetYaw);
             mob.setYHeadRot(targetYaw);
-            startRolling();
-        } else mob.startCartwheelTurn();
+            this.settleTicks = 3;
+        } else {
+            mob.startCartwheelTurn();
+        }
     }
 
     @Override
