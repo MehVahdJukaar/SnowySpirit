@@ -96,8 +96,16 @@ public class GingyEntityRenderer extends HumanoidMobRenderer<GingyEntity, GingyM
 
         if (limbSwingAmount > 0.001) {
             float angle = walkAnim * (Mth.TWO_PI / period);
-            float sideSwayPower = 20 / this.scale * (1 - GingyModel.cartwheelPoseWeight(cartwheel));
-            poseStack.mulPose(Axis.ZP.rotationDegrees(Mth.cos(angle) * sideSwayPower * limbSwingAmount));
+            float notCartwheeling = 1 - GingyModel.cartwheelPoseWeight(cartwheel);
+
+            float hop = GingyModel.hopWeight(limbSwingAmount, this.scale);
+            float hopAngle = bob * (Mth.PI / GingyModel.HOP_TICKS);
+            float hopHeight = 2.5f / 16 * this.scale * hop * notCartwheeling;
+            poseStack.translate(0, Mth.abs(Mth.sin(hopAngle)) * hopHeight, 0);
+
+            float swayPower = 20 / this.scale * notCartwheeling * (1 - 0.5f * hop);
+            float s = Mth.lerp(hop, Mth.cos(angle), Mth.cos(hopAngle));
+            poseStack.mulPose(Axis.ZP.rotationDegrees(s * swayPower * limbSwingAmount));
         }
     }
 }

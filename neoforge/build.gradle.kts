@@ -35,5 +35,7 @@ dependencies {
     modCompileOnly("curse.maven:entity-texture-features-fabric-568563:5000985")
     // 3.3.x crashes without create on neoforge
     modRuntimeOnly("maven.modrinth:dramatic-doors:y70qyPca")
+    modRuntimeOnly("maven.modrinth:alexs-caves-unofficial-port:pC1MYhqR")
+    modRuntimeOnly("maven.modrinth:citadel-1.21.1-port:mIylVpkN")
 
 }

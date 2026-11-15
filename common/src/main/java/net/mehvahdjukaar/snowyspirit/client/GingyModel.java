@@ -10,6 +10,8 @@ import net.minecraft.util.Mth;
 
 public class GingyModel extends HumanoidModel<GingyEntity> {
 
+    public static final float HOP_TICKS = 5;
+
     private final ModelPart bodyEaten;
     private final float scale;
     private float cartwheelWeight;
@@ -37,6 +39,11 @@ public class GingyModel extends HumanoidModel<GingyEntity> {
         return Mth.clamp(Mth.sin(Mth.PI * progress) * 2.5f, 0, 1);
     }
 
+    // legs are too short to keep up when chasing
+    public static float hopWeight(float limbSwingAmount, float scale) {
+        return Mth.clamp((limbSwingAmount / scale - 0.65f) / 0.15f, 0, 1);
+    }
+
     @Override
     public void setupAnim(GingyEntity entity, float walkAnimation, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
         this.head.yRot = netHeadYaw * Mth.DEG_TO_RAD;
@@ -56,10 +63,11 @@ public class GingyModel extends HumanoidModel<GingyEntity> {
 
         float period = GingyEntity.walkCyclePeriod(scale);
         float angle = walkAnimation * (Mth.TWO_PI / period);
+        float hop = hopWeight(limbSwingAmount, scale);
 
-        float armSwingPower = 2;
-        float cos = Mth.cos(angle);
-        float legSwing = GingyEntity.WALK_LEG_SWING * Mth.clamp(limbSwingAmount / 0.3f, 0, 1);
+        float armSwingPower = 2 + hop;
+        float cos = Mth.lerp(hop, Mth.cos(angle), Mth.cos(ageInTicks * (Mth.PI / HOP_TICKS)));
+        float legSwing = GingyEntity.WALK_LEG_SWING * Mth.clamp(limbSwingAmount / 0.3f, 0, 1) * (1 + 0.3f * hop);
         float walkCycleClamped = cos * Mth.clamp(limbSwingAmount, 0, 0.4f);
 
         this.head.zRot = walkCycleClamped * 0.3f;
