@@ -11,44 +11,57 @@ import net.minecraft.world.phys.Vec3;
 import java.util.EnumSet;
 
 public class GingyCartwheelGoal extends Goal {
-    private final GingyEntity mob;
+    protected final GingyEntity mob;
+    private final boolean fast;
     private float targetYaw;
     private Vec3 rollDirection = Vec3.ZERO;
     private boolean rollRight;
     private int spins;
-    private double rollDistance;
+    protected double rollDistance;
     private int settleTicks;
-    private boolean rolling;
+    protected boolean rolling;
     private int ticks;
 
     public GingyCartwheelGoal(GingyEntity mob) {
+        this(mob, false);
+    }
+
+    protected GingyCartwheelGoal(GingyEntity mob, boolean fast) {
         this.mob = mob;
+        this.fast = fast;
         this.setFlags(EnumSet.of(Flag.MOVE, Flag.LOOK, Flag.JUMP));
     }
 
     @Override
     public boolean canUse() {
-        if (mob.isOrderedToSit() || mob.isPassenger() || mob.isVehicle() || !mob.onGround() || mob.isInWaterOrBubble()) {
+        if (!canCartwheel()) {
             return false;
         }
         if (mob.getRandom().nextInt(reducedTickDelay(400)) != 0) return false;
-        RandomSource random = mob.getRandom();
-        this.spins = random.nextInt(5) == 0 ? 2 : 1;
-        this.rollRight = random.nextBoolean();
+        randomizeSpinsAndSide();
         float bodyYaw = mob.yBodyRot;
 
-        if (random.nextInt(3) == 0) {
-            //turn sideways first
-            float sideOn = bodyYaw + (rollRight ? -90 : 90);
-            if (tryCartwheel(sideOn)) {
-                this.targetYaw = sideOn;
-                return true;
-            }
+        if(mob.getRandom().nextInt(3) == 0 && tryCartwheelTowards(bodyYaw)) {
+            return true;
         }
-        this.targetYaw = bodyYaw;
         if (tryCartwheel(bodyYaw)) return true;
         this.rollRight = !rollRight;
         return tryCartwheel(bodyYaw);
+    }
+
+    protected boolean canCartwheel() {
+        return !mob.isOrderedToSit() && !mob.isPassenger() && !mob.isVehicle() && mob.onGround() && !mob.isInWaterOrBubble();
+    }
+
+    protected void randomizeSpinsAndSide() {
+        RandomSource random = mob.getRandom();
+        this.spins = random.nextInt(5) == 0 ? 2 : 1;
+        this.rollRight = random.nextBoolean();
+    }
+
+    //turn sideways first
+    protected boolean tryCartwheelTowards(float yaw) {
+        return tryCartwheel(yaw + (rollRight ? -90 : 90));
     }
 
     private boolean tryCartwheel(float yaw) {
@@ -60,6 +73,7 @@ public class GingyCartwheelGoal extends Goal {
         AABB box = mob.getBoundingBox();
 
         if (mob.level().noCollision(mob, box.move(dir.scale(distance * 0.5))) && canStandAt(box.move(dir.scale(distance)))) {
+            this.targetYaw = yaw;
             this.rollDirection = dir;
             this.rollDistance = distance;
             return true;
@@ -125,7 +139,7 @@ public class GingyCartwheelGoal extends Goal {
 
     private void startRolling() {
         this.rolling = true;
-        mob.startCartwheel(rollRight, spins);
+        mob.startCartwheel(rollRight, spins, fast);
     }
 
 }

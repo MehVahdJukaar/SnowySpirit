@@ -2,6 +2,7 @@ package net.mehvahdjukaar.snowyspirit.common.entity;
 
 import net.mehvahdjukaar.moonlight.api.util.Utils;
 import net.mehvahdjukaar.snowyspirit.SnowySpirit;
+import net.mehvahdjukaar.snowyspirit.common.ai.GingyCartwheelAttackGoal;
 import net.mehvahdjukaar.snowyspirit.common.ai.GingyCartwheelGoal;
 import net.mehvahdjukaar.snowyspirit.common.ai.GingyFollowOwnerGoal;
 import net.mehvahdjukaar.snowyspirit.common.ai.GingySitWhenOrderedToGoal;
@@ -52,15 +53,20 @@ public class GingyEntity extends AbstractGolem implements OwnableEntity {
 
     public static final Predicate<LivingEntity> TARGET_SELECTOR = (entity) -> entity.getType().is(ModTags.GINGY_TARGETS);
 
-    //70-73, low bit is right, second bit is double spin
+    //from 70-77. these are one shot so not using entity data.. maybe i should.
     private static final byte CARTWHEEL_EVENT = 70;
-    private static final byte CARTWHEEL_TURN_EVENT = 74;
+    private static final int CARTWHEEL_RIGHT_BIT = 1;
+    private static final int CARTWHEEL_DOUBLE_SPIN_BIT = 2;
+    private static final int CARTWHEEL_FAST_BIT = 4;
+    private static final byte CARTWHEEL_TURN_EVENT = 78;
     public static final float CARTWHEEL_RADIUS = 7.8f / 16;
+
     public static final float WALK_LEG_SWING = 0.9f;
 
     private int cartwheelStart = -1;
     private boolean cartwheelRight;
     private int cartwheelSpinCount = 1;
+    private boolean cartwheelingFast;
     private int bodyLockTicks;
 
     public GingyEntity(EntityType<? extends AbstractGolem> entityType, Level level) {
@@ -71,6 +77,7 @@ public class GingyEntity extends AbstractGolem implements OwnableEntity {
     protected void registerGoals() {
         this.goalSelector.addGoal(1, new FloatGoal(this));
         this.goalSelector.addGoal(2, new GingySitWhenOrderedToGoal(this));
+        this.goalSelector.addGoal(4, new GingyCartwheelAttackGoal(this));
         this.goalSelector.addGoal(5, new MeleeAttackGoal(this, 1.25, true));
         this.goalSelector.addGoal(6, new GingyFollowOwnerGoal(this, 1.0, 7.0F, 3.5F, false));
         this.goalSelector.addGoal(10, new GingyCartwheelGoal(this));
@@ -204,23 +211,40 @@ public class GingyEntity extends AbstractGolem implements OwnableEntity {
         }
     }
 
-    public void startCartwheel(boolean right, int spins) {
+    public void startCartwheel(boolean right, int spins, boolean fast) {
         // hack. event arrives before positions do
         int clientDelay = this.level().isClientSide ? 2 : 0;
         this.cartwheelStart = this.tickCount + clientDelay;
         this.cartwheelRight = right;
         this.cartwheelSpinCount = spins;
+        this.cartwheelingFast = fast;
         this.bodyLockTicks = clientDelay;
         if (!this.level().isClientSide) {
-            this.level().broadcastEntityEvent(this, (byte) (CARTWHEEL_EVENT + (right ? 1 : 0) + (spins == 2 ? 2 : 0)));
+            this.level().broadcastEntityEvent(this, encodeCartwheelEvent(right, spins, fast));
         }
+    }
+
+    //all this since client needs to match exactly the server
+    private static byte encodeCartwheelEvent(boolean right, int spins, boolean fast) {
+        int bits = 0;
+        if (right) bits |= CARTWHEEL_RIGHT_BIT;
+        if (spins == 2) bits |= CARTWHEEL_DOUBLE_SPIN_BIT;
+        if (fast) bits |= CARTWHEEL_FAST_BIT;
+        return (byte) (CARTWHEEL_EVENT + bits);
+    }
+
+    private void startCartwheelFromEvent(int bits) {
+        boolean right = (bits & CARTWHEEL_RIGHT_BIT) != 0;
+        int spins = (bits & CARTWHEEL_DOUBLE_SPIN_BIT) != 0 ? 2 : 1;
+
+        this.startCartwheel(right, spins, (bits & CARTWHEEL_FAST_BIT) != 0);
     }
 
     @Override
     public void handleEntityEvent(byte id) {
         int cartwheel = id - CARTWHEEL_EVENT;
-        if (cartwheel >= 0 && cartwheel < 4) {
-            this.startCartwheel((cartwheel & 1) != 0, (cartwheel & 2) != 0 ? 2 : 1);
+        if (cartwheel >= 0 && cartwheel < 8) {
+            this.startCartwheelFromEvent(cartwheel);
         } else if (id == CARTWHEEL_TURN_EVENT) {
             this.startCartwheelTurn();
         } else super.handleEntityEvent(id);
@@ -238,8 +262,13 @@ public class GingyEntity extends AbstractGolem implements OwnableEntity {
     }
 
     //bigger ones spin slower, like a pendulum
+    //shared between goal ana nimation
     public int getCartwheelDuration() {
         float spinTime = cartwheelSpinCount == 2 ? 46 : 30;
+        if (cartwheelingFast) {
+            //for the attack
+            spinTime *= 0.75f;
+        }
         return Mth.ceil(spinTime * Mth.sqrt(this.getBbHeight()));
     }
 
