@@ -60,6 +60,9 @@ public class GingyEntity extends AbstractGolem implements OwnableEntity {
     private static final int CARTWHEEL_FAST_BIT = 4;
     private static final byte CARTWHEEL_TURN_EVENT = 78;
     public static final float CARTWHEEL_RADIUS = 7.8f / 16;
+    private static final float CARTWHEEL_DAMAGE_MULT = 1.5f;
+    private static final float ANGRY_SPEED_MULT = 1.25f;
+    private static final float ANGRY_CARTWHEEL_MULT = 1.33f;
 
     public static final float WALK_LEG_SWING = 0.9f;
 
@@ -78,7 +81,7 @@ public class GingyEntity extends AbstractGolem implements OwnableEntity {
         this.goalSelector.addGoal(1, new FloatGoal(this));
         this.goalSelector.addGoal(2, new GingySitWhenOrderedToGoal(this));
         this.goalSelector.addGoal(4, new GingyCartwheelAttackGoal(this));
-        this.goalSelector.addGoal(5, new MeleeAttackGoal(this, 1.25, true));
+        this.goalSelector.addGoal(5, new MeleeAttackGoal(this, ANGRY_SPEED_MULT, true));
         this.goalSelector.addGoal(6, new GingyFollowOwnerGoal(this, 1.0, 7.0F, 3.5F, false));
         this.goalSelector.addGoal(10, new GingyCartwheelGoal(this));
         this.goalSelector.addGoal(11, new WaterAvoidingRandomStrollGoal(this, 0.8, 1.0000001E-5F));
@@ -267,7 +270,7 @@ public class GingyEntity extends AbstractGolem implements OwnableEntity {
         float spinTime = cartwheelSpinCount == 2 ? 46 : 30;
         if (cartwheelingFast) {
             //for the attack
-            spinTime *= 0.75f;
+            spinTime /= ANGRY_CARTWHEEL_MULT;
         }
         return Mth.ceil(spinTime * Mth.sqrt(this.getBbHeight()));
     }
@@ -437,9 +440,23 @@ public class GingyEntity extends AbstractGolem implements OwnableEntity {
     @Override
     public boolean doHurtTarget(Entity entity) {
         if (super.doHurtTarget(entity)) {
-            this.heal(0.1f);
+            this.healFromEating(entity);
         }
         return false;
+    }
+
+    private void healFromEating(Entity victim) {
+        if (victim.getType().is(ModTags.GINGY_TARGETS)) {
+            this.heal(0.1f);
+        }
+    }
+
+    public void doCartwheelHurtTarget(LivingEntity target) {
+        float damage = (float) this.getAttributeValue(Attributes.ATTACK_DAMAGE) * CARTWHEEL_DAMAGE_MULT;
+        if (target.hurt(this.damageSources().mobAttack(this), damage)) {
+            this.setLastHurtMob(target);
+            this.healFromEating(target);
+        }
     }
 
     public static AttributeSupplier.Builder createAttributes() {

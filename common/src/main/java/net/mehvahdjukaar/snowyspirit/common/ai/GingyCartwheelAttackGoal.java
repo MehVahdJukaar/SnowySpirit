@@ -52,7 +52,7 @@ public class GingyCartwheelAttackGoal extends GingyCartwheelGoal {
         for(LivingEntity le : mob.level().getEntitiesOfClass(LivingEntity.class, box)) {
             boolean enemy = le == target || GingyEntity.TARGET_SELECTOR.test(le);
             if(enemy && alreadyHit.add(le)) {
-                mob.doHurtTarget(le);
+                mob.doCartwheelHurtTarget(le);
             }
         }
     }
