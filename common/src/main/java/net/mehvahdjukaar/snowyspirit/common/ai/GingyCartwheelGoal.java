@@ -33,7 +33,7 @@ public class GingyCartwheelGoal extends Goal {
         }
         if (mob.getRandom().nextInt(reducedTickDelay(400)) != 0) return false;
         RandomSource random = mob.getRandom();
-        this.spins = random.nextInt(3) == 0 ? 2 : 1;
+        this.spins = random.nextInt(5) == 0 ? 2 : 1;
         this.rollRight = random.nextBoolean();
         float bodyYaw = mob.yBodyRot;
 
