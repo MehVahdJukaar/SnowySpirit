@@ -61,7 +61,6 @@ public class GingyEntity extends AbstractGolem implements OwnableEntity {
     private static final int CARTWHEEL_FAST_BIT = 4;
     private static final byte CARTWHEEL_TURN_EVENT = 78;
     public static final float CARTWHEEL_RADIUS = 7.8f / 16;
-    private static final float CARTWHEEL_DAMAGE_MULT = 1.6f;
     private static final float ANGRY_SPEED_MULT = 1.3f;
     private static final float ANGRY_CARTWHEEL_MULT = 2.2f;
 
@@ -459,7 +458,7 @@ public class GingyEntity extends AbstractGolem implements OwnableEntity {
     }
 
     public void doCartwheelHurtTarget(LivingEntity target) {
-        float damage = (float) this.getAttributeValue(Attributes.ATTACK_DAMAGE) * CARTWHEEL_DAMAGE_MULT;
+        float damage = (float) this.getAttributeValue(Attributes.ATTACK_DAMAGE);
         if (target.hurt(this.damageSources().mobAttack(this), damage)) {
             this.setLastHurtMob(target);
             this.healFromEating(target);
@@ -469,7 +468,7 @@ public class GingyEntity extends AbstractGolem implements OwnableEntity {
     public static AttributeSupplier.Builder createAttributes() {
         return Mob.createMobAttributes()
                 .add(Attributes.MAX_HEALTH, 5.0)
-                .add(Attributes.ATTACK_DAMAGE, 0.25)
+                .add(Attributes.ATTACK_DAMAGE, 0.75)
                 .add(Attributes.ATTACK_KNOCKBACK, 0)
                 .add(Attributes.MOVEMENT_SPEED, 0.25);
     }

@@ -1,8 +1,7 @@
 package net.mehvahdjukaar.snowyspirit.common.ai;
 
-import net.mehvahdjukaar.moonlight.api.util.math.MthUtils;
 import net.mehvahdjukaar.snowyspirit.common.entity.GingyEntity;
-import net.minecraft.util.Mth;
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.phys.Vec3;
@@ -52,30 +51,31 @@ public class GingyChaseTargetGoal extends Goal {
         float radius = 2 * mob.getBbHeight() ;
         float dist = mob.distanceTo(target);
         if(dist < radius + 1) {
-            circleAround(target, dist - radius);
+            circleAround(target, radius);
         } else if(--this.timeToRecalcPath <= 0) {
             this.timeToRecalcPath = this.adjustedTickDelay(10);
             mob.getNavigation().moveTo(target, speedModifier);
         }
     }
 
-    // skeleton strafing but side on, so its already turned for a cartwheel
-    private void circleAround(LivingEntity target,float tooFar) {
+    // walking around it keeps it side on. that way we are aalready turned for a cartwheel
+    private void circleAround(LivingEntity target,float radius) {
         mob.getNavigation().stop();
         this.timeToRecalcPath = 0;
 
-        boolean wantsToTurnBack = circlingTime > 10 && (mob.horizontalCollision || mob.getRandom().nextInt(60) == 0);
-        if(wantsToTurnBack) {
+        Vec3 fromTarget = mob.position().subtract(target.position()).multiply(1, 0, 1).normalize().scale(radius);
+        Vec3 ahead = target.position().add(fromTarget.yRot(clockwise ? 0.7f : -0.7f));
+        boolean hasGround = mob.getNavigation().isStableDestination(BlockPos.containing(ahead.x, mob.getY(), ahead.z));
+
+        boolean blocked = mob.horizontalCollision || !hasGround;
+        if (blocked && circlingTime > 10) {
             this.clockwise = !clockwise;
             this.circlingTime = 0;
         }
         this.circlingTime++;
 
-        Vec3 v = target.position().subtract(mob.position());
-        float sideOn = (float) MthUtils.getYaw(v) + (clockwise ? 90 : -90);
-        mob.setYRot(Mth.approachDegrees(mob.getYRot(), sideOn, 20));
-
-        float inwards = Mth.clamp(tooFar, -0.5f, 0.5f);
-        mob.getMoveControl().strafe(1, clockwise ? inwards : -inwards);
+        if (hasGround) {
+            mob.getMoveControl().setWantedPosition(ahead.x, mob.getY(), ahead.z, 1);
+        }
     }
 }
