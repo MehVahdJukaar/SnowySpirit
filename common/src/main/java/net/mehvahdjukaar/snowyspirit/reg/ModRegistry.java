@@ -166,7 +166,7 @@ public class ModRegistry {
             BlockBehaviour.Properties.ofFullCopy(GINGERBREAD_BLOCK.get())));
 
     public static final Supplier<Block> GINGERBREAD_FROSTED_BLOCK = regWithItem("gingerbread_frosted", () ->
-            new Block(BlockBehaviour.Properties.ofFullCopy(GINGERBREAD_BLOCK.get())));
+            new RotatedPillarBlock(BlockBehaviour.Properties.ofFullCopy(GINGERBREAD_BLOCK.get())));
 
     public static final Supplier<Block> GINGERBREAD_DOOR = regWithItem("gingerbread_door", () ->
             new DoorBlock(GINGER_TYPE, BlockBehaviour.Properties.ofFullCopy(GINGERBREAD_BLOCK.get())));

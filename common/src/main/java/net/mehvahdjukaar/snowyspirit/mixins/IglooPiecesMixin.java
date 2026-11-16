@@ -50,7 +50,7 @@ public abstract class IglooPiecesMixin extends TemplateStructurePiece {
                           ChunkGenerator chunkGenerator, RandomSource pRandom, BoundingBox pBox,
                           ChunkPos chunkPos, BlockPos pos, CallbackInfo ci) {
 
-        if (pRandom.nextFloat() > 0.3 && CommonConfigs.SLEDS.get()) {
+        if (pRandom.nextFloat() < CommonConfigs.IGLOO_SLED_CHANCE.get() && CommonConfigs.SLEDS.get()) {
 
             ResourceLocation resourcelocation = ResourceLocation.parse(this.templateName);
             if (resourcelocation.equals(ResourceLocation.parse("igloo/top"))) {

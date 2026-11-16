@@ -40,6 +40,7 @@ public class CommonConfigs {
     public static final Supplier<Double> STEER_FACTOR_WOLF;
 
     public static final Supplier<Double> MAX_SLED_PULLER_SIZE;
+    public static final Supplier<Double> IGLOO_SLED_CHANCE;
 
     //content toggles
     public static final Supplier<Boolean> SLEDS;
@@ -134,6 +135,8 @@ public class CommonConfigs {
 
         MAX_SLED_PULLER_SIZE = builder.comment("Max allowed size of a sled entity puller. Allowing bigger ones could cause issue as hitbox will clash with sled itself")
                 .define("max_sled_puller_size", 1.25, 0.1, 3);
+        IGLOO_SLED_CHANCE = builder.comment("Chance for an igloo to spawn with a sled outside. Set to 0 to disable")
+                .define("igloo_sled_chance", 0.7, 0, 1);
 
         builder.pop();
 

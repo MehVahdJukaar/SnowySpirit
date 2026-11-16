@@ -8,3 +8,7 @@
 - fixed #55
 - fixed #78
 - fixed #98
+- fixed #128
+- fixed #72
+- fixed #64
+- fixed #118

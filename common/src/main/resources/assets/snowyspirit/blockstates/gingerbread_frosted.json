@@ -1,7 +1,16 @@
 {
   "variants": {
-    "": {
+    "axis=x": {
+      "model": "snowyspirit:block/gingerbread_frosted_block",
+      "x": 90,
+      "y": 90
+    },
+    "axis=y": {
       "model": "snowyspirit:block/gingerbread_frosted_block"
+    },
+    "axis=z": {
+      "model": "snowyspirit:block/gingerbread_frosted_block",
+      "x": 90
     }
   }
 }
