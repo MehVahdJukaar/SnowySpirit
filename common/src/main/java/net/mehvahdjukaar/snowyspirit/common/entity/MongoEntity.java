@@ -40,6 +40,7 @@ public class MongoEntity extends GingyEntity implements PlayerRideableJumping {
 
     @Override
     public void onPlayerJump(int jumpPower) {
+        if (!this.onGround()) return;
         float f = 0.01f;
         double d = jumpPower * (double) this.getBlockJumpFactor() * f;
         double e = d + (double) this.getJumpBoostPower();
@@ -88,7 +89,7 @@ public class MongoEntity extends GingyEntity implements PlayerRideableJumping {
 
     @Override
     protected float getRiddenSpeed(Player player) {
-        return 0.1f;
+        return (float) this.getAttributeValue(Attributes.MOVEMENT_SPEED) * 0.2f;
     }
 
     @Override

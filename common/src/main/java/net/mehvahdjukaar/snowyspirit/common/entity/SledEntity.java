@@ -459,6 +459,10 @@ public class SledEntity extends Entity implements IControllableVehicle {
         if (level.isClientSide) this.startSoundsOnce();
         if (this.chest != null && chest.isRemoved()) this.chest = null;
         this.updatePuller();
+        if (!level.isClientSide && this.sledPuller != null && this.isUnderWater()) {
+            this.spawnAtLocation(Items.LEAD);
+            this.sledPuller.stopRiding();
+        }
 
         if (this.getHurtTime() > 0) {
             this.setHurtTime(this.getHurtTime() - 1);

@@ -17,13 +17,13 @@
       "item": "minecraft:hay_block"
     },
     {
-      "item": "snowyspirit:ginger"
+      "tag": "c:crops/ginger"
     },
     {
-      "item": "snowyspirit:ginger"
+      "tag": "c:crops/ginger"
     },
     {
-      "item": "snowyspirit:ginger"
+      "tag": "c:crops/ginger"
     }
   ],
   "result": {

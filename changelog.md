@@ -1,1 +1,10 @@
-- many more small overdue fixes
+- gingerbread men can cartwkeel & cartwheel attack
+- gingies are no longer allergic to water
+- fixedd many issues
+- fixed #119
+- fixed #140
+- fixed #85
+- fixed #139
+- fixed #55
+- fixed #78
+- fixed #98

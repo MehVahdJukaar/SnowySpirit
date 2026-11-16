@@ -145,11 +145,6 @@ public class GingyEntity extends AbstractGolem implements OwnableEntity {
         return super.finalizeSpawn(level, difficulty, spawnType, spawnGroupData);
     }
 
-    @Override
-    public boolean isSensitiveToWater() {
-        return true;
-    }
-
     public DyeColor getColor() {
         return DyeColor.byId(this.entityData.get(DATA_COLOR));
     }
@@ -361,20 +356,23 @@ public class GingyEntity extends AbstractGolem implements OwnableEntity {
         Level level = level();
 
 
-        if (this.isOwnedBy(player)) {
+        boolean isGiant = this.getBbHeight() > 2;
+        if (this.isOwnedBy(player) || isGiant) {
             if (!player.isSecondaryUseActive() && itemStack.has(DataComponents.FOOD) && this.isFood(itemStack) && this.getHealth() < this.getMaxHealth()) {
                 this.usePlayerItem(player, hand, itemStack);
                 this.heal(itemStack.get(DataComponents.FOOD).nutrition());
                 return InteractionResult.sidedSuccess(level.isClientSide);
             }
+        }
 
+        if (this.isOwnedBy(player)) {
             if (player.isSecondaryUseActive()) {
                 this.setOrderedToSit(!this.isOrderedToSit());
                 return InteractionResult.sidedSuccess(level.isClientSide);
             }
         }
 
-        if (this.getBbHeight() > 2) {
+        if (isGiant) {
             player.startRiding(this);
             return InteractionResult.sidedSuccess(level.isClientSide);
 
