@@ -1,7 +1,7 @@
     plugins {
     id "architectury-plugin" version "3.4-SNAPSHOT"
     id "dev.architectury.loom" version "1.7-SNAPSHOT" apply false
-    id "com.matthewprenger.cursegradle" version "1.4.0"
+    id "net.darkhax.curseforgegradle" version "1.1.28" apply false
     id "com.modrinth.minotaur" version "2.+"
     id "com.github.johnrengelman.shadow" version "7.1.2" apply false
 }
@@ -13,7 +13,7 @@ architectury {
 subprojects {
     apply plugin: "dev.architectury.loom"
     apply plugin: "com.github.johnrengelman.shadow"
-    apply plugin: "com.matthewprenger.cursegradle"
+    apply plugin: "net.darkhax.curseforgegradle"
     apply plugin: "com.modrinth.minotaur"
 
     loom {
@@ -58,32 +58,25 @@ subprojects {
     }
 
     if (env.CURSEFORGE_TOKEN) {
-        curseforge {
-            apiKey = env.CURSEFORGE_TOKEN
-            project {
-                id = rootProject.project_id
-                changelog = changelogText
-                releaseType = 'release'
-                addGameVersion rootProject.minecraft_version
-                addGameVersion modLoader.capitalize()
+        tasks.register("curseforge", net.darkhax.curseforgegradle.TaskPublishCurseForge) {
+            apiToken = env.CURSEFORGE_TOKEN
 
-                mainArtifact(tasks.remapJar)
+            def mainFile = upload(rootProject.project_id, tasks.remapJar)
+            mainFile.changelog = changelogText
+            mainFile.changelogType = "markdown"
+            mainFile.releaseType = "release"
+            mainFile.addGameVersion(rootProject.minecraft_version)
+            mainFile.addGameVersion(modLoader.capitalize())
+            mainFile.addEnvironment("Client", "Server")
 
-                if (modLoader == "fabric") {
-                    relations {
-                        requiredDependency "fabric-api"
-                        requiredDependency "selene"
-
-                        optionalDependency("fabric-seasons")
-                    }
-                } else {
-                    relations {
-                        requiredDependency("selene")
-
-                        optionalDependency("supplementaries")
-                        optionalDependency("serene-seasons")
-                    }
-                }
+            if (modLoader == "fabric") {
+                mainFile.addRequirement("fabric-api")
+                mainFile.addRequirement("selene")
+                mainFile.addOptional("fabric-seasons")
+            } else {
+                mainFile.addRequirement("selene")
+                mainFile.addOptional("supplementaries")
+                mainFile.addOptional("serene-seasons")
             }
         }
     }
