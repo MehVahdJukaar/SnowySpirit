@@ -199,6 +199,7 @@ public class ContainerHolderEntity extends Entity implements Container, IExtraCl
     }
 
     public void spawnDrops() {
+        if (innerBlockEntity == null) return;
         ItemStack stack = this.containerStack.copy();
         if (this.hasCustomName()) {
             stack.setHoverName(this.getCustomName());
