@@ -87,8 +87,8 @@
   "advancements.husbandry.eat_gingerbread_golem.title": "You're a Monster!",
   "advancements.adventure.ride_sled_fast.description": "Ride a sled down a slope",
   "advancements.adventure.ride_sled_fast.title": "It's All Downhill From Here",
-  "advancements.adventure.sled_with_wolf.description": "The Wolf of Haul Street",
-  "advancements.adventure.sled_with_wolf.title": "Let a wolf pull a sled with chest",
+  "advancements.adventure.sled_with_wolf.description": "Let a wolf pull a sled with chest",
+  "advancements.adventure.sled_with_wolf.title": "The Wolf of Haul Street",
   "subtitle.snowyspirit.sled": "Sled sliding",
   "block_type.snowyspirit.sled": "Sled"
 }

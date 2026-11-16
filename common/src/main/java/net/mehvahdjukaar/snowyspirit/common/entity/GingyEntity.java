@@ -251,20 +251,23 @@ public class GingyEntity extends AbstractGolem implements OwnableEntity {
         Level level = level();
 
 
-        if (this.isOwnedBy(player)) {
+        boolean isGiant = this.getBbHeight() > 2;
+        if (this.isOwnedBy(player) || isGiant) {
             if (item.isEdible() && this.isFood(itemStack) && this.getHealth() < this.getMaxHealth()) {
                 this.usePlayerItem(player, hand, itemStack);
                 this.heal(item.getFoodProperties().getNutrition());
                 return InteractionResult.sidedSuccess(level.isClientSide);
             }
+        }
 
+        if (this.isOwnedBy(player)) {
             if (player.isSecondaryUseActive()) {
                 this.setOrderedToSit(!this.isOrderedToSit());
                 return InteractionResult.sidedSuccess(level.isClientSide);
             }
         }
 
-        if (this.getBbHeight() > 2) {
+        if (isGiant) {
             player.startRiding(this);
             return InteractionResult.sidedSuccess(level.isClientSide);
 

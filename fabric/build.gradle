@@ -40,7 +40,7 @@ dependencies {
     //modImplementation("curse.maven:selene-499980:3859239")
 
     modImplementation ("curse.maven:fabric-seasons-413523:4576886")
-    modImplementation("net.mehvahdjukaar:moonlight-fabric:${project.moonlight_version}")
+    modImplementation("net.mehvahdjukaar:moonlight-fabric:${project.moonlight_version}:fabric")
     //modCompileOnly("net.mehvahdjukaar:supplementaries-fabric:${project.supplementaries_version}")
     modCompileOnly("curse.maven:farmers-delight-fabric-482834:4061213")
     modCompileOnly("curse.maven:supplementaries-412082:5676066")

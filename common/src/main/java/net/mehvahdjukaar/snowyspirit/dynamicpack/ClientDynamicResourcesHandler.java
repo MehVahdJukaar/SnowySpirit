@@ -93,11 +93,6 @@ public class ClientDynamicResourcesHandler extends DynClientResourcesGenerator {
     }
 
     @Override
-    public boolean dependsOnLoadedPacks() {
-        return true;
-    }
-
-    @Override
     public void regenerateDynamicAssets(ResourceManager manager) {
         StaticResource itemModel = StaticResource.getOrLog(manager,
                 ResType.ITEM_MODELS.getPath(SnowySpirit.res("sled_oak")));

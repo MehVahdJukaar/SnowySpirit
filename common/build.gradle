@@ -12,8 +12,8 @@ dependencies {
     modImplementation "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
 
     //implementation fileTree(dir: 'mods', include: '*.jar')
-    modImplementation("curse.maven:entity-model-features-844662:8782763")
-    modImplementation("curse.maven:entity-texture-features-fabric-568563:8782689")
+    compileOnly("curse.maven:entity-model-features-844662:8782763")
+    compileOnly("curse.maven:entity-texture-features-fabric-568563:8782689")
 
     modImplementation("net.mehvahdjukaar:moonlight:${project.moonlight_version}") {
         exclude group: "org.valkyrienskies"

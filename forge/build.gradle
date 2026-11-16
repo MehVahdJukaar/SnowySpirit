@@ -122,7 +122,7 @@ dependencies {
     modCompileOnly("curse.maven:entity-model-features-844662:4995898")
     modCompileOnly("curse.maven:entity-texture-features-fabric-568563:5000985")
     //modImplementation("curse.maven:selene-499980:4656567")
-    modImplementation("net.mehvahdjukaar:moonlight-forge:${project.moonlight_version}")
+    modImplementation("net.mehvahdjukaar:moonlight-forge:${project.moonlight_version}:forge")
     //modCompileOnly("net.mehvahdjukaar:supplementaries-forge:${project.supplementaries_version}")
     modCompileOnly("curse.maven:supplementaries-412082:5676069")
 

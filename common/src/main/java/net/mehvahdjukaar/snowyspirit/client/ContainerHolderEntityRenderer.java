@@ -6,24 +6,35 @@ import net.mehvahdjukaar.snowyspirit.common.entity.ContainerHolderEntity;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlas;
+import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class ContainerHolderEntityRenderer<T extends ContainerHolderEntity> extends EntityRenderer<T> {
 
     private final BlockRenderDispatcher blockRenderer;
+    private final BlockEntityRenderDispatcher blockEntityRenderer;
+    private final Map<BlockState, BlockEntity> displayBlockEntities = new HashMap<>();
 
     public ContainerHolderEntityRenderer(EntityRendererProvider.Context context) {
         super(context);
         this.shadowRadius = 0.4F;
         this.blockRenderer = Minecraft.getInstance().getBlockRenderer();
+        this.blockEntityRenderer = Minecraft.getInstance().getBlockEntityRenderDispatcher();
     }
 
     @Override
@@ -61,11 +72,20 @@ public class ContainerHolderEntityRenderer<T extends ContainerHolderEntity> exte
             poseStack.scale(scale, scale, scale);
             poseStack.translate(-0.5D, 0, -0.5D);
             //poseStack.mulPose(Vector3f.YP.rotationDegrees(90.0F));
-            blockRenderer.renderSingleBlock(blockstate, poseStack, pBuffer, pPackedLight, OverlayTexture.NO_OVERLAY);
+            BlockEntity be = getDisplayBlockEntity(blockstate);
+            if (be == null || !this.blockEntityRenderer.renderItem(be, poseStack, pBuffer, pPackedLight, OverlayTexture.NO_OVERLAY)) {
+                blockRenderer.renderSingleBlock(blockstate, poseStack, pBuffer, pPackedLight, OverlayTexture.NO_OVERLAY);
+            }
             poseStack.popPose();
         }
         poseStack.popPose();
 
+    }
+
+    @Nullable
+    private BlockEntity getDisplayBlockEntity(BlockState state) {
+        if (state.getRenderShape() != RenderShape.ENTITYBLOCK_ANIMATED || !(state.getBlock() instanceof EntityBlock eb)) return null;
+        return displayBlockEntities.computeIfAbsent(state, s -> eb.newBlockEntity(BlockPos.ZERO, s));
     }
 
     /**

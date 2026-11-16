@@ -32,11 +32,6 @@ public class ServerDynamicResourcesHandler extends DynServerResourcesGenerator {
     }
 
     @Override
-    public boolean dependsOnLoadedPacks() {
-        return true;
-    }
-
-    @Override
     public void regenerateDynamicAssets(ResourceManager resourceManager) {
 
         SimpleTagBuilder builder = SimpleTagBuilder.of(SnowySpirit.res("sleds"));

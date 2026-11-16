@@ -5,13 +5,14 @@
   "compatibilityLevel": "JAVA_16",
   "package": "net.mehvahdjukaar.snowyspirit.mixins",
   "mixins": [
-    "CompatEMFMixin",
     "EntityMixin",
     "IglooPiecesMixin",
     "PowderSnowMixin",
     "SnowballMixin"
   ],
   "client": [
+    "CompatEMFMixin",
+    "CompatEMFStateMixin",
     "LivingEntityRendererMixin"
   ],
   "injectors": {
