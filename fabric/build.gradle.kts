@@ -28,8 +28,8 @@ dependencies {
     compileOnly("curse.maven:quark-243121:8146177")
     compileOnly("curse.maven:zeta-968868:7980010")
     modImplementation("maven.modrinth:entity-model-features:3.3.12-fabric-1.21")
-    modImplementation("maven.modrinth:entitytexturefeatures:7.2.6-fabric-1.21")
-    modCompileOnly("curse.maven:entity-texture-features-fabric-568563:5000985")
+    modCompileOnly("maven.modrinth:lootr:nar56EsW")
+    modImplementation("maven.modrinth:entitytexturefeatures:7.2.7-fabric-1.21")
 
     modRuntimeOnly("maven.modrinth:sodium:mc1.21.1-0.8.12-fabric")
     modRuntimeOnly("maven.modrinth:dramatic-doors:X5oMCwaA")

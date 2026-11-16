@@ -22,7 +22,8 @@ dependencies {
         exclude(group = "com.github.bawnorton.mixinsquared")
     }
     modImplementation("maven.modrinth:entity-model-features:3.3.12-neoforge-1.21")
-    modImplementation("maven.modrinth:entitytexturefeatures:7.2.6-neoforge-1.21")
+    modCompileOnly("maven.modrinth:lootr:SPOrIzX8")
+    modImplementation("maven.modrinth:entitytexturefeatures:7.2.7-neoforge-1.21")
 
     modCompileOnly("curse.maven:jei-238222:5846880")
     modCompileOnly("curse.maven:farmers-delight-398521:5772720")
@@ -32,7 +33,6 @@ dependencies {
     modCompileOnly("curse.maven:biomes-o-plenty-220318:4683058")
     modCompileOnly("curse.maven:terrablender-563928:4647094")
     modCompileOnly("curse.maven:configured-457570:5180900")
-    modCompileOnly("curse.maven:entity-texture-features-fabric-568563:5000985")
     // 3.3.x crashes without create on neoforge
     modRuntimeOnly("maven.modrinth:dramatic-doors:y70qyPca")
     modRuntimeOnly("maven.modrinth:alexs-caves-unofficial-port:pC1MYhqR")

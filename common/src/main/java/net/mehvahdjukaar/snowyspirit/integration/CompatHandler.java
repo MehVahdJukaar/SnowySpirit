@@ -10,6 +10,7 @@ public class CompatHandler {
     public static final boolean BOATLOAD = isLoaded("boatload");
     public static final boolean POLYTONE = isLoaded("polytone");
     public static final boolean QUARK = isLoaded("quark");
+    public static final boolean LOOTR = isLoaded("lootr");
 
     private static boolean isLoaded(String name) {
         return PlatHelper.isModLoaded(name);

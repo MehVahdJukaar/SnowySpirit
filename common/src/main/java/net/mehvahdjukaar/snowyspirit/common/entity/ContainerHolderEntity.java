@@ -1,6 +1,7 @@
 package net.mehvahdjukaar.snowyspirit.common.entity;
 
 import net.mehvahdjukaar.snowyspirit.integration.CompatHandler;
+import net.mehvahdjukaar.snowyspirit.integration.LootrCompat;
 import net.mehvahdjukaar.candlelight.api.VirtualOverride;
 import net.mehvahdjukaar.moonlight.api.platform.PlatHelper;
 import net.mehvahdjukaar.snowyspirit.integration.supp.SuppCompat;
@@ -321,6 +322,10 @@ public class ContainerHolderEntity extends Entity implements Container, MenuProv
         if (ret.consumesAction()) return ret;
         if (!pPlayer.level().isClientSide) {
             boolean isSack = isSack(this.getContainerItem().getItem());
+            if(CompatHandler.LOOTR && innerBlockEntity instanceof RandomizableContainerBlockEntity r
+                    && LootrCompat.tryOpenLootrContainer(this, r, (ServerPlayer) pPlayer)) {
+                return InteractionResult.CONSUME;
+            }
             if (isSack) {
                 SuppCompat.openSackMenu((ServerPlayer) pPlayer, this);
             } else {
