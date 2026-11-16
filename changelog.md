@@ -12,3 +12,4 @@
 - fixed #72
 - fixed #64
 - fixed #118
+- fixed #124
