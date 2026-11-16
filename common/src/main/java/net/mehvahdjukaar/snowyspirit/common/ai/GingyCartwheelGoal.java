@@ -1,5 +1,6 @@
 package net.mehvahdjukaar.snowyspirit.common.ai;
 
+import net.mehvahdjukaar.moonlight.api.util.math.MthUtils;
 import net.mehvahdjukaar.snowyspirit.common.entity.GingyEntity;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
@@ -15,9 +16,9 @@ public class GingyCartwheelGoal extends Goal {
     private final boolean fast;
     private float targetYaw;
     private Vec3 rollDirection = Vec3.ZERO;
-    private boolean rollRight;
-    private int spins;
-    protected double rollDistance;
+    protected boolean rollRight;
+    protected int spins;
+    private double rollDistance;
     private int settleTicks;
     protected boolean rolling;
     private int ticks;
@@ -64,11 +65,14 @@ public class GingyCartwheelGoal extends Goal {
         return tryCartwheel(yaw + (rollRight ? -90 : 90));
     }
 
+
+    protected double rollDistance(int spinCount) {
+        return Mth.TWO_PI * GingyEntity.CARTWHEEL_RADIUS * mob.getBbHeight() * spinCount;
+    }
+
     private boolean tryCartwheel(float yaw) {
-        float rad = yaw * Mth.DEG_TO_RAD;
-        Vec3 left = new Vec3(Mth.cos(rad), 0, Mth.sin(rad));
-        Vec3 dir = rollRight ? left.reverse() : left;
-        double distance = Mth.TWO_PI * GingyEntity.CARTWHEEL_RADIUS * mob.getBbHeight() * spins;
+        Vec3 dir = rollDirectionAt(yaw);
+        double distance = rollDistance(spins);
 
         AABB box = mob.getBoundingBox();
 
@@ -79,6 +83,28 @@ public class GingyCartwheelGoal extends Goal {
             return true;
         }
         return false;
+    }
+
+    private Vec3 rollDirectionAt(float yaw) {
+        float rad = yaw * Mth.DEG_TO_RAD;
+        Vec3 left = new Vec3(Mth.cos(rad), 0, Mth.sin(rad));
+        return rollRight ? left.reverse() : left;
+    }
+
+    protected void aimRollAt(Vec3 pos, float maxTurn){
+        Vec3 v = pos.subtract(mob.position());
+        if (v.dot(rollDirection) <= 0) {
+            return; //already past it
+        }
+
+        float sideOn = (float) MthUtils.getYaw(v) + (rollRight ? -90 : 90);
+        this.targetYaw = Mth.approachDegrees(targetYaw, sideOn, maxTurn);
+        this.rollDirection = rollDirectionAt(targetYaw);
+        if (rolling){
+            mob.setYRot(targetYaw);
+            mob.setYHeadRot(targetYaw);
+            mob.setYBodyRot(targetYaw);
+        }
     }
 
     private boolean canStandAt(AABB box) {

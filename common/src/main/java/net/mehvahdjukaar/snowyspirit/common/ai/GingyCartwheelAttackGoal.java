@@ -1,5 +1,6 @@
 package net.mehvahdjukaar.snowyspirit.common.ai;
 
+import net.mehvahdjukaar.moonlight.api.util.math.MthUtils;
 import net.mehvahdjukaar.snowyspirit.common.entity.GingyEntity;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
@@ -21,7 +22,7 @@ public class GingyCartwheelAttackGoal extends GingyCartwheelGoal {
     public boolean canUse() {
         LivingEntity target = mob.getTarget();
         if (target == null || !target.isAlive() || !canCartwheel()) return false;
-        if (mob.getRandom().nextInt(reducedTickDelay(80)) != 0) {
+        if (mob.getRandom().nextInt(reducedTickDelay(40)) != 0) {
             return false;
         }
         randomizeSpinsAndSide();
@@ -30,8 +31,15 @@ public class GingyCartwheelAttackGoal extends GingyCartwheelGoal {
         if (Math.abs(v.y) > mob.getBbHeight()) {
             return false;
         }
-        float yaw = (float) (Mth.atan2(v.z, v.x) * Mth.RAD_TO_DEG) - 90;
-        return tryCartwheelTowards(yaw) && v.horizontalDistance() < rollDistance;
+        //single one is slower than walking there
+        if (v.horizontalDistance() > rollDistance(1)) {
+            this.spins = 2;
+        }
+
+        float facing = (float) MthUtils.getYaw(v);
+        boolean rightSideAlreadyTurnedToIt = Mth.wrapDegrees(mob.yBodyRot - facing) < 0;
+        this.rollRight = rightSideAlreadyTurnedToIt;
+        return tryCartwheelTowards(facing);
     }
 
     @Override
@@ -42,10 +50,13 @@ public class GingyCartwheelAttackGoal extends GingyCartwheelGoal {
 
     @Override
     public void tick() {
+        LivingEntity target = mob.getTarget();
+        if (target != null) {
+            aimRollAt(target.position(), 4);
+        }
         super.tick();
         if (!rolling) return;
 
-        LivingEntity target = mob.getTarget();
         float reach = mob.getBbHeight() / 4;
         AABB box = mob.getBoundingBox().inflate(reach, 0, reach);
 

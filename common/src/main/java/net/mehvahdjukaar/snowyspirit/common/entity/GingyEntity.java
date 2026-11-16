@@ -4,6 +4,7 @@ import net.mehvahdjukaar.moonlight.api.util.Utils;
 import net.mehvahdjukaar.snowyspirit.SnowySpirit;
 import net.mehvahdjukaar.snowyspirit.common.ai.GingyCartwheelAttackGoal;
 import net.mehvahdjukaar.snowyspirit.common.ai.GingyCartwheelGoal;
+import net.mehvahdjukaar.snowyspirit.common.ai.GingyChaseTargetGoal;
 import net.mehvahdjukaar.snowyspirit.common.ai.GingyFollowOwnerGoal;
 import net.mehvahdjukaar.snowyspirit.common.ai.GingySitWhenOrderedToGoal;
 import net.mehvahdjukaar.snowyspirit.reg.ModRegistry;
@@ -28,7 +29,6 @@ import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.FloatGoal;
 import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
-import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
 import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
 import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
@@ -61,11 +61,11 @@ public class GingyEntity extends AbstractGolem implements OwnableEntity {
     private static final int CARTWHEEL_FAST_BIT = 4;
     private static final byte CARTWHEEL_TURN_EVENT = 78;
     public static final float CARTWHEEL_RADIUS = 7.8f / 16;
-    private static final float CARTWHEEL_DAMAGE_MULT = 1.5f;
-    private static final float ANGRY_SPEED_MULT = 1.25f;
-    private static final float ANGRY_CARTWHEEL_MULT = 1.33f;
+    private static final float CARTWHEEL_DAMAGE_MULT = 1.6f;
+    private static final float ANGRY_SPEED_MULT = 1.3f;
+    private static final float ANGRY_CARTWHEEL_MULT = 2.2f;
 
-    public static final float WALK_LEG_SWING = 0.9f;
+    public static final float WALK_LEG_SWING = 0.8f;
 
     private int cartwheelStart = -1;
     private boolean cartwheelRight;
@@ -82,7 +82,7 @@ public class GingyEntity extends AbstractGolem implements OwnableEntity {
         this.goalSelector.addGoal(1, new FloatGoal(this));
         this.goalSelector.addGoal(2, new GingySitWhenOrderedToGoal(this));
         this.goalSelector.addGoal(4, new GingyCartwheelAttackGoal(this));
-        this.goalSelector.addGoal(5, new MeleeAttackGoal(this, ANGRY_SPEED_MULT, true));
+        this.goalSelector.addGoal(5, new GingyChaseTargetGoal(this, ANGRY_SPEED_MULT));
         this.goalSelector.addGoal(6, new GingyFollowOwnerGoal(this, 1.0, 7.0F, 3.5F, false));
         this.goalSelector.addGoal(10, new GingyCartwheelGoal(this));
         this.goalSelector.addGoal(11, new WaterAvoidingRandomStrollGoal(this, 0.8, 1.0000001E-5F));
